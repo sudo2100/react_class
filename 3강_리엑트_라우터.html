@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3강. 리엑트 라우터(Router)</title>
+<style>
+/* highlight.js atom-one-dark theme (inlined) */
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*
+
+Atom One Dark by Daniel Gamage
+Original One Dark Syntax theme from https://github.com/atom/one-dark-syntax
+
+base:    #282c34
+mono-1:  #abb2bf
+mono-2:  #818896
+mono-3:  #5c6370
+hue-1:   #56b6c2
+hue-2:   #61aeee
+hue-3:   #c678dd
+hue-4:   #98c379
+hue-5:   #e06c75
+hue-5-2: #be5046
+hue-6:   #d19a66
+hue-6-2: #e6c07b
+
+*/
+.hljs {
+  color: #abb2bf;
+  background: #282c34
+}
+.hljs-comment,
+.hljs-quote {
+  color: #5c6370;
+  font-style: italic
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #c678dd
+}
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+  color: #e06c75
+}
+.hljs-literal {
+  color: #56b6c2
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #98c379
+}
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: #d19a66
+}
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #61aeee
+}
+.hljs-built_in,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: #e6c07b
+}
+.hljs-emphasis {
+  font-style: italic
+}
+.hljs-strong {
+  font-weight: bold
+}
+.hljs-link {
+  text-decoration: underline
+}
+</style>
+<style>
+  :root{--bg:#f4f6f9;--card:#fff;--ink:#1f2933;--muted:#52606d;--line:#e4e7eb;--accent:#2965f1;--accent2:#1b3a8f;--code-bg:#282c34;--goal:#eafaf1;--goal-line:#27ae60;--ex:#eef4ff;--ex-line:#5b8def;--lab:#eef7ff;--lab-line:#2965f1;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Malgun Gothic","맑은 고딕",-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.75;}
+  header.hero{background:linear-gradient(135deg,#2965f1,#1b3a8f 60%,#153e75);color:#fff;padding:52px 24px;text-align:center;}
+  header.hero .eyebrow{letter-spacing:3px;font-size:.78rem;opacity:.92;text-transform:uppercase}
+  header.hero h1{margin:12px 0 8px;font-size:1.9rem}header.hero p{margin:0;opacity:.94}
+  header.hero .tags{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  header.hero .tags span{background:rgba(255,255,255,.18);border-radius:999px;padding:5px 13px;font-size:.82rem}
+  .wrap{max-width:920px;margin:0 auto;padding:32px 20px 80px}
+  nav.toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 26px;margin-bottom:34px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  nav.toc h2{margin:0 0 12px;font-size:1.05rem;color:var(--accent2)}
+  nav.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+  nav.toc a{color:var(--ink);text-decoration:none}nav.toc a:hover{color:var(--accent);text-decoration:underline}
+  section.module{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px 30px;margin-bottom:26px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  section.module > h2{margin:0 0 6px;font-size:1.4rem;color:var(--accent2);display:flex;align-items:center;gap:12px;}
+  section.module > h2 .num{background:var(--accent);color:#fff;font-size:.95rem;font-weight:800;padding:4px 12px;border-radius:10px;min-width:38px;text-align:center;}
+  h3.blk{font-size:1.02rem;margin:22px 0 8px;font-weight:800}
+  .goal{background:var(--goal);border-left:5px solid var(--goal-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:14px 0}
+  .goal .lbl{font-weight:800;color:#1e874b}.goal ul{margin:8px 0 0}
+  .concept h3.blk{color:var(--ink);border-left:4px solid var(--accent);padding-left:10px}
+  .ex{background:var(--ex);border-left:5px solid var(--ex-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .ex .lbl{font-weight:800;color:#2f5fc7}
+  .lab{background:var(--lab);border-left:5px solid var(--lab-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .lab .lbl{font-weight:800;color:#1b4fc0}.lab h4{margin:6px 0 6px;font-size:.98rem}
+  ul{margin:8px 0}li{margin:5px 0}.muted{color:var(--muted)}
+  code{background:#eceef1;padding:2px 6px;border-radius:5px;font-size:.92em;font-family:Consolas,"D2Coding",monospace}
+  pre{background:var(--code-bg);border-radius:10px;padding:0;overflow-x:auto;margin:10px 0}
+  pre code{display:block;padding:16px 18px;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;line-height:1.6;background:var(--code-bg);color:#abb2bf;border-radius:10px;white-space:pre}
+  pre code.hljs{background:var(--code-bg);padding:16px 18px}
+  .fname{display:inline-block;background:#1b3a8f;color:#fff;font-family:Consolas,"D2Coding",monospace;font-size:.8rem;font-weight:700;padding:4px 12px;border-radius:8px 8px 0 0;margin:10px 0 -8px}
+  .fname + pre{border-top-left-radius:0}
+  .out{background:#fff;color:var(--ink);border:1px solid var(--line);border-left:4px solid #27ae60;border-radius:8px;padding:12px 16px;margin:8px 0 0}
+  .out .rt{font-size:.72rem;letter-spacing:1px;color:#27ae60;font-weight:800;text-transform:uppercase;display:block;margin-bottom:6px}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:.93rem}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:#eef2fb;color:var(--accent2)}td.c,th.c{text-align:center}
+  td code,th code{background:#eef1f5}
+  details{margin-top:10px;background:#fff;border:1px solid #cfe0ff;border-radius:8px;padding:8px 14px}
+  details summary{cursor:pointer;font-weight:700;color:#1b4fc0}details pre{margin-top:10px}
+  footer{text-align:center;color:var(--muted);font-size:.85rem;padding:30px 20px}
+  .pill{display:inline-block;background:#eceef1;border-radius:6px;padding:2px 9px;margin:2px;font-size:.85rem}
+  .flow{background:#f7f9fc;border:1px dashed #b9c6de;border-radius:10px;padding:12px 16px;margin:12px 0;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;white-space:pre-wrap;color:#37475f}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}nav.toc ol{columns:1}}
+  .tip{background:#fff8e6;border-left:5px solid #f2b705;border-radius:0 10px 10px 0;padding:12px 18px;margin:14px 0}
+  .tip .lbl{font-weight:800;color:#b57f00}
+  .demo{border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:8px 0 0;background:#fafbfc}
+  .demo button{margin:2px 4px 2px 0;padding:4px 12px;border:1px solid #b9c6de;border-radius:6px;background:#fff;cursor:default}
+  .demo input{padding:4px 8px;border:1px solid #b9c6de;border-radius:6px;margin:2px 0}
+
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="eyebrow">React 심화 · Chapter 03 · 학습 교안</div>
+  <h1>리엑트 라우터(Router)</h1>
+  <p>SPA(Single Page Application)에서 URL에 따라 화면을 갈아끼우는 표준 라이브러리 react-router-dom을 학습합니다. 기본 라우팅부터 동적 라우팅(useParams), 프로그래밍 방식 이동(useNavigate), 로그인 상태 관리까지 상품 관리 앱을 만들며 익힙니다.</p>
+  <div class="tags">
+    <span>🏷️ react-router-dom</span>
+    <span>🏷️ BrowserRouter</span>
+    <span>🏷️ Routes / Route</span>
+    <span>🏷️ Link</span>
+    <span>🏷️ useParams</span>
+    <span>🏷️ useNavigate</span>
+    <span>🏷️ 동적 라우팅</span>
+  </div>
+</header>
+<div class="wrap">
+  <nav class="toc">
+    <h2>📚 학습 목차</h2>
+    <ol>
+      <li><a href="#m1">리엑트 라우터란 무엇인가</a></li>
+      <li><a href="#m2">주요 컴포넌트와 라이브러리 설치</a></li>
+      <li><a href="#m3">기본 라우팅 프로젝트 만들기 (routes)</a></li>
+      <li><a href="#m4">상품 관리 앱 – 구조와 BrowserRouter 배치</a></li>
+      <li><a href="#m5">경로 정의 – Routes와 Route</a></li>
+      <li><a href="#m6">객체 데이터 리스트 렌더링</a></li>
+      <li><a href="#m7">동적 라우팅과 useParams</a></li>
+      <li><a href="#m8">useNavigate와 상품 등록 폼</a></li>
+      <li><a href="#m9">상품 목록 테이블 만들기</a></li>
+      <li><a href="#m10">로그인 / 로그아웃 메뉴와 상태 관리</a></li>
+      <li><a href="#m11">종합 실습 문제</a></li>
+    </ol>
+  </nav>
+
+  <section class="module" id="m1">
+    <h2><span class="num">1</span> 리엑트 라우터란 무엇인가</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>SPA 방식에서 라우팅이 왜 필요한지 설명할 수 있다.</li>
+      <li>리엑트 라우터가 URL에 따라 어떤 컴포넌트를 보여줄지 결정한다는 것을 이해한다.</li>
+    </ul></div>
+    <div class="concept">
+      <h3 class="blk">📖 리엑트 라우터(React Router)</h3>
+      <p><strong>리엑트 라우터(React Router)</strong>는 리액트 앱에서 <strong>페이지 이동(Routing)</strong>을 구현하기 위해 가장 널리 사용되는 표준 라이브러리입니다.</p>
+      <p>리엑트는 기본적으로 <strong>SPA(Single Page Application)</strong> 방식이기 때문에, 서버에서 매번 새로운 HTML을 받아오는 대신 하나의 페이지 안에서 필요한 컴포넌트만 갈아끼우는 방식으로 작동합니다.</p>
+      <p>이때 사용자가 접속한 <strong>URL 주소</strong>에 따라 어떤 컴포넌트를 보여줄지 결정하는 역할을 리액트 라우터가 담당합니다.</p>
+      <div class="tip"><span class="lbl">💡 정리</span> 전통적인 웹은 링크를 누를 때마다 서버에서 새 HTML을 받아 페이지 전체를 새로고침합니다. SPA는 최초 1회만 HTML을 받고, 이후에는 라우터가 URL을 감지해 자바스크립트로 컴포넌트만 교체하므로 화면 전환이 빠릅니다.</div>
+    </div>
+  </section>
+
+  <section class="module" id="m2">
+    <h2><span class="num">2</span> 주요 컴포넌트와 라이브러리 설치</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>BrowserRouter, Routes/Route, Link, useNavigate의 역할을 구분할 수 있다.</li>
+      <li>react-router-dom 라이브러리를 설치하고 package.json에서 확인할 수 있다.</li>
+    </ul></div>
+    <div class="concept">
+      <h3 class="blk">📖 주요 컴포넌트 및 기능</h3>
+      <table>
+        <thead><tr><th>구성 요소</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr><td>BrowserRouter</td><td>라우터의 최상위 컴포넌트입니다. HTML5 History API를 사용해 UI와 URL을 동기화합니다.</td></tr>
+          <tr><td>Routes &amp; Route</td><td>경로를 정의합니다. path 속성에는 URL을, element에는 해당 주소에서 보여줄 컴포넌트를 넣습니다.</td></tr>
+          <tr><td>Link</td><td>HTML의 &lt;a&gt; 태그와 비슷하지만, 페이지 새로고침을 막고 라우터를 통해 이동하게 합니다.</td></tr>
+          <tr><td>useNavigate</td><td>특정 이벤트(버튼 클릭 등)가 발생했을 때 프로그래밍 방식으로 페이지를 이동시킬 때 쓰는 Hook입니다.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — react-router-dom 라이브러리 설치</div>
+      <span class="fname">터미널</span>
+      <pre><code class="language-bash">npm install react-router-dom</code></pre>
+      <p>설치 후 package.json의 dependencies에서 버전을 확인할 수 있습니다.</p>
+      <span class="fname">package.json</span>
+      <pre><code class="language-json">"dependencies": {
+  "react": "^19.2.6",
+  "react-dom": "^19.2.6",
+  "react-router-dom": "^7.16.0"
+},</code></pre>
+    </div>
+  </section>
+
+  <section class="module" id="m3">
+    <h2><span class="num">3</span> 기본 라우팅 프로젝트 만들기 (routes)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>BrowserRouter로 앱 전체를 감싸는 구조를 만들 수 있다.</li>
+      <li>Link로 메뉴를, Routes/Route로 경로별 화면을 연결할 수 있다.</li>
+      <li>Link가 브라우저에서 &lt;a&gt; 태그로 렌더링되는 것을 확인한다.</li>
+    </ul></div>
+    <div class="concept">
+      <h3 class="blk">📖 routes 프로젝트 구조</h3>
+      <p>Home, SignIn(로그인), SignUp(회원가입) 세 화면을 member 폴더에 만들고, App.jsx에서 라우팅합니다.</p>
+      <div class="flow">src/
+ ├─ member/
+ │    ├─ Home.jsx
+ │    ├─ SignIn.jsx
+ │    └─ SignUp.jsx
+ ├─ App.css
+ ├─ App.jsx
+ └─ main.jsx</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 메뉴(Link)와 헤더 영역</div>
+      <span class="fname">src/App.jsx</span>
+      <pre><code class="language-jsx">import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import Home from './member/Home'
+import SignIn from './member/SignIn'
+import SignUp from './member/SignUp'
+
+function App() {
+
+  return (
+    &lt;&gt;
+      &lt;section className='app'&gt;
+        &lt;BrowserRouter&gt;
+          &lt;div className='header'&gt;
+            &lt;Link to="/"&gt;Home&lt;/Link&gt;
+            &lt;Link to="/sign-in"&gt;로그인&lt;/Link&gt;
+            &lt;Link to="/sign-up"&gt;회원가입&lt;/Link&gt;
+          &lt;/div&gt;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 경로 정의(Main 영역)와 export</div>
+      <span class="fname">src/App.jsx (이어서)</span>
+      <pre><code class="language-jsx">          &lt;div className='contents'&gt;
+            &lt;Routes&gt;
+              &lt;Route path='/' element={&lt;Home /&gt;} /&gt;
+              &lt;Route path="/sign-in" element={&lt;SignIn /&gt;} /&gt;
+              &lt;Route path='/sign-up' element={&lt;SignUp /&gt;} /&gt;
+            &lt;/Routes&gt;
+          &lt;/div&gt;
+        &lt;/BrowserRouter&gt;
+      &lt;/section&gt;
+    &lt;/&gt;
+  )
+}
+
+export default App</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div class="demo"><a href="#">Home</a> &nbsp; <a href="#">로그인</a> &nbsp; <a href="#">회원가입</a></div>
+        <p><strong>라우터를 테스트합니다.</strong></p>
+        <p>[ 상단의 메뉴를 클릭해 보세요. ]</p>
+      </div>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 Link는 &lt;a&gt; 태그로 렌더링된다</h3>
+      <p>개발자 도구로 확인하면 각 Link는 실제 HTML에서 <code>&lt;a&gt;</code> 태그로 그려집니다. 다만 라우터가 클릭을 가로채 새로고침 없이 화면만 바꿉니다.</p>
+      <pre><code class="language-html">&lt;section class="app"&gt;
+  &lt;div class="header"&gt;
+    &lt;a href="/" data-discover="true"&gt;Home&lt;/a&gt;
+    &lt;a href="/sign-in" data-discover="true"&gt;로그인&lt;/a&gt;
+    &lt;a href="/sign-up" data-discover="true"&gt;회원가입&lt;/a&gt;
+  &lt;/div&gt;
+  &lt;div class="contents"&gt;...&lt;/div&gt;
+&lt;/section&gt;</code></pre>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 3-1. 세 번째 메뉴 추가하기</h4>
+      <p>위 App.jsx에 "회원가입" 다음으로 "소개" 메뉴를 추가하고, <code>/about</code> 경로에서 About 컴포넌트를 보여주도록 Link와 Route를 각각 작성하세요.</p>
+      <details><summary>정답 보기</summary>
+      <pre><code class="language-jsx">// 헤더에 Link 추가
+&lt;Link to="/about"&gt;소개&lt;/Link&gt;
+
+// Routes 안에 Route 추가
+&lt;Route path="/about" element={&lt;About /&gt;} /&gt;</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m4">
+    <h2><span class="num">4</span> 상품 관리 앱 – 구조와 BrowserRouter 배치</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>layouts / pages / datas로 나눈 프로젝트 구조를 이해한다.</li>
+      <li>Header, Main 컴포넌트를 만들고 BrowserRouter로 감쌀 수 있다.</li>
+    </ul></div>
+    <div class="concept">
+      <h3 class="blk">📖 상품 관리 프로젝트 구조</h3>
+      <div class="flow">src/
+ ├─ datas/
+ │    └─ products.js
+ ├─ layouts/
+ │    ├─ Header.jsx
+ │    └─ Main.jsx
+ ├─ pages/
+ │    ├─ AddProduct.jsx
+ │    ├─ ProductInfo.jsx
+ │    └─ ProductList.jsx
+ ├─ App.css
+ ├─ App.jsx
+ └─ main.jsx</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — Header.jsx (헤더 메뉴)</div>
+      <span class="fname">src/layouts/Header.jsx</span>
+      <pre><code class="language-jsx">import { Link } from "react-router-dom"
+
+const Header = () =&gt; {
+  return (
+    &lt;header className="header"&gt;
+      &lt;Link to="/"&gt;Home&lt;/Link&gt;
+    &lt;/header&gt;
+  )
+}
+
+export default Header</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — Main.jsx (메인 화면)</div>
+      <span class="fname">src/layouts/Main.jsx</span>
+      <pre><code class="language-jsx">const Main = () =&gt; {
+  return (
+    &lt;main&gt;
+      &lt;h1&gt;컴퓨터 기기 쇼핑몰&lt;/h1&gt;
+    &lt;/main&gt;
+  )
+}
+
+export default Main</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — App.jsx에서 BrowserRouter로 감싸기</div>
+      <span class="fname">src/App.jsx</span>
+      <pre><code class="language-jsx">import { BrowserRouter } from 'react-router-dom'
+
+function App() {
+
+  return (
+    &lt;&gt;
+      &lt;div className="App"&gt;
+        &lt;BrowserRouter&gt;
+          &lt;Header /&gt;
+          &lt;Main /&gt;
+        &lt;/BrowserRouter&gt;
+      &lt;/div&gt;
+    &lt;/&gt;
+  )
+}</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div class="demo"><a href="#">Home</a></div>
+        <p style="font-size:1.4em;font-weight:bold;">컴퓨터 기기 쇼핑몰</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="module" id="m5">
+    <h2><span class="num">5</span> 경로 정의 – Routes와 Route</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>Main을 직접 배치하지 않고 Route의 element로 연결하는 방식을 이해한다.</li>
+      <li>Route는 반드시 Routes 안에 있어야 함을 안다.</li>
+      <li>Header에 상품 목록 메뉴를 추가하고 App.css로 헤더를 꾸민다.</li>
+    </ul></div>
+    <div class="concept">
+      <h3 class="blk">📖 &lt;Route&gt;는 &lt;Routes&gt; 안에 있어야 한다</h3>
+      <p>기존에 직접 렌더링하던 <code>&lt;Main /&gt;</code>을 주석 처리하고, Routes/Route로 경로에 연결합니다.</p>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — App.jsx에서 경로 정의</div>
+      <span class="fname">src/App.jsx</span>
+      <pre><code class="language-jsx">import { BrowserRouter, Routes, Route } from 'react-router-dom'
+
+// ...
+
+return (
+  &lt;&gt;
+    &lt;div className="app"&gt;
+      &lt;BrowserRouter&gt;
+        &lt;Header /&gt;
+        {/* &lt;Main /&gt; */}
+        &lt;Routes&gt;
+          &lt;Route path="/" element={&lt;Main /&gt;} /&gt;
+        &lt;/Routes&gt;
+      &lt;/BrowserRouter&gt;
+    &lt;/div&gt;
+  &lt;/&gt;
+)</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품 목록 메뉴 추가 (Header.jsx)</div>
+      <span class="fname">src/layouts/Header.jsx</span>
+      <pre><code class="language-jsx">const Header = () =&gt; {
+  return (
+    &lt;header className="header"&gt;
+      &lt;Link to="/"&gt;Home&lt;/Link&gt;
+      &lt;Link to="/products"&gt;상품 목록&lt;/Link&gt;
+    &lt;/header&gt;
+  )
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — App.css 헤더/메인 스타일</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* Header 스타일 */
+.header{
+  padding: 20px;
+  background-color: #333;
+}
+.header a{
+  margin: 0 16px;
+  color: yellow;
+  text-decoration: none;
+}
+.header a:hover{
+  color: #eee;
+}
+
+/* Main 스타일 */
+.main{padding: 20px;}
+
+/* 상품 목록 스타일 */
+.product-list{padding: 20px;}</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div class="demo" style="background:#333;color:yellow;padding:10px;"><a href="#" style="color:yellow;">Home</a> &nbsp;&nbsp; <a href="#" style="color:yellow;">상품 목록</a></div>
+        <p style="font-size:1.4em;font-weight:bold;">컴퓨터 기기 쇼핑몰</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="module" id="m6">
+    <h2><span class="num">6</span> 객체 데이터 리스트 렌더링</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>객체 배열 데이터를 별도 파일로 분리해 관리할 수 있다.</li>
+      <li>map()으로 상품 목록을 반복 렌더링할 수 있다.</li>
+    </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품 데이터 정의</div>
+      <span class="fname">src/datas/products.js</span>
+      <pre><code class="language-javascript">export const products = [
+  {
+    id: 1,
+    name: '모니터',
+    price: 130000,
+    description: '22인치 최신 모니터입니다.',
+  },
+  {
+    id: 2,
+    name: '마우스',
+    price: 30000,
+    description: '무선 마우스입니다.',
+  },
+  {
+    id: 3,
+    name: '키보드',
+    price: 50000,
+    description: '무선 키보드입니다.',
+  },
+]</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ProductList.jsx (map으로 목록 렌더링)</div>
+      <span class="fname">src/pages/ProductList.jsx</span>
+      <pre><code class="language-jsx">import {products} from "../datas/products"
+import { Link} from "react-router-dom";
+
+const ProductList = () =&gt; {
+
+  return(
+    &lt;div className="product-list"&gt;
+      &lt;h2&gt;상품 리스트&lt;/h2&gt;
+      &lt;ul&gt;
+        {products.map((product) =&gt; (
+          &lt;li key={product.id}&gt;
+            &lt;h3&gt;{product.name}&lt;/h3&gt;
+            &lt;p&gt;가격: {product.price}원&lt;/p&gt;
+            &lt;p&gt;설명: {product.description}&lt;/p&gt;
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p style="text-align:center;font-weight:bold;">상품 리스트</p>
+        <p><strong>모니터</strong><br>가격: 120000원<br>설명: 22인치 최신 모니터입니다.</p>
+        <p><strong>마우스</strong><br>가격: 30000원<br>설명: 무선 마우스입니다.</p>
+        <p><strong>키보드</strong><br>가격: 40000원<br>설명: 무선 키보드입니다.</p>
+      </div>
+    </div>
+    <div class="tip"><span class="lbl">💡 정리</span> ProductList를 화면에 띄우려면 App.jsx의 Routes에 <code>&lt;Route path="/products" element={&lt;ProductList /&gt;} /&gt;</code>를 추가해야 합니다.</div>
+  </section>
+
+  <section class="module" id="m7">
+    <h2><span class="num">7</span> 동적 라우팅과 useParams</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>URL 파라미터(:id)로 동적 경로를 정의할 수 있다.</li>
+      <li>useParams()로 URL의 id 값을 읽어올 수 있다.</li>
+      <li>useNavigate()로 목록 페이지로 되돌아갈 수 있다.</li>
+    </ul></div>
+    <div class="concept">
+      <h3 class="blk">📖 상품 상세 보기 컴포넌트</h3>
+      <span class="fname">src/pages/ProductInfo.jsx</span>
+      <pre><code class="language-jsx">const ProductInfo = () =&gt; {
+
+  return (
+    &lt;section className="product-info"&gt;
+      &lt;h2&gt;상품 정보&lt;/h2&gt;
+    &lt;/section&gt;
+  )
+}
+
+export default ProductInfo</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품명에 상세 페이지 링크 추가</div>
+      <span class="fname">src/pages/ProductList.jsx</span>
+      <pre><code class="language-jsx">&lt;h2&gt;상품 리스트&lt;/h2&gt;
+{products.map((product) =&gt; (
+  &lt;div key={product.id}&gt;
+    &lt;h3&gt;
+      &lt;Link to={`/products/${product.id}`}&gt;{product.name}&lt;/Link&gt;
+    &lt;/h3&gt;
+    &lt;p&gt;가격: {product.price}원&lt;/p&gt;</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> 템플릿 리터럴(백틱)로 <code>/products/1</code>, <code>/products/2</code>처럼 각 상품 id에 맞는 경로를 만들어 줍니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품 상세 경로(:id) 정의</div>
+      <span class="fname">src/App.jsx</span>
+      <pre><code class="language-jsx">&lt;BrowserRouter&gt;
+  &lt;Header /&gt;
+  {/* &lt;Main /&gt; */}
+  &lt;Routes&gt;
+    &lt;Route path="/" element={&lt;Main /&gt;} /&gt;
+    &lt;Route path="/products" element={&lt;ProductList /&gt;} /&gt;
+    {/* URL 파라미터를 포함한 경로 설정 */}
+    {/* :id는 URL에서 동적으로 변하는 부분을 나타냅니다. */}
+    {/* 예를 들어, /products/1, /products/2 등 다양한 상품 ID에 대응. */}
+    &lt;Route path="/products/:id" element={&lt;ProductInfo /&gt;} /&gt;
+  &lt;/Routes&gt;
+&lt;/BrowserRouter&gt;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — useParams()로 id 받아오기</div>
+      <span class="fname">src/pages/ProductInfo.jsx</span>
+      <pre><code class="language-jsx">import { useParams } from 'react-router-dom'
+
+const ProductInfo = () =&gt; {
+  // URL 파라미터에서 id 값을 추출
+  // useParams 훅을 사용하여 URL에서 id 값을 가져옵니다.
+  // 예를 들어, URL이 /products/1 이면 id는 1이 됩니다.
+  const { id } = useParams()
+
+  return (
+    &lt;section className="product-info"&gt;
+      &lt;h2&gt;상품 정보&lt;/h2&gt;
+      &lt;p&gt;상품 ID: {id}&lt;/p&gt;
+    &lt;/section&gt;
+  )
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — useNavigate로 목록 이동 + 상품 찾기</div>
+      <span class="fname">src/pages/ProductInfo.jsx</span>
+      <pre><code class="language-jsx">import { useParams, useNavigate } from "react-router-dom";
+import {products} from "../datas/products"
+
+const ProductInfo = () =&gt; {
+  // URL 파라미터에서 id 값을 추출
+  const {id} = useParams()
+  // 페이지 이동 hook
+  const navigate = useNavigate();
+
+  // products 리스트에 id와 일치하는 상품 찾기
+  const product = products.find(product =&gt;
+      product.id === parseInt(id))
+
+  // 페이지 이동 핸들러
+  const doClick = () =&gt; {
+    navigate('/products');
+  }
+
+  return(
+    &lt;div className="product-info"&gt;
+      &lt;h3&gt;상품 ID: {id}&lt;/h3&gt;
+      {/* &lt;p&gt;가격: {products[id-1].price}&lt;/p&gt;
+      &lt;p&gt;설명: {products[id-1].description}&lt;/p&gt; */}
+      &lt;p&gt;이름: {product.name}&lt;/p&gt;
+      &lt;p&gt;가격: {product.price}&lt;/p&gt;
+      &lt;p&gt;설명: {product.description}&lt;/p&gt;
+
+      {/* &lt;button onClick={() =&gt; {navigate('/products')}}&gt;목록보기&lt;/button&gt; */}
+      &lt;button onClick={doClick}&gt;목록보기&lt;/button&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p style="text-align:center;font-weight:bold;">상품 정보</p>
+        <p><strong>상품 ID: 1</strong></p>
+        <p>가격: 120000<br>설명: 22인치 최신 모니터입니다.</p>
+        <div class="demo"><button>목록보기</button></div>
+      </div>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 7-1. useParams로 값 확인하기</h4>
+      <p><code>/products/:id</code> 경로에서 useParams로 받은 id는 문자열입니다. 데이터의 숫자형 id와 비교하려면 어떻게 처리해야 할까요? 위 코드에서 근거를 찾아 설명하고 코드로 나타내세요.</p>
+      <details><summary>정답 보기</summary>
+      <p>useParams가 반환하는 값은 항상 문자열이므로, 숫자형 <code>product.id</code>와 <code>===</code>로 비교하려면 parseInt()로 변환해야 합니다.</p>
+      <pre><code class="language-jsx">const { id } = useParams()               // "1" (문자열)
+const product = products.find(
+  (product) =&gt; product.id === parseInt(id) // 숫자로 변환 후 비교
+)</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m8">
+    <h2><span class="num">8</span> useNavigate와 상품 등록 폼</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>상품 등록 경로(/add-product)를 추가하고 메뉴/버튼으로 이동할 수 있다.</li>
+      <li>useState로 폼 데이터를 관리하고 name 속성으로 통합 핸들러를 만든다.</li>
+      <li>유효성 검사 후 useNavigate로 목록 페이지로 이동한다.</li>
+    </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품 등록 경로 추가 (App.jsx)</div>
+      <span class="fname">src/App.jsx</span>
+      <pre><code class="language-jsx">import AddProduct from './pages/AddProduct'
+
+function App() {
+
+  return (
+    &lt;&gt;
+      &lt;section className="app"&gt;
+        &lt;BrowserRouter&gt;
+          &lt;Header /&gt;
+          &lt;Routes&gt;
+            &lt;Route path='/' element={&lt;Main /&gt;} /&gt;
+            &lt;Route path='/products' element={&lt;ProductList /&gt;} /&gt;
+            &lt;Route path='/products/:id' element={&lt;ProductInfo /&gt;} /&gt;
+            &lt;Route path='/add-product' element={&lt;AddProduct /&gt;} /&gt;
+          &lt;/Routes&gt;
+        &lt;/BrowserRouter&gt;
+      &lt;/section&gt;
+    &lt;/&gt;
+  )
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 헤더와 목록에 등록 진입점 추가</div>
+      <span class="fname">src/layouts/Header.jsx</span>
+      <pre><code class="language-jsx">import { Link } from "react-router-dom"
+
+const Header = () =&gt; {
+  return (
+    &lt;header&gt;
+      &lt;header className="header"&gt;
+        &lt;Link to="/"&gt;Home&lt;/Link&gt;
+        &lt;Link to="/products"&gt;상품 목록&lt;/Link&gt;
+        &lt;Link to="/add-product"&gt;상품 등록&lt;/Link&gt;
+      &lt;/header&gt;
+    &lt;/header&gt;
+  )
+}
+
+export default Header</code></pre>
+      <span class="fname">src/pages/ProductList.jsx (목록 하단 버튼)</span>
+      <pre><code class="language-jsx">      &lt;div className="btn-add"&gt;
+        &lt;Link to="/add-product"&gt;
+          &lt;button type="button"&gt;상품 등록하기&lt;/button&gt;
+        &lt;/Link&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — AddProduct.jsx ① 상태와 입력 핸들러</div>
+      <span class="fname">src/pages/AddProduct.jsx</span>
+      <pre><code class="language-jsx">import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const AddProduct = () =&gt; {
+  // 폼 데이터 상태 관리
+  const [formData, setFormData] = useState({
+    name: '',
+    price: '',
+    description: ''
+  })
+
+  const navigate = useNavigate();
+
+  // 입력 필드 변경 핸들러
+  const handleChange = (e) =&gt; {
+    const { name, value } = e.target
+
+    // 변경된 name 값만 업데이트
+    setFormData({...formData, [name]: value})
+  }</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — AddProduct.jsx ② 제출 핸들러(유효성 검사)</div>
+      <span class="fname">src/pages/AddProduct.jsx (이어서)</span>
+      <pre><code class="language-jsx">  // 폼 전송 핸들러
+  const handleSubmit = (e) =&gt; {
+    e.preventDefault();
+
+    // 입력값 검증(유효성 검사)
+    if(!formData.name.trim() || !formData.price ||
+        !formData.description.trim()){
+      alert("모든 필드를 입력해주세요");
+      return; //즉시 종료
+    }
+
+    // 가격 필드 검증
+    if(isNaN(formData.price) || formData.price &lt;= 0){
+      alert("가격은 0보다 큰 숫자를 입력해주세요");
+      return;
+    }
+
+    console.log('상품 추가:', formData);
+    alert("상품이 등록되었습니다.")
+    navigate("/products"); //상품 목록 페이지로 이동
+  }
+
+  // 입력 취소 버튼
+  const handleCancel = () =&gt; {
+    //입력 필드 초기화
+    setFormData({
+      name: '',
+      price: '',
+      description: ''
+    })
+  }</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — AddProduct.jsx ③ 폼 렌더링</div>
+      <span class="fname">src/pages/AddProduct.jsx (이어서)</span>
+      <pre><code class="language-jsx">  return(
+    &lt;div className="add-product"&gt;
+      &lt;h2&gt;상품 등록&lt;/h2&gt;
+      &lt;form onSubmit={handleSubmit} className="add-form"&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="name"&gt;상품명 &lt;/label&gt;
+          &lt;input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="상품명을 입력하세요"
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="price"&gt;가격 &lt;/label&gt;
+          &lt;input
+            type="number"
+            id="price"
+            name="price"
+            value={formData.price}
+            onChange={handleChange}
+            placeholder="가격을 입력하세요"
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="description"&gt;설명 &lt;/label&gt;
+          &lt;textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows={5}
+            cols={30}
+            placeholder="상품 설명을 입력하세요"
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;button type="submit"&gt;등록&lt;/button&gt;
+          &lt;button type="button" onClick={handleCancel}&gt;취소&lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/form&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default AddProduct;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p style="text-align:center;font-weight:bold;">상품 등록</p>
+        <div class="demo">
+          상품명 <input type="text" value="USB 메모리" readonly><br>
+          가격 <input type="number" value="13000" readonly><br>
+          설명 <input type="text" value="128GB USB 메모리 입니다." readonly><br>
+          <button>등록</button> <button>취소</button>
+        </div>
+        <p>등록 성공 시 alert("상품이 등록되었습니다.") 후 콘솔에 formData가 출력되고 목록 페이지로 이동합니다.</p>
+      </div>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 8-1. 하나의 핸들러로 여러 입력 다루기</h4>
+      <p>name, price, description 세 입력을 각각 다른 핸들러 없이 <code>handleChange</code> 하나로 처리했습니다. 그 원리를 설명하고 코드로 나타내세요.</p>
+      <details><summary>정답 보기</summary>
+      <p>각 input에 <code>name</code> 속성을 지정하고, 핸들러에서 <code>e.target</code>의 name과 value를 구조 분해한 뒤 <strong>계산된 속성명(computed property name)</strong> <code>[name]</code>으로 해당 필드만 갱신합니다.</p>
+      <pre><code class="language-jsx">const handleChange = (e) =&gt; {
+  const { name, value } = e.target
+  setFormData({ ...formData, [name]: value })
+}</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m9">
+    <h2><span class="num">9</span> 상품 목록 테이블 만들기</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>상품 목록을 표(table) 형태로 렌더링할 수 있다.</li>
+      <li>테이블 셀 안의 상품명에 상세 페이지 Link를 걸 수 있다.</li>
+    </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — 테이블 형태의 상품 목록</div>
+      <span class="fname">src/pages/ProductList.jsx</span>
+      <pre><code class="language-jsx">&lt;h2&gt;상품 리스트&lt;/h2&gt;
+&lt;table className="table-list"&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;번호&lt;/th&gt;
+      &lt;th&gt;상품명&lt;/th&gt;
+      &lt;th&gt;가격&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    {products.map((product) =&gt; (
+      &lt;tr key={product.id}&gt;
+        &lt;td&gt;{product.id}&lt;/td&gt;
+        &lt;td&gt;
+          &lt;Link to={`/products/${product.id}`}&gt;{product.name}&lt;/Link&gt;
+        &lt;/td&gt;
+        &lt;td&gt;{product.price}&lt;/td&gt;
+      &lt;/tr&gt;
+    ))}
+  &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 테이블 스타일 (App.css)</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 상품 목록 스타일 */
+.product-list{padding: 20px;}
+.table-list{
+  width: 60%;
+  border-collapse: collapse;
+  margin: 20px auto;
+}
+.table-list th, td{
+  border: 1px solid #ccc;
+  padding: 6px;
+}
+.table-list thead{background-color: #eee;}
+.table-list a{
+  text-decoration: none;
+  color: #333;
+}
+.table-list a:hover{text-decoration: underline;}
+.btn-add{
+  text-align: right;
+  margin-right: 20%;
+}
+.btn-add button{padding: 6px 12px;}</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <table>
+          <thead><tr><th>번호</th><th>상품명</th><th>가격</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td><a href="#">모니터</a></td><td>120000</td></tr>
+            <tr><td>2</td><td><a href="#">무선마우스</a></td><td>30000</td></tr>
+            <tr><td>3</td><td><a href="#">무선키보드</a></td><td>40000</td></tr>
+          </tbody>
+        </table>
+        <div class="demo" style="text-align:right;"><button>상품 등록하기</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="module" id="m10">
+    <h2><span class="num">10</span> 로그인 / 로그아웃 메뉴와 상태 관리</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>App에서 로그인 상태(isLoggedIn, userId)를 관리하고 하위로 내려줄 수 있다.</li>
+      <li>로그인 여부에 따라 헤더 메뉴를 조건부로 렌더링할 수 있다.</li>
+      <li>SignIn에서 로그인 성공 시 onLogin 콜백과 navigate로 처리할 수 있다.</li>
+    </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — App.jsx ① 로그인 상태와 핸들러</div>
+      <span class="fname">src/App.jsx</span>
+      <pre><code class="language-jsx">function App() {
+  // 로그인 상태 관리
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  // 로그인한 사용자 ID 관리
+  const [userId, setUserId] = useState('')
+
+  // 로그인 핸들러
+  const handleLogin = (userId) =&gt; {
+    setIsLoggedIn(true) // 로그인 성공 시 상태 업데이트
+    setUserId(userId)   // 로그인한 사용자 ID 저장
+  }
+
+  // 로그아웃 핸들러
+  const handleLogout = () =&gt; {
+    setIsLoggedIn(false)
+    setUserId('')
+  }</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — App.jsx ② 상태 전달과 signin 경로</div>
+      <span class="fname">src/App.jsx (이어서)</span>
+      <pre><code class="language-jsx">  return (
+    &lt;&gt;
+      &lt;div className="app"&gt;
+        &lt;BrowserRouter&gt;
+          &lt;Header isLoggedIn={isLoggedIn} userId={userId} onLogout={handleLogout} /&gt;
+          {/* &lt;Main /&gt; */}
+          &lt;Routes&gt;
+            &lt;Route path="/" element={&lt;Main /&gt;} /&gt;
+            &lt;Route path="/products" element={&lt;ProductList /&gt;} /&gt;
+            &lt;Route path="/products/:id" element={&lt;ProductInfo /&gt;} /&gt;
+            &lt;Route path="/add-product" element={&lt;AddProduct /&gt;} /&gt;
+            &lt;Route path="/signin" element={&lt;SignIn onLogin={handleLogin} /&gt;} /&gt;
+          &lt;/Routes&gt;
+        &lt;/BrowserRouter&gt;
+      &lt;/div&gt;
+    &lt;/&gt;
+  )
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — Header.jsx (조건부 메뉴)</div>
+      <span class="fname">src/layouts/Header.jsx</span>
+      <pre><code class="language-jsx">import { Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+
+const Header = ({ isLoggedIn, userId, onLogout }) =&gt; {
+  const navigate = useNavigate() // 페이지 이동을 위한 훅
+
+  return (
+    &lt;header className="header"&gt;
+      &lt;Link to="/"&gt;Home&lt;/Link&gt;
+      &lt;Link to="/products"&gt;상품 목록&lt;/Link&gt;
+      &lt;Link to="/add-product"&gt;상품 등록&lt;/Link&gt;
+      {isLoggedIn ? (
+        &lt;div className="header-user"&gt;
+          &lt;span&gt;{userId}님&lt;/span&gt;
+          &lt;button
+            type="button"
+            className="logout-btn"
+            onClick={() =&gt; { onLogout(); navigate('/'); }}
+          &gt;
+            로그아웃
+          &lt;/button&gt;
+        &lt;/div&gt;
+      ) : (
+        &lt;Link to="/signin"&gt;로그인&lt;/Link&gt;
+      )}
+    &lt;/header&gt;
+  )
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — App.css (사용자/로그아웃 버튼 스타일)</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">.header-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  margin-left: 12px;
+}
+.logout-btn {
+  padding: 6px 12px;
+  border: 1px solid #ff9f1c;
+  border-radius: 6px;
+  background-color: transparent;
+  color: #ff9f1c;
+  cursor: pointer;
+}
+.logout-btn:hover {
+  background-color: #ff9f1c;
+  color: #333;
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — SignIn.jsx ① 상태와 입력 핸들러</div>
+      <span class="fname">src/pages/SignIn.jsx</span>
+      <pre><code class="language-jsx">const SignIn = ({ onLogin }) =&gt; {
+  const navigate = useNavigate(); // 페이지 이동을 위한 훅
+  // 1. 입력 데이터를 객체로 통합
+  const [loginData, setLoginData] = useState(
+    { userId: '', password: '' }
+  );
+  // 로그인 결과 상태 (성공, 실패, 또는 null)
+  const [result, setResult] = useState(null);
+
+  // 2. 통합 핸들러 (name 속성 활용)
+  const handleChange = (e) =&gt; {
+    const { name, value } = e.target;
+    console.log(e);
+
+    setLoginData({ ...loginData, [name]: value });
+    setResult(null); // 입력 시 결과 메시지 숨김
+  };</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — SignIn.jsx ② 제출 핸들러(로그인 검증)</div>
+      <span class="fname">src/pages/SignIn.jsx (이어서)</span>
+      <pre><code class="language-jsx">  // 3. 제출 핸들러
+  const handleSubmit = (e) =&gt; {
+    e.preventDefault();
+    const { userId, password } = loginData;
+
+    //find 메서드로 사용자 데이터에서 첫번째 일치하는 항목 찾기
+    const matched = users.find(
+      (user) =&gt; user.userId === userId &amp;&amp; user.password === password
+    );
+
+    // 로그인 성공 여부에 따라 결과 상태 업데이트
+    if (matched) {
+      setResult('success');
+      onLogin(userId); // App에 로그인 정보 전달
+      navigate('/');
+    } else {
+      setResult('fail');
+    }
+  };</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> 위 코드는 <code>users</code> 배열(예: <code>[{ userId: 'cloud', password: '1234' }]</code>)이 파일 내에 정의되어 있다고 가정합니다. 강의 슬라이드에는 users 데이터 정의 화면이 별도로 등장하지 않았습니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — SignIn.jsx ③ 폼과 결과 메시지</div>
+      <span class="fname">src/pages/SignIn.jsx (이어서)</span>
+      <pre><code class="language-jsx">  return (
+    &lt;div className='sign-in'&gt;
+      &lt;h2&gt;로그인&lt;/h2&gt;
+      &lt;form onSubmit={handleSubmit}&gt;
+        &lt;p&gt;
+          &lt;input
+            name="userId" // name 추가
+            type="text"
+            placeholder="ID 입력"
+            value={loginData.userId}
+            onChange={handleChange}
+          /&gt;
+        &lt;/p&gt;
+        &lt;p&gt;
+          &lt;input
+            name="password" // name 추가
+            type="password"
+            placeholder="패스워드 입력"
+            value={loginData.password}
+            onChange={handleChange}
+          /&gt;
+        &lt;/p&gt;
+        &lt;button type="submit"&gt;로그인&lt;/button&gt;
+      &lt;/form&gt;
+
+      {/* 결과 메시지 부분 */}
+      {result === 'success' &amp;&amp; (
+        &lt;p style={{ color: 'green' }}&gt;환영합니다, {loginData.userId}님.&lt;/p&gt;
+      )}
+      {result === 'fail' &amp;&amp; (
+        &lt;p style={{ color: 'red' }}&gt;아이디 또는 비밀번호가 올바르지 않습니다.&lt;/p&gt;
+      )}
+    &lt;/div&gt;
+  );
+};
+
+export default SignIn;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div class="demo" style="background:#333;color:#ff9f1c;padding:10px;">
+          <a href="#" style="color:#ff9f1c;">Home</a> &nbsp; <a href="#" style="color:#ff9f1c;">상품 목록</a> &nbsp; <a href="#" style="color:#ff9f1c;">상품 등록</a> &nbsp; <span style="color:#fff;">cloud님</span> <button>로그아웃</button>
+        </div>
+        <p>로그인 성공 시 헤더에 "<strong>cloud님</strong>"과 로그아웃 버튼이 나타나고, 실패 시 빨간 글씨로 오류 메시지가 표시됩니다.</p>
+      </div>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 10-1. 조건부 렌더링으로 메뉴 바꾸기</h4>
+      <p>로그인 상태(isLoggedIn)에 따라 "로그인" 링크와 "로그아웃" 버튼을 번갈아 보여주려면 어떤 문법을 사용하나요? Header.jsx 코드를 근거로 답하세요.</p>
+      <details><summary>정답 보기</summary>
+      <p>삼항 연산자(<code>조건 ? A : B</code>)를 JSX 안에서 사용합니다.</p>
+      <pre><code class="language-jsx">{isLoggedIn ? (
+  &lt;button onClick={() =&gt; { onLogout(); navigate('/'); }}&gt;로그아웃&lt;/button&gt;
+) : (
+  &lt;Link to="/signin"&gt;로그인&lt;/Link&gt;
+)}</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m11">
+    <h2><span class="num">11</span> 종합 실습 문제</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>여러 페이지를 만들고 메뉴 클릭으로 이동하는 라우팅을 스스로 구현한다.</li>
+      <li>URL 파라미터를 이용한 동적 라우팅을 구현한다.</li>
+    </ul></div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 11-1. 3개 페이지 라우팅</h4>
+      <p>리엑트 라우터를 이용하여 3개의 페이지(Home, About, Board)를 만들고, 상단 메뉴를 클릭하면 각 페이지로 이동하도록 만드세요.</p>
+      <details><summary>정답 보기</summary>
+      <span class="fname">src/App.jsx</span>
+      <pre><code class="language-jsx">import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import Home from './pages/Home'
+import About from './pages/About'
+import Board from './pages/Board'
+
+function App() {
+  return (
+    &lt;BrowserRouter&gt;
+      &lt;nav&gt;
+        &lt;Link to="/"&gt;Home&lt;/Link&gt;
+        &lt;Link to="/about"&gt;About&lt;/Link&gt;
+        &lt;Link to="/board"&gt;Board&lt;/Link&gt;
+      &lt;/nav&gt;
+      &lt;Routes&gt;
+        &lt;Route path="/" element={&lt;Home /&gt;} /&gt;
+        &lt;Route path="/about" element={&lt;About /&gt;} /&gt;
+        &lt;Route path="/board" element={&lt;Board /&gt;} /&gt;
+      &lt;/Routes&gt;
+    &lt;/BrowserRouter&gt;
+  )
+}
+
+export default App</code></pre>
+      </details>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 11-2. 동적 라우팅 구현</h4>
+      <p><code>/board/1</code>, <code>/board/2</code> 처럼 게시글 번호에 따라 다른 화면을 보여주는 동적 라우팅을 구현하세요.</p>
+      <details><summary>정답 보기</summary>
+      <span class="fname">src/App.jsx (Route 추가)</span>
+      <pre><code class="language-jsx">&lt;Route path="/board/:id" element={&lt;BoardDetail /&gt;} /&gt;</code></pre>
+      <span class="fname">src/pages/BoardDetail.jsx</span>
+      <pre><code class="language-jsx">import { useParams } from 'react-router-dom'
+
+const BoardDetail = () =&gt; {
+  const { id } = useParams()  // URL의 번호를 읽어옴
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;게시글 상세&lt;/h2&gt;
+      &lt;p&gt;{id}번 게시글입니다.&lt;/p&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default BoardDetail</code></pre>
+      <span class="fname">Board.jsx (목록에서 링크)</span>
+      <pre><code class="language-jsx">&lt;Link to="/board/1"&gt;1번 글&lt;/Link&gt;
+&lt;Link to="/board/2"&gt;2번 글&lt;/Link&gt;</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <footer>3강. 리엑트 라우터(Router) · 학습 교안<br>모듈별 학습목표 · 개념 · 예제 · 실습문제 구성</footer>
+</div>
+
+<script>
+(()=>{var wn=Object.create;var Ce=Object.defineProperty;var On=Object.getOwnPropertyDescriptor;var Rn=Object.getOwnPropertyNames;var xn=Object.getPrototypeOf,Mn=Object.prototype.hasOwnProperty;var vn=(e,n)=>()=>{try{return n||e((n={exports:{}}).exports,n),n.exports}catch(t){throw n=0,t}};var kn=(e,n,t,s)=>{if(n&&typeof n=="object"||typeof n=="function")for(let g of Rn(n))!Mn.call(e,g)&&g!==t&&Ce(e,g,{get:()=>n[g],enumerable:!(s=On(n,g))||s.enumerable});return e};var In=(e,n,t)=>(t=e!=null?wn(xn(e)):{},kn(n||!e||!e.__esModule?Ce(t,"default",{value:e,enumerable:!0}):t,e));var Ve=vn((Lt,Je)=>{function $e(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(n=>{let t=e[n],s=typeof t;(s==="object"||s==="function")&&!Object.isFrozen(t)&&$e(t)}),e}var de=class{constructor(n){n.data===void 0&&(n.data={}),this.data=n.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function He(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function K(e,...n){let t=Object.create(null);for(let s in e)t[s]=e[s];return n.forEach(function(s){for(let g in s)t[g]=s[g]}),t}var Cn="</span>",Le=e=>!!e.scope,Ln=(e,{prefix:n})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let t=e.split(".");return[`${n}${t.shift()}`,...t.map((s,g)=>`${s}${"_".repeat(g+1)}`)].join(" ")}return`${n}${e}`},_e=class{constructor(n,t){this.buffer="",this.classPrefix=t.classPrefix,n.walk(this)}addText(n){this.buffer+=He(n)}openNode(n){if(!Le(n))return;let t=Ln(n.scope,{prefix:this.classPrefix});this.span(t)}closeNode(n){Le(n)&&(this.buffer+=Cn)}value(){return this.buffer}span(n){this.buffer+=`<span class="${n}">`}},De=(e={})=>{let n={children:[]};return Object.assign(n,e),n},Ne=class e{constructor(){this.rootNode=De(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(n){this.top.children.push(n)}openNode(n){let t=De({scope:n});this.add(t),this.stack.push(t)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(n){return this.constructor._walk(n,this.rootNode)}static _walk(n,t){return typeof t=="string"?n.addText(t):t.children&&(n.openNode(t),t.children.forEach(s=>this._walk(n,s)),n.closeNode(t)),n}static _collapse(n){typeof n!="string"&&n.children&&(n.children.every(t=>typeof t=="string")?n.children=[n.children.join("")]:n.children.forEach(t=>{e._collapse(t)}))}},Se=class extends Ne{constructor(n){super(),this.options=n}addText(n){n!==""&&this.add(n)}startScope(n){this.openNode(n)}endScope(){this.closeNode()}__addSublanguage(n,t){let s=n.root;t&&(s.scope=`language:${t}`),this.add(s)}toHTML(){return new _e(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function re(e){return e?typeof e=="string"?e:e.source:null}function Ge(e){return j("(?=",e,")")}function Dn(e){return j("(?:",e,")*")}function Bn(e){return j("(?:",e,")?")}function j(...e){return e.map(t=>re(t)).join("")}function Un(e){let n=e[e.length-1];return typeof n=="object"&&n.constructor===Object?(e.splice(e.length-1,1),n):{}}function ye(...e){return"("+(Un(e).capture?"":"?:")+e.map(s=>re(s)).join("|")+")"}function Fe(e){return new RegExp(e.toString()+"|").exec("").length-1}function Pn(e,n){let t=e&&e.exec(n);return t&&t.index===0}var zn=/\[(?:[^\\\]]|\\.)*\]|\(\??|\\([1-9][0-9]*)|\\./;function Te(e,{joinWith:n}){let t=0;return e.map(s=>{t+=1;let g=t,E=re(s),a="";for(;E.length>0;){let i=zn.exec(E);if(!i){a+=E;break}a+=E.substring(0,i.index),E=E.substring(i.index+i[0].length),i[0][0]==="\\"&&i[1]?a+="\\"+String(Number(i[1])+g):(a+=i[0],i[0]==="("&&t++)}return a}).map(s=>`(${s})`).join(n)}var $n=/\b\B/,Ke="[a-zA-Z]\\w*",we="[a-zA-Z_]\\w*",Ze="\\b\\d+(\\.\\d+)?",We="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Xe="\\b(0b[01]+)",Hn="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",Gn=(e={})=>{let n=/^#![ ]*\//;return e.binary&&(e.begin=j(n,/.*\b/,e.binary,/\b.*/)),K({scope:"meta",begin:n,end:/$/,relevance:0,"on:begin":(t,s)=>{t.index!==0&&s.ignoreMatch()}},e)},ae={begin:"\\\\[\\s\\S]",relevance:0},Fn={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[ae]},Kn={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[ae]},Zn={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},fe=function(e,n,t={}){let s=K({scope:"comment",begin:e,end:n,contains:[]},t);s.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let g=ye("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return s.contains.push({begin:j(/[ ]+/,"(",g,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),s},Wn=fe("//","$"),Xn=fe("/\\*","\\*/"),Yn=fe("#","$"),jn={scope:"number",begin:Ze,relevance:0},qn={scope:"number",begin:We,relevance:0},Qn={scope:"number",begin:Xe,relevance:0},Jn={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[ae,{begin:/\[/,end:/\]/,relevance:0,contains:[ae]}]},Vn={scope:"title",begin:Ke,relevance:0},et={scope:"title",begin:we,relevance:0},nt={begin:"\\.\\s*"+we,relevance:0},tt=function(e){return Object.assign(e,{"on:begin":(n,t)=>{t.data._beginMatch=n[1]},"on:end":(n,t)=>{t.data._beginMatch!==n[1]&&t.ignoreMatch()}})},ue=Object.freeze({__proto__:null,APOS_STRING_MODE:Fn,BACKSLASH_ESCAPE:ae,BINARY_NUMBER_MODE:Qn,BINARY_NUMBER_RE:Xe,COMMENT:fe,C_BLOCK_COMMENT_MODE:Xn,C_LINE_COMMENT_MODE:Wn,C_NUMBER_MODE:qn,C_NUMBER_RE:We,END_SAME_AS_BEGIN:tt,HASH_COMMENT_MODE:Yn,IDENT_RE:Ke,MATCH_NOTHING_RE:$n,METHOD_GUARD:nt,NUMBER_MODE:jn,NUMBER_RE:Ze,PHRASAL_WORDS_MODE:Zn,QUOTE_STRING_MODE:Kn,REGEXP_MODE:Jn,RE_STARTERS_RE:Hn,SHEBANG:Gn,TITLE_MODE:Vn,UNDERSCORE_IDENT_RE:we,UNDERSCORE_TITLE_MODE:et});function it(e,n){e.input[e.index-1]==="."&&n.ignoreMatch()}function st(e,n){e.className!==void 0&&(e.scope=e.className,delete e.className)}function rt(e,n){n&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=it,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function at(e,n){Array.isArray(e.illegal)&&(e.illegal=ye(...e.illegal))}function ot(e,n){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function ct(e,n){e.relevance===void 0&&(e.relevance=1)}var lt=(e,n)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let t=Object.assign({},e);Object.keys(e).forEach(s=>{delete e[s]}),e.keywords=t.keywords,e.begin=j(t.beforeMatch,Ge(t.begin)),e.starts={relevance:0,contains:[Object.assign(t,{endsParent:!0})]},e.relevance=0,delete t.beforeMatch},ut=["of","and","for","in","not","or","if","then","parent","list","value"],dt="keyword";function Ye(e,n,t=dt){let s=Object.create(null);return typeof e=="string"?g(t,e.split(" ")):Array.isArray(e)?g(t,e):Object.keys(e).forEach(function(E){Object.assign(s,Ye(e[E],n,E))}),s;function g(E,a){n&&(a=a.map(i=>i.toLowerCase())),a.forEach(function(i){let l=i.split("|");s[l[0]]=[E,gt(l[0],l[1])]})}}function gt(e,n){return n?Number(n):ft(e)?0:1}function ft(e){return ut.includes(e.toLowerCase())}var Be={},Y=e=>{console.error(e)},Ue=(e,...n)=>{console.log(`WARN: ${e}`,...n)},J=(e,n)=>{Be[`${e}/${n}`]||(console.log(`Deprecated as of ${e}. ${n}`),Be[`${e}/${n}`]=!0)},ge=new Error;function je(e,n,{key:t}){let s=0,g=e[t],E={},a={};for(let i=1;i<=n.length;i++)a[i+s]=g[i],E[i+s]=!0,s+=Fe(n[i-1]);e[t]=a,e[t]._emit=E,e[t]._multi=!0}function bt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw Y("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),ge;if(typeof e.beginScope!="object"||e.beginScope===null)throw Y("beginScope must be object"),ge;je(e,e.begin,{key:"beginScope"}),e.begin=Te(e.begin,{joinWith:""})}}function pt(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw Y("skip, excludeEnd, returnEnd not compatible with endScope: {}"),ge;if(typeof e.endScope!="object"||e.endScope===null)throw Y("endScope must be object"),ge;je(e,e.end,{key:"endScope"}),e.end=Te(e.end,{joinWith:""})}}function ht(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function Et(e){ht(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),bt(e),pt(e)}function mt(e){function n(a,i){return new RegExp(re(a),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(i?"g":""))}class t{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(i,l){l.position=this.position++,this.matchIndexes[this.matchAt]=l,this.regexes.push([l,i]),this.matchAt+=Fe(i)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let i=this.regexes.map(l=>l[1]);this.matcherRe=n(Te(i,{joinWith:"|"}),!0),this.lastIndex=0}exec(i){this.matcherRe.lastIndex=this.lastIndex;let l=this.matcherRe.exec(i);if(!l)return null;let f=l.findIndex((w,S)=>S>0&&w!==void 0),m=this.matchIndexes[f];return l.splice(0,f),Object.assign(l,m)}}class s{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(i){if(this.multiRegexes[i])return this.multiRegexes[i];let l=new t;return this.rules.slice(i).forEach(([f,m])=>l.addRule(f,m)),l.compile(),this.multiRegexes[i]=l,l}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(i,l){this.rules.push([i,l]),l.type==="begin"&&this.count++}exec(i){let l=this.getMatcher(this.regexIndex);l.lastIndex=this.lastIndex;let f=l.exec(i);if(this.resumingScanAtSamePosition()&&!(f&&f.index===this.lastIndex)){let m=this.getMatcher(0);m.lastIndex=this.lastIndex+1,f=m.exec(i)}return f&&(this.regexIndex+=f.position+1,this.regexIndex===this.count&&this.considerAll()),f}}function g(a){let i=new s;return a.contains.forEach(l=>i.addRule(l.begin,{rule:l,type:"begin"})),a.terminatorEnd&&i.addRule(a.terminatorEnd,{type:"end"}),a.illegal&&i.addRule(a.illegal,{type:"illegal"}),i}function E(a,i){let l=a;if(a.isCompiled)return l;[st,ot,Et,lt].forEach(m=>m(a,i)),e.compilerExtensions.forEach(m=>m(a,i)),a.__beforeBegin=null,[rt,at,ct].forEach(m=>m(a,i)),a.isCompiled=!0;let f=null;return typeof a.keywords=="object"&&a.keywords.$pattern&&(a.keywords=Object.assign({},a.keywords),f=a.keywords.$pattern,delete a.keywords.$pattern),f=f||/\w+/,a.keywords&&(a.keywords=Ye(a.keywords,e.case_insensitive)),l.keywordPatternRe=n(f,!0),i&&(a.begin||(a.begin=/\B|\b/),l.beginRe=n(l.begin),!a.end&&!a.endsWithParent&&(a.end=/\B|\b/),a.end&&(l.endRe=n(l.end)),l.terminatorEnd=re(l.end)||"",a.endsWithParent&&i.terminatorEnd&&(l.terminatorEnd+=(a.end?"|":"")+i.terminatorEnd)),a.illegal&&(l.illegalRe=n(a.illegal)),a.contains||(a.contains=[]),a.contains=[].concat(...a.contains.map(function(m){return _t(m==="self"?a:m)})),a.contains.forEach(function(m){E(m,l)}),a.starts&&E(a.starts,i),l.matcher=g(l),l}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=K(e.classNameAliases||{}),E(e)}function qe(e){return e?e.endsWithParent||qe(e.starts):!1}function _t(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(n){return K(e,{variants:null},n)})),e.cachedVariants?e.cachedVariants:qe(e)?K(e,{starts:e.starts?K(e.starts):null}):Object.isFrozen(e)?K(e):e}var Nt="11.9.0",Ae=class extends Error{constructor(n,t){super(n),this.name="HTMLInjectionError",this.html=t}},me=He,Pe=K,ze=Symbol("nomatch"),St=7,Qe=function(e){let n=Object.create(null),t=Object.create(null),s=[],g=!0,E="Could not find the language '{}', did you forget to load/include a language module?",a={disableAutodetect:!0,name:"Plain text",contains:[]},i={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:Se};function l(r){return i.noHighlightRe.test(r)}function f(r){let o=r.className+" ";o+=r.parentNode?r.parentNode.className:"";let d=i.languageDetectRe.exec(o);if(d){let h=D(d[1]);return h||(Ue(E.replace("{}",d[1])),Ue("Falling back to no-highlight mode for this block.",r)),h?d[1]:"no-highlight"}return o.split(/\s+/).find(h=>l(h)||D(h))}function m(r,o,d){let h="",_="";typeof o=="object"?(h=r,d=o.ignoreIllegals,_=o.language):(J("10.7.0","highlight(lang, code, ...args) has been deprecated."),J("10.7.0",`Please use highlight(code, options) instead.
+https://github.com/highlightjs/highlight.js/issues/2277`),_=r,h=o),d===void 0&&(d=!0);let T={code:h,language:_};F("before:highlight",T);let v=T.result?T.result:w(T.language,T.code,d);return v.code=T.code,F("after:highlight",v),v}function w(r,o,d,h){let _=Object.create(null);function T(c,u){return c.keywords[u]}function v(){if(!b.keywords){O.addText(A);return}let c=0;b.keywordPatternRe.lastIndex=0;let u=b.keywordPatternRe.exec(A),p="";for(;u;){p+=A.substring(c,u.index);let N=$.case_insensitive?u[0].toLowerCase():u[0],R=T(b,N);if(R){let[G,yn]=R;if(O.addText(p),p="",_[N]=(_[N]||0)+1,_[N]<=St&&(le+=yn),G.startsWith("_"))p+=u[0];else{let Tn=$.classNameAliases[G]||G;z(u[0],Tn)}}else p+=u[0];c=b.keywordPatternRe.lastIndex,u=b.keywordPatternRe.exec(A)}p+=A.substring(c),O.addText(p)}function oe(){if(A==="")return;let c=null;if(typeof b.subLanguage=="string"){if(!n[b.subLanguage]){O.addText(A);return}c=w(b.subLanguage,A,!0,Ie[b.subLanguage]),Ie[b.subLanguage]=c._top}else c=y(A,b.subLanguage.length?b.subLanguage:null);b.relevance>0&&(le+=c.relevance),O.__addSublanguage(c._emitter,c.language)}function I(){b.subLanguage!=null?oe():v(),A=""}function z(c,u){c!==""&&(O.startScope(u),O.addText(c),O.endScope())}function xe(c,u){let p=1,N=u.length-1;for(;p<=N;){if(!c._emit[p]){p++;continue}let R=$.classNameAliases[c[p]]||c[p],G=u[p];R?z(G,R):(A=G,v(),A=""),p++}}function Me(c,u){return c.scope&&typeof c.scope=="string"&&O.openNode($.classNameAliases[c.scope]||c.scope),c.beginScope&&(c.beginScope._wrap?(z(A,$.classNameAliases[c.beginScope._wrap]||c.beginScope._wrap),A=""):c.beginScope._multi&&(xe(c.beginScope,u),A="")),b=Object.create(c,{parent:{value:b}}),b}function ve(c,u,p){let N=Pn(c.endRe,p);if(N){if(c["on:end"]){let R=new de(c);c["on:end"](u,R),R.isMatchIgnored&&(N=!1)}if(N){for(;c.endsParent&&c.parent;)c=c.parent;return c}}if(c.endsWithParent)return ve(c.parent,u,p)}function mn(c){return b.matcher.regexIndex===0?(A+=c[0],1):(Ee=!0,0)}function _n(c){let u=c[0],p=c.rule,N=new de(p),R=[p.__beforeBegin,p["on:begin"]];for(let G of R)if(G&&(G(c,N),N.isMatchIgnored))return mn(u);return p.skip?A+=u:(p.excludeBegin&&(A+=u),I(),!p.returnBegin&&!p.excludeBegin&&(A=u)),Me(p,c),p.returnBegin?0:u.length}function Nn(c){let u=c[0],p=o.substring(c.index),N=ve(b,c,p);if(!N)return ze;let R=b;b.endScope&&b.endScope._wrap?(I(),z(u,b.endScope._wrap)):b.endScope&&b.endScope._multi?(I(),xe(b.endScope,c)):R.skip?A+=u:(R.returnEnd||R.excludeEnd||(A+=u),I(),R.excludeEnd&&(A=u));do b.scope&&O.closeNode(),!b.skip&&!b.subLanguage&&(le+=b.relevance),b=b.parent;while(b!==N.parent);return N.starts&&Me(N.starts,c),R.returnEnd?0:u.length}function Sn(){let c=[];for(let u=b;u!==$;u=u.parent)u.scope&&c.unshift(u.scope);c.forEach(u=>O.openNode(u))}let ce={};function ke(c,u){let p=u&&u[0];if(A+=c,p==null)return I(),0;if(ce.type==="begin"&&u.type==="end"&&ce.index===u.index&&p===""){if(A+=o.slice(u.index,u.index+1),!g){let N=new Error(`0 width match regex (${r})`);throw N.languageName=r,N.badRule=ce.rule,N}return 1}if(ce=u,u.type==="begin")return _n(u);if(u.type==="illegal"&&!d){let N=new Error('Illegal lexeme "'+p+'" for mode "'+(b.scope||"<unnamed>")+'"');throw N.mode=b,N}else if(u.type==="end"){let N=Nn(u);if(N!==ze)return N}if(u.type==="illegal"&&p==="")return 1;if(he>1e5&&he>u.index*3)throw new Error("potential infinite loop, way more iterations than matches");return A+=p,p.length}let $=D(r);if(!$)throw Y(E.replace("{}",r)),new Error('Unknown language: "'+r+'"');let An=mt($),pe="",b=h||An,Ie={},O=new i.__emitter(i);Sn();let A="",le=0,X=0,he=0,Ee=!1;try{if($.__emitTokens)$.__emitTokens(o,O);else{for(b.matcher.considerAll();;){he++,Ee?Ee=!1:b.matcher.considerAll(),b.matcher.lastIndex=X;let c=b.matcher.exec(o);if(!c)break;let u=o.substring(X,c.index),p=ke(u,c);X=c.index+p}ke(o.substring(X))}return O.finalize(),pe=O.toHTML(),{language:r,value:pe,relevance:le,illegal:!1,_emitter:O,_top:b}}catch(c){if(c.message&&c.message.includes("Illegal"))return{language:r,value:me(o),illegal:!0,relevance:0,_illegalBy:{message:c.message,index:X,context:o.slice(X-100,X+100),mode:c.mode,resultSoFar:pe},_emitter:O};if(g)return{language:r,value:me(o),illegal:!1,relevance:0,errorRaised:c,_emitter:O,_top:b};throw c}}function S(r){let o={value:me(r),illegal:!1,relevance:0,_top:a,_emitter:new i.__emitter(i)};return o._emitter.addText(r),o}function y(r,o){o=o||i.languages||Object.keys(n);let d=S(r),h=o.filter(D).filter(Q).map(I=>w(I,r,!1));h.unshift(d);let _=h.sort((I,z)=>{if(I.relevance!==z.relevance)return z.relevance-I.relevance;if(I.language&&z.language){if(D(I.language).supersetOf===z.language)return 1;if(D(z.language).supersetOf===I.language)return-1}return 0}),[T,v]=_,oe=T;return oe.secondBest=v,oe}function C(r,o,d){let h=o&&t[o]||d;r.classList.add("hljs"),r.classList.add(`language-${h}`)}function x(r){let o=null,d=f(r);if(l(d))return;if(F("before:highlightElement",{el:r,language:d}),r.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",r);return}if(r.children.length>0&&(i.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("https://github.com/highlightjs/highlight.js/wiki/security"),console.warn("The element with unescaped HTML:"),console.warn(r)),i.throwUnescapedHTML))throw new Ae("One of your code blocks includes unescaped HTML.",r.innerHTML);o=r;let h=o.textContent,_=d?m(h,{language:d,ignoreIllegals:!0}):y(h);r.innerHTML=_.value,r.dataset.highlighted="yes",C(r,d,_.language),r.result={language:_.language,re:_.relevance,relevance:_.relevance},_.secondBest&&(r.secondBest={language:_.secondBest.language,relevance:_.secondBest.relevance}),F("after:highlightElement",{el:r,result:_,text:h})}function M(r){i=Pe(i,r)}let ee=()=>{L(),J("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function B(){L(),J("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let P=!1;function L(){if(document.readyState==="loading"){P=!0;return}document.querySelectorAll(i.cssSelector).forEach(x)}function H(){P&&L()}typeof window<"u"&&window.addEventListener&&window.addEventListener("DOMContentLoaded",H,!1);function k(r,o){let d=null;try{d=o(e)}catch(h){if(Y("Language definition for '{}' could not be registered.".replace("{}",r)),g)Y(h);else throw h;d=a}d.name||(d.name=r),n[r]=d,d.rawDefinition=o.bind(null,e),d.aliases&&q(d.aliases,{languageName:r})}function ne(r){delete n[r];for(let o of Object.keys(t))t[o]===r&&delete t[o]}function Z(){return Object.keys(n)}function D(r){return r=(r||"").toLowerCase(),n[r]||n[t[r]]}function q(r,{languageName:o}){typeof r=="string"&&(r=[r]),r.forEach(d=>{t[d.toLowerCase()]=o})}function Q(r){let o=D(r);return o&&!o.disableAutodetect}function te(r){r["before:highlightBlock"]&&!r["before:highlightElement"]&&(r["before:highlightElement"]=o=>{r["before:highlightBlock"](Object.assign({block:o.el},o))}),r["after:highlightBlock"]&&!r["after:highlightElement"]&&(r["after:highlightElement"]=o=>{r["after:highlightBlock"](Object.assign({block:o.el},o))})}function ie(r){te(r),s.push(r)}function se(r){let o=s.indexOf(r);o!==-1&&s.splice(o,1)}function F(r,o){let d=r;s.forEach(function(h){h[d]&&h[d](o)})}function W(r){return J("10.7.0","highlightBlock will be removed entirely in v12.0"),J("10.7.0","Please use highlightElement now."),x(r)}Object.assign(e,{highlight:m,highlightAuto:y,highlightAll:L,highlightElement:x,highlightBlock:W,configure:M,initHighlighting:ee,initHighlightingOnLoad:B,registerLanguage:k,unregisterLanguage:ne,listLanguages:Z,getLanguage:D,registerAliases:q,autoDetection:Q,inherit:Pe,addPlugin:ie,removePlugin:se}),e.debugMode=function(){g=!1},e.safeMode=function(){g=!0},e.versionString=Nt,e.regex={concat:j,lookahead:Ge,either:ye,optional:Bn,anyNumberOfTimes:Dn};for(let r in ue)typeof ue[r]=="object"&&$e(ue[r]);return Object.assign(e,ue),e},V=Qe({});V.newInstance=()=>Qe({});Je.exports=V;V.HighlightJS=V;V.default=V});var en=In(Ve(),1);var U=en.default;var nn="[A-Za-z$_][0-9A-Za-z$_]*",At=["as","in","of","if","for","while","finally","var","new","function","do","return","void","else","break","catch","instanceof","with","throw","case","default","try","switch","continue","typeof","delete","let","yield","const","class","debugger","async","await","static","import","from","export","extends"],yt=["true","false","null","undefined","NaN","Infinity"],tn=["Object","Function","Boolean","Symbol","Math","Date","Number","BigInt","String","RegExp","Array","Float32Array","Float64Array","Int8Array","Uint8Array","Uint8ClampedArray","Int16Array","Int32Array","Uint16Array","Uint32Array","BigInt64Array","BigUint64Array","Set","Map","WeakSet","WeakMap","ArrayBuffer","SharedArrayBuffer","Atomics","DataView","JSON","Promise","Generator","GeneratorFunction","AsyncFunction","Reflect","Proxy","Intl","WebAssembly"],sn=["Error","EvalError","InternalError","RangeError","ReferenceError","SyntaxError","TypeError","URIError"],rn=["setInterval","setTimeout","clearInterval","clearTimeout","require","exports","eval","isFinite","isNaN","parseFloat","parseInt","decodeURI","decodeURIComponent","encodeURI","encodeURIComponent","escape","unescape"],Tt=["arguments","this","super","console","window","document","localStorage","sessionStorage","module","global"],wt=[].concat(rn,tn,sn);function Oe(e){let n=e.regex,t=(o,{after:d})=>{let h="</"+o[0].slice(1);return o.input.indexOf(h,d)!==-1},s=nn,g={begin:"<>",end:"</>"},E=/<[A-Za-z0-9\\._:-]+\s*\/>/,a={begin:/<[A-Za-z0-9\\._:-]+/,end:/\/[A-Za-z0-9\\._:-]+>|\/>/,isTrulyOpeningTag:(o,d)=>{let h=o[0].length+o.index,_=o.input[h];if(_==="<"||_===","){d.ignoreMatch();return}_===">"&&(t(o,{after:h})||d.ignoreMatch());let T,v=o.input.substring(h);if(T=v.match(/^\s*=/)){d.ignoreMatch();return}if((T=v.match(/^\s+extends\s+/))&&T.index===0){d.ignoreMatch();return}}},i={$pattern:nn,keyword:At,literal:yt,built_in:wt,"variable.language":Tt},l="[0-9](_?[0-9])*",f=`\\.(${l})`,m="0|[1-9](_?[0-9])*|0[0-7]*[89][0-9]*",w={className:"number",variants:[{begin:`(\\b(${m})((${f})|\\.)?|(${f}))[eE][+-]?(${l})\\b`},{begin:`\\b(${m})\\b((${f})\\b|\\.)?|(${f})\\b`},{begin:"\\b(0|[1-9](_?[0-9])*)n\\b"},{begin:"\\b0[xX][0-9a-fA-F](_?[0-9a-fA-F])*n?\\b"},{begin:"\\b0[bB][0-1](_?[0-1])*n?\\b"},{begin:"\\b0[oO][0-7](_?[0-7])*n?\\b"},{begin:"\\b0[0-7]+n?\\b"}],relevance:0},S={className:"subst",begin:"\\$\\{",end:"\\}",keywords:i,contains:[]},y={begin:"html`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"xml"}},C={begin:"css`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"css"}},x={begin:"gql`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"graphql"}},M={className:"string",begin:"`",end:"`",contains:[e.BACKSLASH_ESCAPE,S]},B={className:"comment",variants:[e.COMMENT(/\/\*\*(?!\/)/,"\\*/",{relevance:0,contains:[{begin:"(?=@[A-Za-z]+)",relevance:0,contains:[{className:"doctag",begin:"@[A-Za-z]+"},{className:"type",begin:"\\{",end:"\\}",excludeEnd:!0,excludeBegin:!0,relevance:0},{className:"variable",begin:s+"(?=\\s*(-)|$)",endsParent:!0,relevance:0},{begin:/(?=[^\n])\s/,relevance:0}]}]}),e.C_BLOCK_COMMENT_MODE,e.C_LINE_COMMENT_MODE]},P=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,{match:/\$\d+/},w];S.contains=P.concat({begin:/\{/,end:/\}/,keywords:i,contains:["self"].concat(P)});let L=[].concat(B,S.contains),H=L.concat([{begin:/\(/,end:/\)/,keywords:i,contains:["self"].concat(L)}]),k={className:"params",begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H},ne={variants:[{match:[/class/,/\s+/,s,/\s+/,/extends/,/\s+/,n.concat(s,"(",n.concat(/\./,s),")*")],scope:{1:"keyword",3:"title.class",5:"keyword",7:"title.class.inherited"}},{match:[/class/,/\s+/,s],scope:{1:"keyword",3:"title.class"}}]},Z={relevance:0,match:n.either(/\bJSON/,/\b[A-Z][a-z]+([A-Z][a-z]*|\d)*/,/\b[A-Z]{2,}([A-Z][a-z]+|\d)+([A-Z][a-z]*)*/,/\b[A-Z]{2,}[a-z]+([A-Z][a-z]+|\d)*([A-Z][a-z]*)*/),className:"title.class",keywords:{_:[...tn,...sn]}},D={label:"use_strict",className:"meta",relevance:10,begin:/^\s*['"]use (strict|asm)['"]/},q={variants:[{match:[/function/,/\s+/,s,/(?=\s*\()/]},{match:[/function/,/\s*(?=\()/]}],className:{1:"keyword",3:"title.function"},label:"func.def",contains:[k],illegal:/%/},Q={relevance:0,match:/\b[A-Z][A-Z_0-9]+\b/,className:"variable.constant"};function te(o){return n.concat("(?!",o.join("|"),")")}let ie={match:n.concat(/\b/,te([...rn,"super","import"]),s,n.lookahead(/\(/)),className:"title.function",relevance:0},se={begin:n.concat(/\./,n.lookahead(n.concat(s,/(?![0-9A-Za-z$_(])/))),end:s,excludeBegin:!0,keywords:"prototype",className:"property",relevance:0},F={match:[/get|set/,/\s+/,s,/(?=\()/],className:{1:"keyword",3:"title.function"},contains:[{begin:/\(\)/},k]},W="(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|"+e.UNDERSCORE_IDENT_RE+")\\s*=>",r={match:[/const|var|let/,/\s+/,s,/\s*/,/=\s*/,/(async\s*)?/,n.lookahead(W)],keywords:"async",className:{1:"keyword",3:"title.function"},contains:[k]};return{name:"JavaScript",aliases:["js","jsx","mjs","cjs"],keywords:i,exports:{PARAMS_CONTAINS:H,CLASS_REFERENCE:Z},illegal:/#(?![$_A-z])/,contains:[e.SHEBANG({label:"shebang",binary:"node",relevance:5}),D,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,B,{match:/\$\d+/},w,Z,{className:"attr",begin:s+n.lookahead(":"),relevance:0},r,{begin:"("+e.RE_STARTERS_RE+"|\\b(case|return|throw)\\b)\\s*",keywords:"return throw case",relevance:0,contains:[B,e.REGEXP_MODE,{className:"function",begin:W,returnBegin:!0,end:"\\s*=>",contains:[{className:"params",variants:[{begin:e.UNDERSCORE_IDENT_RE,relevance:0},{className:null,begin:/\(\s*\)/,skip:!0},{begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H}]}]},{begin:/,/,relevance:0},{match:/\s+/,relevance:0},{variants:[{begin:g.begin,end:g.end},{match:E},{begin:a.begin,"on:begin":a.isTrulyOpeningTag,end:a.end}],subLanguage:"xml",contains:[{begin:a.begin,end:a.end,skip:!0,contains:["self"]}]}]},q,{beginKeywords:"while if switch catch for"},{begin:"\\b(?!function)"+e.UNDERSCORE_IDENT_RE+"\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)\\s*\\{",returnBegin:!0,label:"func.def",contains:[k,e.inherit(e.TITLE_MODE,{begin:s,className:"title.function"})]},{match:/\.\.\./,relevance:0},se,{match:"\\$"+s,relevance:0},{match:[/\bconstructor(?=\s*\()/],className:{1:"title.function"},contains:[k]},ie,Q,ne,F,{match:/\$[(.]/}]}}var be="[A-Za-z$_][0-9A-Za-z$_]*",an=["as","in","of","if","for","while","finally","var","new","function","do","return","void","else","break","catch","instanceof","with","throw","case","default","try","switch","continue","typeof","delete","let","yield","const","class","debugger","async","await","static","import","from","export","extends"],on=["true","false","null","undefined","NaN","Infinity"],cn=["Object","Function","Boolean","Symbol","Math","Date","Number","BigInt","String","RegExp","Array","Float32Array","Float64Array","Int8Array","Uint8Array","Uint8ClampedArray","Int16Array","Int32Array","Uint16Array","Uint32Array","BigInt64Array","BigUint64Array","Set","Map","WeakSet","WeakMap","ArrayBuffer","SharedArrayBuffer","Atomics","DataView","JSON","Promise","Generator","GeneratorFunction","AsyncFunction","Reflect","Proxy","Intl","WebAssembly"],ln=["Error","EvalError","InternalError","RangeError","ReferenceError","SyntaxError","TypeError","URIError"],un=["setInterval","setTimeout","clearInterval","clearTimeout","require","exports","eval","isFinite","isNaN","parseFloat","parseInt","decodeURI","decodeURIComponent","encodeURI","encodeURIComponent","escape","unescape"],dn=["arguments","this","super","console","window","document","localStorage","sessionStorage","module","global"],gn=[].concat(un,cn,ln);function Ot(e){let n=e.regex,t=(o,{after:d})=>{let h="</"+o[0].slice(1);return o.input.indexOf(h,d)!==-1},s=be,g={begin:"<>",end:"</>"},E=/<[A-Za-z0-9\\._:-]+\s*\/>/,a={begin:/<[A-Za-z0-9\\._:-]+/,end:/\/[A-Za-z0-9\\._:-]+>|\/>/,isTrulyOpeningTag:(o,d)=>{let h=o[0].length+o.index,_=o.input[h];if(_==="<"||_===","){d.ignoreMatch();return}_===">"&&(t(o,{after:h})||d.ignoreMatch());let T,v=o.input.substring(h);if(T=v.match(/^\s*=/)){d.ignoreMatch();return}if((T=v.match(/^\s+extends\s+/))&&T.index===0){d.ignoreMatch();return}}},i={$pattern:be,keyword:an,literal:on,built_in:gn,"variable.language":dn},l="[0-9](_?[0-9])*",f=`\\.(${l})`,m="0|[1-9](_?[0-9])*|0[0-7]*[89][0-9]*",w={className:"number",variants:[{begin:`(\\b(${m})((${f})|\\.)?|(${f}))[eE][+-]?(${l})\\b`},{begin:`\\b(${m})\\b((${f})\\b|\\.)?|(${f})\\b`},{begin:"\\b(0|[1-9](_?[0-9])*)n\\b"},{begin:"\\b0[xX][0-9a-fA-F](_?[0-9a-fA-F])*n?\\b"},{begin:"\\b0[bB][0-1](_?[0-1])*n?\\b"},{begin:"\\b0[oO][0-7](_?[0-7])*n?\\b"},{begin:"\\b0[0-7]+n?\\b"}],relevance:0},S={className:"subst",begin:"\\$\\{",end:"\\}",keywords:i,contains:[]},y={begin:"html`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"xml"}},C={begin:"css`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"css"}},x={begin:"gql`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"graphql"}},M={className:"string",begin:"`",end:"`",contains:[e.BACKSLASH_ESCAPE,S]},B={className:"comment",variants:[e.COMMENT(/\/\*\*(?!\/)/,"\\*/",{relevance:0,contains:[{begin:"(?=@[A-Za-z]+)",relevance:0,contains:[{className:"doctag",begin:"@[A-Za-z]+"},{className:"type",begin:"\\{",end:"\\}",excludeEnd:!0,excludeBegin:!0,relevance:0},{className:"variable",begin:s+"(?=\\s*(-)|$)",endsParent:!0,relevance:0},{begin:/(?=[^\n])\s/,relevance:0}]}]}),e.C_BLOCK_COMMENT_MODE,e.C_LINE_COMMENT_MODE]},P=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,{match:/\$\d+/},w];S.contains=P.concat({begin:/\{/,end:/\}/,keywords:i,contains:["self"].concat(P)});let L=[].concat(B,S.contains),H=L.concat([{begin:/\(/,end:/\)/,keywords:i,contains:["self"].concat(L)}]),k={className:"params",begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H},ne={variants:[{match:[/class/,/\s+/,s,/\s+/,/extends/,/\s+/,n.concat(s,"(",n.concat(/\./,s),")*")],scope:{1:"keyword",3:"title.class",5:"keyword",7:"title.class.inherited"}},{match:[/class/,/\s+/,s],scope:{1:"keyword",3:"title.class"}}]},Z={relevance:0,match:n.either(/\bJSON/,/\b[A-Z][a-z]+([A-Z][a-z]*|\d)*/,/\b[A-Z]{2,}([A-Z][a-z]+|\d)+([A-Z][a-z]*)*/,/\b[A-Z]{2,}[a-z]+([A-Z][a-z]+|\d)*([A-Z][a-z]*)*/),className:"title.class",keywords:{_:[...cn,...ln]}},D={label:"use_strict",className:"meta",relevance:10,begin:/^\s*['"]use (strict|asm)['"]/},q={variants:[{match:[/function/,/\s+/,s,/(?=\s*\()/]},{match:[/function/,/\s*(?=\()/]}],className:{1:"keyword",3:"title.function"},label:"func.def",contains:[k],illegal:/%/},Q={relevance:0,match:/\b[A-Z][A-Z_0-9]+\b/,className:"variable.constant"};function te(o){return n.concat("(?!",o.join("|"),")")}let ie={match:n.concat(/\b/,te([...un,"super","import"]),s,n.lookahead(/\(/)),className:"title.function",relevance:0},se={begin:n.concat(/\./,n.lookahead(n.concat(s,/(?![0-9A-Za-z$_(])/))),end:s,excludeBegin:!0,keywords:"prototype",className:"property",relevance:0},F={match:[/get|set/,/\s+/,s,/(?=\()/],className:{1:"keyword",3:"title.function"},contains:[{begin:/\(\)/},k]},W="(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|"+e.UNDERSCORE_IDENT_RE+")\\s*=>",r={match:[/const|var|let/,/\s+/,s,/\s*/,/=\s*/,/(async\s*)?/,n.lookahead(W)],keywords:"async",className:{1:"keyword",3:"title.function"},contains:[k]};return{name:"JavaScript",aliases:["js","jsx","mjs","cjs"],keywords:i,exports:{PARAMS_CONTAINS:H,CLASS_REFERENCE:Z},illegal:/#(?![$_A-z])/,contains:[e.SHEBANG({label:"shebang",binary:"node",relevance:5}),D,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,B,{match:/\$\d+/},w,Z,{className:"attr",begin:s+n.lookahead(":"),relevance:0},r,{begin:"("+e.RE_STARTERS_RE+"|\\b(case|return|throw)\\b)\\s*",keywords:"return throw case",relevance:0,contains:[B,e.REGEXP_MODE,{className:"function",begin:W,returnBegin:!0,end:"\\s*=>",contains:[{className:"params",variants:[{begin:e.UNDERSCORE_IDENT_RE,relevance:0},{className:null,begin:/\(\s*\)/,skip:!0},{begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H}]}]},{begin:/,/,relevance:0},{match:/\s+/,relevance:0},{variants:[{begin:g.begin,end:g.end},{match:E},{begin:a.begin,"on:begin":a.isTrulyOpeningTag,end:a.end}],subLanguage:"xml",contains:[{begin:a.begin,end:a.end,skip:!0,contains:["self"]}]}]},q,{beginKeywords:"while if switch catch for"},{begin:"\\b(?!function)"+e.UNDERSCORE_IDENT_RE+"\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)\\s*\\{",returnBegin:!0,label:"func.def",contains:[k,e.inherit(e.TITLE_MODE,{begin:s,className:"title.function"})]},{match:/\.\.\./,relevance:0},se,{match:"\\$"+s,relevance:0},{match:[/\bconstructor(?=\s*\()/],className:{1:"title.function"},contains:[k]},ie,Q,ne,F,{match:/\$[(.]/}]}}function Re(e){let n=Ot(e),t=be,s=["any","void","number","boolean","string","object","never","symbol","bigint","unknown"],g={beginKeywords:"namespace",end:/\{/,excludeEnd:!0,contains:[n.exports.CLASS_REFERENCE]},E={beginKeywords:"interface",end:/\{/,excludeEnd:!0,keywords:{keyword:"interface extends",built_in:s},contains:[n.exports.CLASS_REFERENCE]},a={className:"meta",relevance:10,begin:/^\s*['"]use strict['"]/},i=["type","namespace","interface","public","private","protected","implements","declare","abstract","readonly","enum","override"],l={$pattern:be,keyword:an.concat(i),literal:on,built_in:gn.concat(s),"variable.language":dn},f={className:"meta",begin:"@"+t},m=(S,y,C)=>{let x=S.contains.findIndex(M=>M.label===y);if(x===-1)throw new Error("can not find mode to replace");S.contains.splice(x,1,C)};Object.assign(n.keywords,l),n.exports.PARAMS_CONTAINS.push(f),n.contains=n.contains.concat([f,g,E]),m(n,"shebang",e.SHEBANG()),m(n,"use_strict",a);let w=n.contains.find(S=>S.label==="func.def");return w.relevance=0,Object.assign(n,{name:"TypeScript",aliases:["ts","tsx","mts","cts"]}),n}function fn(e){let n=e.regex,t=n.concat(/[\p{L}_]/u,n.optional(/[\p{L}0-9_.-]*:/u),/[\p{L}0-9_.-]*/u),s=/[\p{L}0-9._:-]+/u,g={className:"symbol",begin:/&[a-z]+;|&#[0-9]+;|&#x[a-f0-9]+;/},E={begin:/\s/,contains:[{className:"keyword",begin:/#?[a-z_][a-z1-9_-]+/,illegal:/\n/}]},a=e.inherit(E,{begin:/\(/,end:/\)/}),i=e.inherit(e.APOS_STRING_MODE,{className:"string"}),l=e.inherit(e.QUOTE_STRING_MODE,{className:"string"}),f={endsWithParent:!0,illegal:/</,relevance:0,contains:[{className:"attr",begin:s,relevance:0},{begin:/=\s*/,relevance:0,contains:[{className:"string",endsParent:!0,variants:[{begin:/"/,end:/"/,contains:[g]},{begin:/'/,end:/'/,contains:[g]},{begin:/[^\s"'=<>`]+/}]}]}]};return{name:"HTML, XML",aliases:["html","xhtml","rss","atom","xjb","xsd","xsl","plist","wsf","svg"],case_insensitive:!0,unicodeRegex:!0,contains:[{className:"meta",begin:/<![a-z]/,end:/>/,relevance:10,contains:[E,l,i,a,{begin:/\[/,end:/\]/,contains:[{className:"meta",begin:/<![a-z]/,end:/>/,contains:[E,a,l,i]}]}]},e.COMMENT(/<!--/,/-->/,{relevance:10}),{begin:/<!\[CDATA\[/,end:/\]\]>/,relevance:10},g,{className:"meta",end:/\?>/,variants:[{begin:/<\?xml/,relevance:10,contains:[l]},{begin:/<\?[a-z][a-z0-9]+/}]},{className:"tag",begin:/<style(?=\s|>)/,end:/>/,keywords:{name:"style"},contains:[f],starts:{end:/<\/style>/,returnEnd:!0,subLanguage:["css","xml"]}},{className:"tag",begin:/<script(?=\s|>)/,end:/>/,keywords:{name:"script"},contains:[f],starts:{end:/<\/script>/,returnEnd:!0,subLanguage:["javascript","handlebars","xml"]}},{className:"tag",begin:/<>|<\/>/},{className:"tag",begin:n.concat(/</,n.lookahead(n.concat(t,n.either(/\/>/,/>/,/\s/)))),end:/\/?>/,contains:[{className:"name",begin:t,relevance:0,starts:f}]},{className:"tag",begin:n.concat(/<\//,n.lookahead(n.concat(t,/>/))),contains:[{className:"name",begin:t,relevance:0},{begin:/>/,relevance:0,endsParent:!0}]}]}}var Rt=e=>({IMPORTANT:{scope:"meta",begin:"!important"},BLOCK_COMMENT:e.C_BLOCK_COMMENT_MODE,HEXCOLOR:{scope:"number",begin:/#(([0-9a-fA-F]{3,4})|(([0-9a-fA-F]{2}){3,4}))\b/},FUNCTION_DISPATCH:{className:"built_in",begin:/[\w-]+(?=\()/},ATTRIBUTE_SELECTOR_MODE:{scope:"selector-attr",begin:/\[/,end:/\]/,illegal:"$",contains:[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE]},CSS_NUMBER_MODE:{scope:"number",begin:e.NUMBER_RE+"(%|em|ex|ch|rem|vw|vh|vmin|vmax|cm|mm|in|pt|pc|px|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?",relevance:0},CSS_VARIABLE:{className:"attr",begin:/--[A-Za-z_][A-Za-z0-9_-]*/}}),xt=["a","abbr","address","article","aside","audio","b","blockquote","body","button","canvas","caption","cite","code","dd","del","details","dfn","div","dl","dt","em","fieldset","figcaption","figure","footer","form","h1","h2","h3","h4","h5","h6","header","hgroup","html","i","iframe","img","input","ins","kbd","label","legend","li","main","mark","menu","nav","object","ol","p","q","quote","samp","section","span","strong","summary","sup","table","tbody","td","textarea","tfoot","th","thead","time","tr","ul","var","video"],Mt=["any-hover","any-pointer","aspect-ratio","color","color-gamut","color-index","device-aspect-ratio","device-height","device-width","display-mode","forced-colors","grid","height","hover","inverted-colors","monochrome","orientation","overflow-block","overflow-inline","pointer","prefers-color-scheme","prefers-contrast","prefers-reduced-motion","prefers-reduced-transparency","resolution","scan","scripting","update","width","min-width","max-width","min-height","max-height"],vt=["active","any-link","blank","checked","current","default","defined","dir","disabled","drop","empty","enabled","first","first-child","first-of-type","fullscreen","future","focus","focus-visible","focus-within","has","host","host-context","hover","indeterminate","in-range","invalid","is","lang","last-child","last-of-type","left","link","local-link","not","nth-child","nth-col","nth-last-child","nth-last-col","nth-last-of-type","nth-of-type","only-child","only-of-type","optional","out-of-range","past","placeholder-shown","read-only","read-write","required","right","root","scope","target","target-within","user-invalid","valid","visited","where"],kt=["after","backdrop","before","cue","cue-region","first-letter","first-line","grammar-error","marker","part","placeholder","selection","slotted","spelling-error"],It=["align-content","align-items","align-self","all","animation","animation-delay","animation-direction","animation-duration","animation-fill-mode","animation-iteration-count","animation-name","animation-play-state","animation-timing-function","backface-visibility","background","background-attachment","background-blend-mode","background-clip","background-color","background-image","background-origin","background-position","background-repeat","background-size","block-size","border","border-block","border-block-color","border-block-end","border-block-end-color","border-block-end-style","border-block-end-width","border-block-start","border-block-start-color","border-block-start-style","border-block-start-width","border-block-style","border-block-width","border-bottom","border-bottom-color","border-bottom-left-radius","border-bottom-right-radius","border-bottom-style","border-bottom-width","border-collapse","border-color","border-image","border-image-outset","border-image-repeat","border-image-slice","border-image-source","border-image-width","border-inline","border-inline-color","border-inline-end","border-inline-end-color","border-inline-end-style","border-inline-end-width","border-inline-start","border-inline-start-color","border-inline-start-style","border-inline-start-width","border-inline-style","border-inline-width","border-left","border-left-color","border-left-style","border-left-width","border-radius","border-right","border-right-color","border-right-style","border-right-width","border-spacing","border-style","border-top","border-top-color","border-top-left-radius","border-top-right-radius","border-top-style","border-top-width","border-width","bottom","box-decoration-break","box-shadow","box-sizing","break-after","break-before","break-inside","caption-side","caret-color","clear","clip","clip-path","clip-rule","color","column-count","column-fill","column-gap","column-rule","column-rule-color","column-rule-style","column-rule-width","column-span","column-width","columns","contain","content","content-visibility","counter-increment","counter-reset","cue","cue-after","cue-before","cursor","direction","display","empty-cells","filter","flex","flex-basis","flex-direction","flex-flow","flex-grow","flex-shrink","flex-wrap","float","flow","font","font-display","font-family","font-feature-settings","font-kerning","font-language-override","font-size","font-size-adjust","font-smoothing","font-stretch","font-style","font-synthesis","font-variant","font-variant-caps","font-variant-east-asian","font-variant-ligatures","font-variant-numeric","font-variant-position","font-variation-settings","font-weight","gap","glyph-orientation-vertical","grid","grid-area","grid-auto-columns","grid-auto-flow","grid-auto-rows","grid-column","grid-column-end","grid-column-start","grid-gap","grid-row","grid-row-end","grid-row-start","grid-template","grid-template-areas","grid-template-columns","grid-template-rows","hanging-punctuation","height","hyphens","icon","image-orientation","image-rendering","image-resolution","ime-mode","inline-size","isolation","justify-content","left","letter-spacing","line-break","line-height","list-style","list-style-image","list-style-position","list-style-type","margin","margin-block","margin-block-end","margin-block-start","margin-bottom","margin-inline","margin-inline-end","margin-inline-start","margin-left","margin-right","margin-top","marks","mask","mask-border","mask-border-mode","mask-border-outset","mask-border-repeat","mask-border-slice","mask-border-source","mask-border-width","mask-clip","mask-composite","mask-image","mask-mode","mask-origin","mask-position","mask-repeat","mask-size","mask-type","max-block-size","max-height","max-inline-size","max-width","min-block-size","min-height","min-inline-size","min-width","mix-blend-mode","nav-down","nav-index","nav-left","nav-right","nav-up","none","normal","object-fit","object-position","opacity","order","orphans","outline","outline-color","outline-offset","outline-style","outline-width","overflow","overflow-wrap","overflow-x","overflow-y","padding","padding-block","padding-block-end","padding-block-start","padding-bottom","padding-inline","padding-inline-end","padding-inline-start","padding-left","padding-right","padding-top","page-break-after","page-break-before","page-break-inside","pause","pause-after","pause-before","perspective","perspective-origin","pointer-events","position","quotes","resize","rest","rest-after","rest-before","right","row-gap","scroll-margin","scroll-margin-block","scroll-margin-block-end","scroll-margin-block-start","scroll-margin-bottom","scroll-margin-inline","scroll-margin-inline-end","scroll-margin-inline-start","scroll-margin-left","scroll-margin-right","scroll-margin-top","scroll-padding","scroll-padding-block","scroll-padding-block-end","scroll-padding-block-start","scroll-padding-bottom","scroll-padding-inline","scroll-padding-inline-end","scroll-padding-inline-start","scroll-padding-left","scroll-padding-right","scroll-padding-top","scroll-snap-align","scroll-snap-stop","scroll-snap-type","scrollbar-color","scrollbar-gutter","scrollbar-width","shape-image-threshold","shape-margin","shape-outside","speak","speak-as","src","tab-size","table-layout","text-align","text-align-all","text-align-last","text-combine-upright","text-decoration","text-decoration-color","text-decoration-line","text-decoration-style","text-emphasis","text-emphasis-color","text-emphasis-position","text-emphasis-style","text-indent","text-justify","text-orientation","text-overflow","text-rendering","text-shadow","text-transform","text-underline-position","top","transform","transform-box","transform-origin","transform-style","transition","transition-delay","transition-duration","transition-property","transition-timing-function","unicode-bidi","vertical-align","visibility","voice-balance","voice-duration","voice-family","voice-pitch","voice-range","voice-rate","voice-stress","voice-volume","white-space","widows","width","will-change","word-break","word-spacing","word-wrap","writing-mode","z-index"].reverse();function bn(e){let n=e.regex,t=Rt(e),s={begin:/-(webkit|moz|ms|o)-(?=[a-z])/},g="and or not only",E=/@-?\w[\w]*(-\w+)*/,a="[a-zA-Z-][a-zA-Z0-9_-]*",i=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE];return{name:"CSS",case_insensitive:!0,illegal:/[=|'\$]/,keywords:{keyframePosition:"from to"},classNameAliases:{keyframePosition:"selector-tag"},contains:[t.BLOCK_COMMENT,s,t.CSS_NUMBER_MODE,{className:"selector-id",begin:/#[A-Za-z0-9_-]+/,relevance:0},{className:"selector-class",begin:"\\."+a,relevance:0},t.ATTRIBUTE_SELECTOR_MODE,{className:"selector-pseudo",variants:[{begin:":("+vt.join("|")+")"},{begin:":(:)?("+kt.join("|")+")"}]},t.CSS_VARIABLE,{className:"attribute",begin:"\\b("+It.join("|")+")\\b"},{begin:/:/,end:/[;}{]/,contains:[t.BLOCK_COMMENT,t.HEXCOLOR,t.IMPORTANT,t.CSS_NUMBER_MODE,...i,{begin:/(url|data-uri)\(/,end:/\)/,relevance:0,keywords:{built_in:"url data-uri"},contains:[...i,{className:"string",begin:/[^)]/,endsWithParent:!0,excludeEnd:!0}]},t.FUNCTION_DISPATCH]},{begin:n.lookahead(/@/),end:"[{;]",relevance:0,illegal:/:/,contains:[{className:"keyword",begin:E},{begin:/\s/,endsWithParent:!0,excludeEnd:!0,relevance:0,keywords:{$pattern:/[a-z-]+/,keyword:g,attribute:Mt.join(" ")},contains:[{begin:/[a-z-]+(?=:)/,className:"attribute"},...i,t.CSS_NUMBER_MODE]}]},{className:"selector-tag",begin:"\\b("+xt.join("|")+")\\b"}]}}function pn(e){let n={className:"attr",begin:/"(\\.|[^\\"\r\n])*"(?=\s*:)/,relevance:1.01},t={match:/[{}[\],:]/,className:"punctuation",relevance:0},s=["true","false","null"],g={scope:"literal",beginKeywords:s.join(" ")};return{name:"JSON",keywords:{literal:s},contains:[n,t,e.QUOTE_STRING_MODE,g,e.C_NUMBER_MODE,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE],illegal:"\\S"}}function hn(e){let n=e.regex,t={},s={begin:/\$\{/,end:/\}/,contains:["self",{begin:/:-/,contains:[t]}]};Object.assign(t,{className:"variable",variants:[{begin:n.concat(/\$[\w\d#@][\w\d_]*/,"(?![\\w\\d])(?![$])")},s]});let g={className:"subst",begin:/\$\(/,end:/\)/,contains:[e.BACKSLASH_ESCAPE]},E={begin:/<<-?\s*(?=\w+)/,starts:{contains:[e.END_SAME_AS_BEGIN({begin:/(\w+)/,end:/(\w+)/,className:"string"})]}},a={className:"string",begin:/"/,end:/"/,contains:[e.BACKSLASH_ESCAPE,t,g]};g.contains.push(a);let i={match:/\\"/},l={className:"string",begin:/'/,end:/'/},f={match:/\\'/},m={begin:/\$?\(\(/,end:/\)\)/,contains:[{begin:/\d+#[0-9a-f]+/,className:"number"},e.NUMBER_MODE,t]},w=["fish","bash","zsh","sh","csh","ksh","tcsh","dash","scsh"],S=e.SHEBANG({binary:`(${w.join("|")})`,relevance:10}),y={className:"function",begin:/\w[\w\d_]*\s*\(\s*\)\s*\{/,returnBegin:!0,contains:[e.inherit(e.TITLE_MODE,{begin:/\w[\w\d_]*/})],relevance:0},C=["if","then","else","elif","fi","for","while","until","in","do","done","case","esac","function","select"],x=["true","false"],M={match:/(\/[a-z._-]+)+/},ee=["break","cd","continue","eval","exec","exit","export","getopts","hash","pwd","readonly","return","shift","test","times","trap","umask","unset"],B=["alias","bind","builtin","caller","command","declare","echo","enable","help","let","local","logout","mapfile","printf","read","readarray","source","type","typeset","ulimit","unalias"],P=["autoload","bg","bindkey","bye","cap","chdir","clone","comparguments","compcall","compctl","compdescribe","compfiles","compgroups","compquote","comptags","comptry","compvalues","dirs","disable","disown","echotc","echoti","emulate","fc","fg","float","functions","getcap","getln","history","integer","jobs","kill","limit","log","noglob","popd","print","pushd","pushln","rehash","sched","setcap","setopt","stat","suspend","ttyctl","unfunction","unhash","unlimit","unsetopt","vared","wait","whence","where","which","zcompile","zformat","zftp","zle","zmodload","zparseopts","zprof","zpty","zregexparse","zsocket","zstyle","ztcp"],L=["chcon","chgrp","chown","chmod","cp","dd","df","dir","dircolors","ln","ls","mkdir","mkfifo","mknod","mktemp","mv","realpath","rm","rmdir","shred","sync","touch","truncate","vdir","b2sum","base32","base64","cat","cksum","comm","csplit","cut","expand","fmt","fold","head","join","md5sum","nl","numfmt","od","paste","ptx","pr","sha1sum","sha224sum","sha256sum","sha384sum","sha512sum","shuf","sort","split","sum","tac","tail","tr","tsort","unexpand","uniq","wc","arch","basename","chroot","date","dirname","du","echo","env","expr","factor","groups","hostid","id","link","logname","nice","nohup","nproc","pathchk","pinky","printenv","printf","pwd","readlink","runcon","seq","sleep","stat","stdbuf","stty","tee","test","timeout","tty","uname","unlink","uptime","users","who","whoami","yes"];return{name:"Bash",aliases:["sh"],keywords:{$pattern:/\b[a-z][a-z0-9._-]+\b/,keyword:C,literal:x,built_in:[...ee,...B,"set","shopt",...P,...L]},contains:[S,e.SHEBANG(),y,m,e.HASH_COMMENT_MODE,E,M,a,i,l,f,t]}}function En(e){let n=e.regex,t={begin:/<\/?[A-Za-z_]/,end:">",subLanguage:"xml",relevance:0},s={begin:"^[-\\*]{3,}",end:"$"},g={className:"code",variants:[{begin:"(`{3,})[^`](.|\\n)*?\\1`*[ ]*"},{begin:"(~{3,})[^~](.|\\n)*?\\1~*[ ]*"},{begin:"```",end:"```+[ ]*$"},{begin:"~~~",end:"~~~+[ ]*$"},{begin:"`.+?`"},{begin:"(?=^( {4}|\\t))",contains:[{begin:"^( {4}|\\t)",end:"(\\n)$"}],relevance:0}]},E={className:"bullet",begin:"^[ 	]*([*+-]|(\\d+\\.))(?=\\s+)",end:"\\s+",excludeEnd:!0},a={begin:/^\[[^\n]+\]:/,returnBegin:!0,contains:[{className:"symbol",begin:/\[/,end:/\]/,excludeBegin:!0,excludeEnd:!0},{className:"link",begin:/:\s*/,end:/$/,excludeBegin:!0}]},i=/[A-Za-z][A-Za-z0-9+.-]*/,l={variants:[{begin:/\[.+?\]\[.*?\]/,relevance:0},{begin:/\[.+?\]\(((data|javascript|mailto):|(?:http|ftp)s?:\/\/).*?\)/,relevance:2},{begin:n.concat(/\[.+?\]\(/,i,/:\/\/.*?\)/),relevance:2},{begin:/\[.+?\]\([./?&#].*?\)/,relevance:1},{begin:/\[.*?\]\(.*?\)/,relevance:0}],returnBegin:!0,contains:[{match:/\[(?=\])/},{className:"string",relevance:0,begin:"\\[",end:"\\]",excludeBegin:!0,returnEnd:!0},{className:"link",relevance:0,begin:"\\]\\(",end:"\\)",excludeBegin:!0,excludeEnd:!0},{className:"symbol",relevance:0,begin:"\\]\\[",end:"\\]",excludeBegin:!0,excludeEnd:!0}]},f={className:"strong",contains:[],variants:[{begin:/_{2}(?!\s)/,end:/_{2}/},{begin:/\*{2}(?!\s)/,end:/\*{2}/}]},m={className:"emphasis",contains:[],variants:[{begin:/\*(?![*\s])/,end:/\*/},{begin:/_(?![_\s])/,end:/_/,relevance:0}]},w=e.inherit(f,{contains:[]}),S=e.inherit(m,{contains:[]});f.contains.push(S),m.contains.push(w);let y=[t,l];return[f,m,w,S].forEach(M=>{M.contains=M.contains.concat(y)}),y=y.concat(f,m),{name:"Markdown",aliases:["md","mkdown","mkd"],contains:[{className:"section",variants:[{begin:"^#{1,6}",end:"$",contains:y},{begin:"(?=^.+?\\n[=-]{2,}$)",contains:[{begin:"^[=-]*$"},{begin:"^",end:"\\n",contains:y}]}]},t,E,f,m,{className:"quote",begin:"^>\\s+",contains:y,end:"$"},g,s,l,a]}}U.registerLanguage("javascript",Oe);U.registerLanguage("typescript",Re);U.registerLanguage("tsx",Re);U.registerLanguage("jsx",Oe);U.registerLanguage("xml",fn);U.registerLanguage("css",bn);U.registerLanguage("json",pn);U.registerLanguage("bash",hn);U.registerLanguage("markdown",En);window.hljs=U;})();
+
+</script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

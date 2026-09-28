@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2강. 리엑트 Hook과 상태관리 — 학습 교안</title>
+<style>
+/* highlight.js atom-one-dark theme (inlined) */
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*
+
+Atom One Dark by Daniel Gamage
+Original One Dark Syntax theme from https://github.com/atom/one-dark-syntax
+
+base:    #282c34
+mono-1:  #abb2bf
+mono-2:  #818896
+mono-3:  #5c6370
+hue-1:   #56b6c2
+hue-2:   #61aeee
+hue-3:   #c678dd
+hue-4:   #98c379
+hue-5:   #e06c75
+hue-5-2: #be5046
+hue-6:   #d19a66
+hue-6-2: #e6c07b
+
+*/
+.hljs {
+  color: #abb2bf;
+  background: #282c34
+}
+.hljs-comment,
+.hljs-quote {
+  color: #5c6370;
+  font-style: italic
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #c678dd
+}
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+  color: #e06c75
+}
+.hljs-literal {
+  color: #56b6c2
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #98c379
+}
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: #d19a66
+}
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #61aeee
+}
+.hljs-built_in,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: #e6c07b
+}
+.hljs-emphasis {
+  font-style: italic
+}
+.hljs-strong {
+  font-weight: bold
+}
+.hljs-link {
+  text-decoration: underline
+}
+</style>
+<style>
+  :root{--bg:#f4f6f9;--card:#fff;--ink:#1f2933;--muted:#52606d;--line:#e4e7eb;--accent:#2965f1;--accent2:#1b3a8f;--code-bg:#282c34;--goal:#eafaf1;--goal-line:#27ae60;--ex:#eef4ff;--ex-line:#5b8def;--lab:#eef7ff;--lab-line:#2965f1;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Malgun Gothic","맑은 고딕",-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.75;}
+  header.hero{background:linear-gradient(135deg,#2965f1,#1b3a8f 60%,#153e75);color:#fff;padding:52px 24px;text-align:center;}
+  header.hero .eyebrow{letter-spacing:3px;font-size:.78rem;opacity:.92;text-transform:uppercase}
+  header.hero h1{margin:12px 0 8px;font-size:1.9rem}header.hero p{margin:0;opacity:.94}
+  header.hero .tags{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  header.hero .tags span{background:rgba(255,255,255,.18);border-radius:999px;padding:5px 13px;font-size:.82rem}
+  .wrap{max-width:920px;margin:0 auto;padding:32px 20px 80px}
+  nav.toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 26px;margin-bottom:34px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  nav.toc h2{margin:0 0 12px;font-size:1.05rem;color:var(--accent2)}
+  nav.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+  nav.toc a{color:var(--ink);text-decoration:none}nav.toc a:hover{color:var(--accent);text-decoration:underline}
+  section.module{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px 30px;margin-bottom:26px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  section.module > h2{margin:0 0 6px;font-size:1.4rem;color:var(--accent2);display:flex;align-items:center;gap:12px;}
+  section.module > h2 .num{background:var(--accent);color:#fff;font-size:.95rem;font-weight:800;padding:4px 12px;border-radius:10px;min-width:38px;text-align:center;}
+  h3.blk{font-size:1.02rem;margin:22px 0 8px;font-weight:800}
+  .goal{background:var(--goal);border-left:5px solid var(--goal-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:14px 0}
+  .goal .lbl{font-weight:800;color:#1e874b}.goal ul{margin:8px 0 0}
+  .concept h3.blk{color:var(--ink);border-left:4px solid var(--accent);padding-left:10px}
+  .ex{background:var(--ex);border-left:5px solid var(--ex-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .ex .lbl{font-weight:800;color:#2f5fc7}
+  .lab{background:var(--lab);border-left:5px solid var(--lab-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .lab .lbl{font-weight:800;color:#1b4fc0}.lab h4{margin:6px 0 6px;font-size:.98rem}
+  ul{margin:8px 0}li{margin:5px 0}.muted{color:var(--muted)}
+  code{background:#eceef1;padding:2px 6px;border-radius:5px;font-size:.92em;font-family:Consolas,"D2Coding",monospace}
+  pre{background:var(--code-bg);border-radius:10px;padding:0;overflow-x:auto;margin:10px 0}
+  pre code{display:block;padding:16px 18px;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;line-height:1.6;background:var(--code-bg);color:#abb2bf;border-radius:10px;white-space:pre}
+  pre code.hljs{background:var(--code-bg);padding:16px 18px}
+  .fname{display:inline-block;background:#1b3a8f;color:#fff;font-family:Consolas,"D2Coding",monospace;font-size:.8rem;font-weight:700;padding:4px 12px;border-radius:8px 8px 0 0;margin:10px 0 -8px}
+  .fname + pre{border-top-left-radius:0}
+  .out{background:#fff;color:var(--ink);border:1px solid var(--line);border-left:4px solid #27ae60;border-radius:8px;padding:12px 16px;margin:8px 0 0}
+  .out .rt{font-size:.72rem;letter-spacing:1px;color:#27ae60;font-weight:800;text-transform:uppercase;display:block;margin-bottom:6px}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:.93rem}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:#eef2fb;color:var(--accent2)}td.c,th.c{text-align:center}
+  td code,th code{background:#eef1f5}
+  details{margin-top:10px;background:#fff;border:1px solid #cfe0ff;border-radius:8px;padding:8px 14px}
+  details summary{cursor:pointer;font-weight:700;color:#1b4fc0}details pre{margin-top:10px}
+  footer{text-align:center;color:var(--muted);font-size:.85rem;padding:30px 20px}
+  .pill{display:inline-block;background:#eceef1;border-radius:6px;padding:2px 9px;margin:2px;font-size:.85rem}
+  .flow{background:#f7f9fc;border:1px dashed #b9c6de;border-radius:10px;padding:12px 16px;margin:12px 0;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;white-space:pre-wrap;color:#37475f}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}nav.toc ol{columns:1}}
+  .tip{background:#fff8e6;border-left:5px solid #f2b705;border-radius:0 10px 10px 0;padding:12px 18px;margin:14px 0}
+  .tip .lbl{font-weight:800;color:#b57f00}
+  .demo{border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:8px 0 0;background:#fafbfc}
+  .demo button{margin:2px 4px 2px 0;padding:4px 12px;border:1px solid #b9c6de;border-radius:6px;background:#fff;cursor:default}
+  .demo input{padding:4px 8px;border:1px solid #b9c6de;border-radius:6px;margin:2px 0}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="eyebrow">React 기초 · Chapter 02 · 학습 교안</div>
+  <h1>리엑트 Hook과 상태관리</h1>
+  <p>useState로 상태를 다루고, useEffect로 사이드 이펙트를 처리하며, 폼을 제어하는 방법</p>
+  <div class="tags"><span>🪝 Hook</span><span>🔢 useState</span><span>♻️ useEffect</span><span>📝 제어 컴포넌트·폼</span><span>✅ Todo App</span><span>✍️ 실습문제(정답 포함)</span></div>
+</header>
+<div class="wrap">
+  <nav class="toc">
+    <h2>📚 학습 목차</h2>
+    <ol>
+      <li><a href="#m1">리엑트 Hook이란?</a></li>
+      <li><a href="#m2">useState — Counter 만들기</a></li>
+      <li><a href="#m3">useState — 객체 상태 관리</a></li>
+      <li><a href="#m4">useState — 배열 상태 관리</a></li>
+      <li><a href="#m5">컴포넌트 분리와 props</a></li>
+      <li><a href="#m6">종합 실습 — 할 일 관리(Todo App)</a></li>
+      <li><a href="#m7">useEffect() 사이드 이펙트</a></li>
+      <li><a href="#m8">제어 컴포넌트 — 회원가입 폼</a></li>
+      <li><a href="#m9">로그인 폼 — 검증 처리</a></li>
+      <li><a href="#m10">실습문제 모음</a></li>
+    </ol>
+  </nav>
+  <!-- ===================== M1 ===================== -->
+  <section class="module" id="m1">
+    <h2><span class="num">1</span> 리엑트 Hook이란?</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>Hook의 개념과 필요성을 설명할 수 있다.</li>
+      <li><code>useState</code>의 반환값(상태 변수·상태 변경 함수)을 구분할 수 있다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 Hook의 개념</h3>
+      <ul>
+        <li>리엑트에서는 <b>상태를 관리할 때 훅(Hook)</b>을 사용한다.</li>
+        <li>훅이란 <b>함수형 컴포넌트</b>에서 <b>상태(state)와 생명주기(lifecycle)</b>를 쉽게 관리할 수 있도록 도와주는, 리엑트가 제공하는 <b>특별한 함수</b>이다.</li>
+        <li>주요 함수로는 <code>useState()</code>, <code>useEffect()</code>, <code>useRef()</code> 등이 있다.</li>
+      </ul>
+    </div>
+    <div class="concept"><h3 class="blk">📖 useState 기본 형태</h3>
+<pre><code class="language-jsx">const [state, setState] = useState(0)</code></pre>
+      <ul>
+        <li><b>state</b>: 상태 값을 저장하는 변수. 보통 <b>상태 변수</b>라고 부른다.</li>
+        <li><b>setState</b>: 상태를 변경하는 함수. <b>상태 변경 함수</b>라고 부른다.</li>
+        <li><code>useState(0)</code>의 <code>0</code>은 <b>초기값</b>이다.</li>
+      </ul>
+      <p class="muted">예) count 상태를 관리하는 코드</p>
+<pre><code class="language-jsx">const [count, setCount] = useState(0)</code></pre>
+    </div>
+  </section>
+
+  <!-- ===================== M2 ===================== -->
+  <section class="module" id="m2">
+    <h2><span class="num">2</span> useState — Counter 만들기</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>버튼 클릭으로 숫자 상태를 증가·감소·초기화할 수 있다.</li>
+      <li>인라인 핸들러와 함수 참조 방식을 함께 사용할 수 있다.</li>
+    </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — Counter.jsx</div>
+      <span class="fname">src/components/Counter.jsx</span>
+<pre><code class="language-jsx">import { useState } from "react";
+
+const Counter = () => {
+  //count 상태 관리
+  const [count, setCount] = useState(0);
+
+  //감소 핸들러
+  const decrement = () => {
+    setCount(count-1);
+  }
+
+  //초기화 핸들러
+  const reset = () => {
+    setCount(0);
+  }
+
+  return(
+    &lt;div&gt;
+      &lt;h2&gt;Counter&lt;/h2&gt;
+      &lt;h3&gt;현재 Count: {count}&lt;/h3&gt;
+      {/* 인라인 핸들러 함수 */}
+      &lt;button onClick={() => setCount(count+1)}&gt;증가&lt;/button&gt;
+      &lt;button onClick={decrement}&gt;감소&lt;/button&gt;
+      &lt;button onClick={reset}&gt;초기화&lt;/button&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default Counter;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div class="demo" style="text-align:center">
+          <div style="font-size:1.1rem">Counter</div>
+          <div style="margin:.3em 0">현재 Count: <b>2</b></div>
+          <button>증가</button><button>감소</button><button>초기화</button>
+        </div>
+      </div>
+      <div class="tip"><span class="lbl">💡 핵심</span> — 상태를 바꿀 때는 <code>count = count+1</code>처럼 직접 바꾸지 않고 반드시 <b>상태 변경 함수</b> <code>setCount(...)</code>를 호출한다. 그래야 리엑트가 화면을 다시 그린다.</div>
+    </div>
+  </section>
+
+  <!-- ===================== M3 ===================== -->
+  <section class="module" id="m3">
+    <h2><span class="num">3</span> useState — 객체 상태 관리</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>객체를 상태로 관리하고, 전개 연산자로 특정 속성만 안전하게 변경할 수 있다.</li>
+    </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — 자동차 연식 업데이트 (Car.jsx)</div>
+      <span class="fname">src/components/Car.jsx</span>
+<pre><code class="language-jsx">const Car = () => {
+  const [car, setCar] = useState({
+    brand: '현대',
+    model: '쏘나타',
+    year: 2020
+  });
+
+  const updateYear = () => {
+    /* car 객체의 year 속성만 업데이트하기 위해
+       기존의 car 객체를 복사하고 year 속성만 변경 */
+    setCar({ ...car, year: 2025 });
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;자동차 컴포넌트&lt;/h2&gt;
+      &lt;p&gt;브랜드: {car.brand}&lt;/p&gt;
+      &lt;p&gt;모델: {car.model}&lt;/p&gt;
+      &lt;p&gt;연식: {car.year}&lt;/p&gt;
+      &lt;button onClick={updateYear}&gt;연식 업데이트&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+      <div class="out"><span class="rt">브라우저 출력 (버튼 클릭 후)</span>
+        <div class="demo">
+          <b>자동차 컴포넌트</b><br>브랜드: 현대<br>모델: 쏘나타<br>연식: <b>2025</b><br><button>연식 업데이트</button>
+        </div>
+      </div>
+      <div class="tip"><span class="lbl">⚠️ 주의</span> — 객체 상태는 <code>setCar({ ...car, year: 2025 })</code>처럼 <b>기존 객체를 복사(...car)한 뒤 바꿀 속성만 덮어써야</b> 나머지 속성이 사라지지 않는다.</div>
+    </div>
+  </section>
+  <!-- ===================== M4 ===================== -->
+  <section class="module" id="m4">
+    <h2><span class="num">4</span> useState — 배열 상태 관리</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>배열을 상태로 관리하고, 전개 연산자로 항목을 추가할 수 있다.</li>
+      <li>입력 필드의 값을 상태로 관리(제어 컴포넌트)하고 <code>map()</code>으로 목록을 렌더링할 수 있다.</li>
+    </ul></div>
+
+    <div class="ex"><div class="lbl">💡 예제 ① — 고정 배열에 항목 추가 (Drinks.jsx)</div>
+      <span class="fname">src/components/Drinks.jsx</span>
+<pre><code class="language-jsx">import { useState } from "react";
+
+const Drinks = () => {
+  //음료 배열 상태 관리 - 초기화
+  const [drinks, setDrinks] = useState(['커피', '콜라']);
+
+  const addDrink = () => {
+    //기존 drinks 배열에 '딸기쥬스'를 추가하여 새로운 배열 생성
+    setDrinks([...drinks, '딸기쥬스'])
+  }
+
+  return(
+    &lt;div&gt;
+      &lt;h2&gt;음료 추가&lt;/h2&gt;
+      &lt;h4&gt;현재 음료: {drinks.join(', ')}&lt;/h4&gt;
+      &lt;button onClick={addDrink}&gt;음료 추가&lt;/button&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+      <div class="out"><span class="rt">브라우저 출력 (버튼 클릭 후)</span>
+        <div class="demo">현재 음료: <b>커피, 콜라, 딸기쥬스</b><br><button>음료 추가</button></div>
+      </div>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 ② — 입력값으로 항목 추가 (Drinks2.jsx)</div>
+      <span class="fname">src/components/Drinks2.jsx</span>
+<pre><code class="language-jsx">const Drinks2 = () => {
+  const [drinks, setDrinks] = useState([]);
+  //입력 필드의 상태 관리
+  const [inputValue, setInputValue] = useState('');
+
+  const addDrink = () => {
+    const newDrink = inputValue.trim();
+    if(newDrink == ''){
+      alert('음료 이름을 입력하세요');
+      return;
+    }
+    //새 음료를 기존 배열에 추가
+    setDrinks([...drinks, newDrink]);
+    setInputValue('');  //입력 필드 초기화
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;음료 추가&lt;/h2&gt;
+      &lt;input
+        type="text"
+        placeholder="음료 이름을 입력하세요"
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+      /&gt;
+      &lt;button onClick={addDrink}&gt;음료 추가&lt;/button&gt;
+      {/* &lt;p&gt;입력값: {inputValue}&lt;/p&gt; */}
+
+      &lt;ul&gt;
+        {drinks.map((drink, index) => (
+          &lt;li key={index}&gt;{drink}&lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+      <div class="tip"><span class="lbl">💡 제어 컴포넌트</span> — <code>&lt;input&gt;</code>의 <code>value</code>를 상태와 묶고 <code>onChange</code>로 상태를 갱신하면, 입력값을 리엑트가 <b>완전히 제어</b>한다. 이것을 <b>제어 컴포넌트(Controlled Component)</b>라고 한다.</div>
+    </div>
+  </section>
+
+  <!-- ===================== M5 ===================== -->
+  <section class="module" id="m5">
+    <h2><span class="num">5</span> 컴포넌트 분리와 props</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>목록 렌더링 부분을 별도 컴포넌트로 분리하고, 상태를 props로 전달할 수 있다.</li>
+    </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — 부모(Drinks2)에서 목록을 자식(DrinkList)로 분리</div>
+      <span class="fname">src/components/Drinks2.jsx (return 부분)</span>
+<pre><code class="language-jsx">return (
+  &lt;div&gt;
+    &lt;h2&gt;음료 추가&lt;/h2&gt;
+    &lt;input
+      type="text"
+      placeholder="음료 이름을 입력하세요"
+      value={inputValue}
+      onChange={(e) => setInputValue(e.target.value)}
+    /&gt;
+    &lt;button onClick={addDrink}&gt;음료 추가&lt;/button&gt;
+
+    {/* DrinkList 컴포넌트 연결 - drinks 속성으로 전달 */}
+    &lt;DrinkList drinks={drinks}/&gt;
+  &lt;/div&gt;
+)
+
+export default Drinks2;</code></pre>
+      <span class="fname">src/components/DrinkList.jsx</span>
+<pre><code class="language-jsx">const DrinkList = ({ drinks }) => {
+  return (
+    &lt;ul&gt;
+      {drinks.map((drink, index) => (
+        &lt;li key={index}&gt;{drink}&lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}
+
+export default DrinkList;</code></pre>
+      <p class="muted">부모는 <code>drinks</code> 상태만 넘기고, 실제 목록 표시는 자식 <code>DrinkList</code>가 담당한다. 이렇게 <b>역할을 나누면</b> 코드가 깔끔해지고 재사용이 쉬워진다.</p>
+    </div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 5-1. 사용자 리스트를 map으로 출력</h4>
+      <p>아래 사용자 리스트를 <code>map</code>으로 출력하세요.</p>
+<pre><code class="language-jsx">[
+ {id:1, name:"홍길동"},
+ {id:2, name:"이순신"}
+]</code></pre>
+      <details><summary>정답 보기</summary>
+<pre><code class="language-jsx">function App() {
+  const users = [
+    { id: 1, name: "홍길동" },
+    { id: 2, name: "이순신" }
+  ];
+
+  return (
+    &lt;ul&gt;
+      {users.map((user) => (
+        &lt;li key={user.id}&gt;{user.name}&lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}
+
+export default App</code></pre>
+        <p class="muted"><code>key</code>에는 고유한 <code>user.id</code>를 사용하는 것이 좋다(index보다 안전).</p>
+      </details>
+    </div>
+  </section>
+  <!-- ===================== M6 ===================== -->
+  <section class="module" id="m6">
+    <h2><span class="num">6</span> 종합 실습 — 할 일 관리(Todo App)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>객체 배열 상태로 할 일 목록을 관리(추가·완료 토글·삭제)할 수 있다.</li>
+      <li><code>map</code>·<code>filter</code>로 배열 상태를 불변성 있게 업데이트하고, 목록을 컴포넌트로 분리할 수 있다.</li>
+    </ul></div>
+
+    <div class="ex"><div class="lbl">💡 STEP 1 — 상태와 입력 핸들러 (App.jsx)</div>
+      <span class="fname">src/App.jsx</span>
+<pre><code class="language-jsx">function App() {
+  const [todos, setTodos] = useState([
+    { id: 1, text: '운동 하기', completed: false },
+    { id: 2, text: '영화 보기', completed: false },
+  ])
+  const [inputValue, setInputValue] = useState('')
+
+  console.log(todos.length); //2
+
+  // 입력값 변경 핸들러
+  const handleInputChange = (e) => {
+    console.log(e.target.value);
+    setInputValue(e.target.value)
+  }</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 STEP 2 — 할 일 추가</div>
+<pre><code class="language-jsx">  // 할 일 추가
+  const handleAddTodo = () => {
+    if (inputValue.trim() !== '') {
+      // 새로운 할 일 객체 생성
+      const newTodo = {
+        id: todos.length + 1,
+        text: inputValue,
+        completed: false,
+      }
+      // 새로운 할 일을 기존 할 일 목록에 추가
+      setTodos([...todos, newTodo])
+      setInputValue('') // 입력 필드 초기화
+    }
+  }</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 STEP 3 — 완료 토글 · 삭제</div>
+<pre><code class="language-jsx">  // 할 일 완료 체크
+  const handleToggleComplete = (id) => {
+    /* 해당 id를 가진 할 일의 completed 상태를 토글
+       todos 배열을 순회하면서 id가 일치하는 할 일의 completed 값을 반전시킴
+       id가 일치하지 않는 할 일은 그대로 유지 */
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    )
+  }
+
+  // 할 일 삭제
+  const handleDeleteTodo = (id) => {
+    /* 해당 id를 가진 할 일을 삭제
+       todos 배열을 필터링하여 id가 일치하지 않는 할 일만 남김 */
+    setTodos(todos.filter((todo) => todo.id !== id))
+  }</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 STEP 4 — 화면 렌더링 (한 파일 버전)</div>
+<pre><code class="language-jsx">  return (
+    &lt;&gt;
+      &lt;div className='container'&gt;
+        &lt;h2&gt;Todo List&lt;/h2&gt;
+        &lt;input
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          placeholder="할 일을 입력하세요"
+        /&gt;
+        &lt;button onClick={handleAddTodo}&gt;추가&lt;/button&gt;
+
+        {/* 할 일 목록 */}
+        &lt;ul className='todo-list'&gt;
+          {todos.map((todo) => (
+            &lt;li key={todo.id} className={todo.completed ? 'completed' : ''}&gt;
+              &lt;input
+                type="checkbox"
+                checked={todo.completed}
+                onChange={() => handleToggleComplete(todo.id)}
+              /&gt;
+              {todo.text}
+              &lt;button onClick={() => handleDeleteTodo(todo.id)}&gt;삭제&lt;/button&gt;
+            &lt;/li&gt;
+          ))}
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/&gt;
+  )
+}</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div class="demo" style="max-width:340px;text-align:center;margin:0 auto">
+          <div style="color:#00f;font-weight:800">Todo List</div>
+          <div style="margin:.4em 0"><input placeholder="할 일을 입력하세요" style="width:60%"> <button>추가</button></div>
+          <div style="text-align:left;display:inline-block">
+            <div><input type="checkbox"> 운동 하기 <button>삭제</button></div>
+            <div><input type="checkbox" checked> <span style="text-decoration:line-through;color:gray">영화 보기</span> <button>삭제</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 STEP 5 — 스타일 (App.css)</div>
+      <span class="fname">src/App.css</span>
+<pre><code class="language-css">body {
+  background-color: #f1fff0;
+  margin: 0;
+  padding: 20px;
+}
+.container{
+  max-width: 400px;
+  margin: 0 auto;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+.container h2{
+  color: #00f;
+}
+.todo-list{
+  list-style: none;
+  padding: 0;
+  margin-top: 30px;
+}
+.todo-list li{
+  margin-bottom: 10px;
+}
+.todo-list li input[type="checkbox"]{
+  margin-right: 10px;
+}
+.completed{
+  text-decoration: line-through;
+  color: gray;
+}
+button{
+  margin-left: 10px;
+}</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 STEP 6 — TodoList 컴포넌트로 분리하기</div>
+      <p class="muted">목록 렌더링을 <code>TodoList</code>로 분리하고, 상태와 핸들러 함수를 props로 내려준다.</p>
+      <span class="fname">src/App.jsx (return 부분)</span>
+<pre><code class="language-jsx">  return (
+    &lt;&gt;
+      &lt;div className='container'&gt;
+        &lt;h2&gt;Todo List&lt;/h2&gt;
+        &lt;input
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          placeholder="할 일을 입력하세요"
+        /&gt;
+        &lt;button onClick={handleAddTodo}&gt;추가&lt;/button&gt;
+
+        {/* 할 일 목록 */}
+        &lt;TodoList
+          todos={todos}
+          onToggleComplete={handleToggleComplete}
+          onDeleteTodo={handleDeleteTodo}
+        /&gt;
+      &lt;/div&gt;
+    &lt;/&gt;
+  )</code></pre>
+      <span class="fname">src/components/TodoList.jsx</span>
+<pre><code class="language-jsx">function TodoList({ todos, onToggleComplete, onDeleteTodo }) {
+  return (
+    &lt;ul className='todo-list'&gt;
+      {todos.map((todo) => (
+        &lt;li key={todo.id} className={todo.completed ? 'completed' : ''}&gt;
+          &lt;input
+            type="checkbox"
+            checked={todo.completed}
+            onChange={() => onToggleComplete(todo.id)}
+          /&gt;
+          {todo.text}
+          &lt;button onClick={() => onDeleteTodo(todo.id)}&gt;삭제&lt;/button&gt;
+        &lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  )
+}
+
+export default TodoList</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> — 상태(<code>todos</code>)와 그 상태를 바꾸는 <b>핸들러 함수</b>는 부모(App)가 가지고, 자식(TodoList)은 props로 <b>받아서 호출만</b> 한다. 이 구조가 리엑트의 기본 데이터 흐름이다.</div>
+    </div>
+  </section>
+  <!-- ===================== M7 ===================== -->
+  <section class="module" id="m7">
+    <h2><span class="num">7</span> useEffect() 사이드 이펙트</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>useEffect가 무엇을 위한 훅인지, 사이드 이펙트의 종류를 설명할 수 있다.</li>
+      <li>의존성 배열의 의미(<code>[]</code> / <code>[값]</code>)를 구분해 사용할 수 있다.</li>
+    </ul></div>
+
+    <div class="concept"><h3 class="blk">📖 useEffect란?</h3>
+      <ul>
+        <li><code>useEffect</code> 훅은 함수형 컴포넌트에서 <b>사이드 이펙트(side effect)</b>를 처리하기 위한 핵심 훅이다.</li>
+        <li>리엑트 컴포넌트는 순수한 렌더링 함수여야 하지만, 현실에서는 <b>외부 세계와 상호작용</b>해야 할 때가 있다. useEffect는 그 부수 효과를 처리하기 위해 존재한다.</li>
+      </ul>
+      <table>
+        <tr><th style="width:180px">종류</th><th>예시</th></tr>
+        <tr><td>데이터 패칭 (API 호출)</td><td><code>fetch()</code>, <code>axios.get()</code></td></tr>
+        <tr><td>DOM 직접 조작</td><td><code>document.title …</code></td></tr>
+        <tr><td>이벤트 등록</td><td><code>addEventListener()</code></td></tr>
+        <tr><td>타이머</td><td><code>setTimeout()</code>, <code>setInterval()</code></td></tr>
+      </table>
+    </div>
+
+    <div class="concept"><h3 class="blk">📖 기본 형태와 의존성 배열</h3>
+<pre><code class="language-jsx">useEffect(() => {
+  // 실행할 코드
+}, [의존성]);
+
+useEffect(() => {
+  console.log("count 변경됨");
+}, [count]);</code></pre>
+      <table>
+        <tr><th style="width:200px">의존성 배열</th><th>실행 시점</th></tr>
+        <tr><td><code>[]</code> (빈 배열)</td><td>처음 렌더링될 때 <b>한 번만</b> 실행</td></tr>
+        <tr><td><code>[age]</code> (값 있음)</td><td>처음 + <code>age</code>가 <b>변경될 때마다</b> 실행</td></tr>
+        <tr><td>생략</td><td><b>매 렌더링마다</b> 실행</td></tr>
+      </table>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 ① — 특정 값이 바뀔 때 실행 (User.jsx)</div>
+      <span class="fname">src/components/User.jsx</span>
+<pre><code class="language-jsx">import { useEffect, useState } from 'react';
+
+const User = () => {
+  const [name, setName] = useState("");
+  const [age, setAge] = useState(1);
+
+  // [] -> 처음 렌더링될 때만 실행
+  // [age] -> age가 변경될 때마다 실행
+  useEffect(() => {
+    console.log("렌더링..");
+    console.log(`이름: ${name}, 나이: ${age}`);
+  }, [age]);
+
+  // 이름을 변경하는 이벤트 핸들러 함수
+  const onChangeName = (e) => {
+    setName(e.target.value);
+  }
+
+  // 나이를 변경하는 이벤트 핸들러 함수
+  const onChangeAge = (e) => {
+    setAge(Number(e.target.value));
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;사용자 정보&lt;/h2&gt;
+      &lt;input
+        type="text"
+        value={name}
+        onChange={onChangeName}
+      /&gt;
+      &lt;br /&gt;
+      &lt;input
+        type="number"
+        value={age}
+        onChange={onChangeAge}
+      /&gt;
+      &lt;p&gt;이름: {name}&lt;/p&gt;
+      &lt;p&gt;나이: {age}&lt;/p&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+      <div class="tip"><span class="lbl">💡 관찰</span> — 이름을 입력해도 콘솔의 <code>렌더링..</code>은 찍히지 않고, <b>나이(age)를 바꿀 때만</b> useEffect가 실행된다. 의존성 배열에 <code>age</code>만 넣었기 때문이다.</div>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 ② — 타이머로 만드는 디지털 시계 (Clock.jsx)</div>
+      <span class="fname">src/components/Clock.jsx</span>
+<pre><code class="language-jsx">export default function Clock(){
+  // time 상태 관리
+  const [time, setTime] = useState(new Date().toLocaleTimeString());
+
+  //처음 렌더링될때 타이머 설정
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTime(new Date().toLocaleTimeString());
+    }, 1000)
+    console.log("렌더링...");
+
+  },[])
+
+  return(
+    &lt;div&gt;
+      &lt;h2&gt;디지털 시계&lt;/h2&gt;
+      &lt;h3&gt;현재 시간: {time}&lt;/h3&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div class="demo"><b>디지털 시계</b><br>현재 시간: 오전 11:51:11</div>
+      </div>
+      <div class="tip"><span class="lbl">💡 참고</span> — 빈 배열 <code>[]</code>이므로 <code>setInterval</code>은 <b>처음 한 번만</b> 등록되고, 1초마다 <code>time</code> 상태가 갱신되어 화면이 다시 그려진다. (실무에서는 <code>useEffect</code>의 <code>return () => clearInterval(timer)</code>로 정리(cleanup) 코드를 넣어 타이머를 해제한다.)</div>
+    </div>
+  </section>
+  <!-- ===================== M8 ===================== -->
+  <section class="module" id="m8">
+    <h2><span class="num">8</span> 제어 컴포넌트 — 회원가입 폼</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>하나의 상태 객체로 여러 입력 필드(text·select·radio·textarea)를 관리할 수 있다.</li>
+      <li><code>name</code> 속성을 이용해 하나의 핸들러로 모든 필드를 처리하고, 폼 제출을 제어할 수 있다.</li>
+    </ul></div>
+
+    <div class="ex"><div class="lbl">💡 STEP 1 — 상태와 공통 핸들러 (SignUp.jsx)</div>
+      <span class="fname">src/components/SignUp.jsx</span>
+<pre><code class="language-jsx">const SignUp = () => {
+  // 폼 데이터를 객체 형태로 관리
+  const [formData, setFormData] = useState({
+    name: '',
+    job: '직장인',
+    gender: '',
+    text: ''
+  })
+
+  // 모든 입력 필드의 변경을 처리하는 함수
+  const handleInputChange = (e) => {
+    const {name, value} = e.target;
+
+    setFormData({...formData, [name]: value})
+  }
+
+  // 폼 제출 시 데이터를 콘솔에 출력하는 함수
+  const handleSubmit = (e) => {
+    e.preventDefault(); // 폼 제출 시 페이지 새로고침 방지
+    console.log("제출 데이터: ", formData);
+  }</code></pre>
+      <div class="tip"><span class="lbl">💡 핵심 기법</span> — 각 입력에 <code>name</code>을 주고 <code>[name]: value</code>(계산된 속성명)를 쓰면, <b>필드마다 핸들러를 따로 만들 필요 없이</b> 하나의 <code>handleInputChange</code>로 모두 처리할 수 있다.</div>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 STEP 2 — 폼 렌더링</div>
+<pre><code class="language-jsx">  return(
+    &lt;div className="sign-up"&gt;
+      &lt;h2&gt;회원가입&lt;/h2&gt;
+      &lt;form onSubmit={handleSubmit}&gt;
+        &lt;p&gt;
+          &lt;label htmlFor="name"&gt;이름&lt;/label&gt;
+          &lt;input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            placeholder="이름을 입력하세요"
+          /&gt;
+        &lt;/p&gt;
+        &lt;p&gt;
+          &lt;label htmlFor="job"&gt;직업&lt;/label&gt;
+          &lt;select
+            name="job"
+            value={formData.job}
+            onChange={handleInputChange}
+          &gt;
+            &lt;option value="직장인"&gt;직장인&lt;/option&gt;
+            &lt;option value="학생"&gt;학생&lt;/option&gt;
+            &lt;option value="프리랜서"&gt;프리랜서&lt;/option&gt;
+          &lt;/select&gt;
+        &lt;/p&gt;
+        &lt;p&gt;
+          &lt;label htmlFor="gender"&gt;성별&lt;/label&gt;
+          &lt;label&gt;&lt;input
+            type="radio"
+            name="gender"
+            value="남자"
+            checked={formData.gender === "남자"}
+            onChange={handleInputChange}
+          /&gt;남자&lt;/label&gt;
+          &lt;label&gt;&lt;input
+            type="radio"
+            name="gender"
+            value="여자"
+            checked={formData.gender === "여자"}
+            onChange={handleInputChange}
+          /&gt;여자&lt;/label&gt;
+        &lt;/p&gt;
+        &lt;p&gt;
+          &lt;label htmlFor="text"&gt;자기소개&lt;/label&gt;
+          &lt;textarea
+            name="text"
+            value={formData.text}
+            onChange={handleInputChange}
+            rows={5}
+            cols={10}
+          /&gt;
+        &lt;/p&gt;
+        &lt;button type="submit"&gt;가입&lt;/button&gt;
+      &lt;/form&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default SignUp;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div class="demo" style="max-width:360px">
+          <div style="text-align:center;font-weight:800;margin-bottom:6px">회원가입</div>
+          <div>이름 <input value="우영우" style="width:60%"></div>
+          <div style="margin-top:4px">직업 <select><option>직장인</option></select></div>
+          <div style="margin-top:4px">성별 <input type="radio"> 남자 <input type="radio" checked> 여자</div>
+          <div style="margin-top:4px">자기소개 <textarea rows="2" style="width:60%;vertical-align:top">안녕하세요~</textarea></div>
+          <div style="text-align:center;margin-top:6px"><button>가입</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 STEP 3 — 스타일 (App.css)</div>
+      <span class="fname">src/App.css</span>
+<pre><code class="language-css">.sign-up h2{
+  margin-bottom: 20px;
+}
+.sign-up form p{
+  margin-bottom: 10px;
+}
+.sign-up form label{
+  display: inline-block;
+  width: 80px;
+}
+.sign-up form input[type="text"],
+.sign-up form input[type="password"],
+.sign-up form select,
+.sign-up form textarea{
+  width: 200px;
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- ===================== M9 ===================== -->
+  <section class="module" id="m9">
+    <h2><span class="num">9</span> 로그인 폼 — 검증 처리</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>임시 사용자 데이터와 <code>find()</code>로 로그인 성공/실패를 검증할 수 있다.</li>
+      <li>검증 결과에 따라 조건부로 메시지를 렌더링할 수 있다.</li>
+    </ul></div>
+
+    <div class="ex"><div class="lbl">💡 STEP 1 — 데이터·상태·핸들러 (SignIn.jsx)</div>
+      <span class="fname">src/components/SignIn.jsx</span>
+<pre><code class="language-jsx">// 임시 데이터(객체 리스트) 생성
+const users = [
+  {username: 'user1', password: 'user1111'},
+  {username: 'user2', password: 'user2222'},
+  {username: 'admin', password: 'admin0000'}
+]
+
+const SignIn = () => {
+  // 객체 상태 관리
+  const [formData, setFormData] = useState(
+    {username: '', password: ''}
+  )
+  // 로그인 결과 상태 관리
+  const [result, setResult] = useState(null);
+
+  // 입력 필드 변경 핸들러
+  const handleInputChange = (e) => {
+    const {name, value} = e.target;
+    // console.log(e);
+    setFormData({
+      ...formData,
+      [name]: value //name 속성과 값
+    })
+  }</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 STEP 2 — 검증 · 조건부 메시지</div>
+<pre><code class="language-jsx">  const handleSubmit = (e) => {
+    e.preventDefault();
+    const {username, password} = formData;
+    //데이터 일치 여부 - find() 메서드
+    const matched = users.find((user) =>
+      user.username === username && user.password === password);
+
+    //로그인 성공여부에 따라 결과 상태 업데이트
+    setResult(matched ? 'success' : 'fail');
+  }
+
+  return(
+    &lt;div className="sign-in"&gt;
+      &lt;h2&gt;로그인&lt;/h2&gt;
+      &lt;form onSubmit={handleSubmit}&gt;
+        &lt;p&gt;
+          &lt;input
+            type="text"
+            name="username"
+            value={formData.username}
+            onChange={handleInputChange}
+            placeholder="아이디를 입력하세요"
+          /&gt;
+        &lt;/p&gt;
+        &lt;p&gt;
+          &lt;input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleInputChange}
+            placeholder="비밀번호를 입력하세요"
+          /&gt;
+        &lt;/p&gt;
+        &lt;button type="submit"&gt;로그인&lt;/button&gt;
+      &lt;/form&gt;
+      {/* 결과 메시지 출력 */}
+      {result === 'success' &amp;&amp; (
+        &lt;p className="result-msg" style={{color: 'blue'}}&gt;
+          환영합니다. {formData.username}님!
+        &lt;/p&gt;
+      )}
+      {result === 'fail' &amp;&amp; (
+        &lt;p className="result-msg" style={{color: 'red'}}&gt;
+          아이디 또는 비밀번호가 일치하지 않습니다.
+        &lt;/p&gt;
+      )}
+    &lt;/div&gt;
+  )
+}</code></pre>
+      <div class="grid2">
+        <div class="out"><span class="rt">성공 (user1 / user1111)</span>
+          <div class="demo" style="text-align:center">로그인<br><input value="user1"><br><input type="password" value="1234567"><br><button>로그인</button><br><b style="color:blue">환영합니다. user1님!</b></div>
+        </div>
+        <div class="out"><span class="rt">실패</span>
+          <div class="demo" style="text-align:center">로그인<br><input value="cloud"><br><input type="password" value="1234567"><br><button>로그인</button><br><b style="color:red">아이디 또는 비밀번호가 일치하지 않습니다.</b></div>
+        </div>
+      </div>
+      <div class="tip"><span class="lbl">💡 핵심</span> — <code>find()</code>는 조건에 맞는 <b>첫 요소</b>를 반환하고, 없으면 <code>undefined</code>를 반환한다. 이 결과로 성공/실패를 판단하고 <code>{조건 &amp;&amp; JSX}</code>로 메시지를 조건부 렌더링한다.</div>
+    </div>
+  </section>
+
+  <!-- ===================== M10 ===================== -->
+  <section class="module" id="m10">
+    <h2><span class="num">10</span> 실습문제 모음</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>useState·이벤트·useEffect를 스스로 조합해 작은 기능을 구현할 수 있다.</li>
+    </ul></div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 10-1. 좋아요 버튼</h4>
+      <p><code>useState</code>로 좋아요 버튼을 만드세요. (좋아요 0 → 1 → 2 …)</p>
+      <details><summary>정답 보기</summary>
+<pre><code class="language-jsx">import { useState } from "react";
+
+function LikeButton() {
+  const [likes, setLikes] = useState(0);
+
+  return (
+    &lt;div&gt;
+      &lt;p&gt;좋아요 {likes}&lt;/p&gt;
+      &lt;button onClick={() => setLikes(likes + 1)}&gt;👍 좋아요&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default LikeButton</code></pre>
+      </details>
+
+      <h4>실습 10-2. 실시간 입력 출력</h4>
+      <p>입력창에 입력한 내용을 실시간으로 화면에 출력하세요.</p>
+      <details><summary>정답 보기</summary>
+<pre><code class="language-jsx">import { useState } from "react";
+
+function LiveInput() {
+  const [text, setText] = useState("");
+
+  return (
+    &lt;div&gt;
+      &lt;input
+        type="text"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      /&gt;
+      &lt;p&gt;입력값: {text}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default LiveInput</code></pre>
+        <div class="out"><span class="rt">브라우저 출력</span>
+          <div class="demo"><input value="하하"><br>입력값: <b>하하</b></div>
+        </div>
+      </details>
+
+      <h4>실습 10-3. useEffect로 최초 실행 시 콘솔 출력</h4>
+      <p><code>useEffect</code>를 사용하여 컴포넌트가 <b>처음 실행될 때</b> 콘솔에 <code>"페이지 로딩…"</code>을 출력하세요.</p>
+      <details><summary>정답 보기</summary>
+<pre><code class="language-jsx">import { useEffect } from "react";
+
+function Page() {
+  useEffect(() => {
+    console.log("페이지 로딩…");
+  }, []); // 빈 배열 → 처음 한 번만 실행
+
+  return &lt;h2&gt;페이지&lt;/h2&gt;;
+}
+
+export default Page</code></pre>
+        <p class="muted">의존성 배열을 <code>[]</code>로 두면 최초 마운트 시 한 번만 실행된다.</p>
+      </details>
+    </div>
+  </section>
+
+  <footer>2강. 리엑트 Hook과 상태관리 · 학습 교안<br>모듈별 학습목표 · 개념 · 예제 · 실습문제 구성</footer>
+</div>
+<script>
+(()=>{var ht=Object.create;var ke=Object.defineProperty;var pt=Object.getOwnPropertyDescriptor;var bt=Object.getOwnPropertyNames;var Et=Object.getPrototypeOf,mt=Object.prototype.hasOwnProperty;var _t=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Nt=(e,t,n,o)=>{if(t&&typeof t=="object"||typeof t=="function")for(let f of bt(t))!mt.call(e,f)&&f!==n&&ke(e,f,{get:()=>t[f],enumerable:!(o=pt(t,f))||o.enumerable});return e};var wt=(e,t,n)=>(n=e!=null?ht(Et(e)):{},Nt(t||!e||!e.__esModule?ke(n,"default",{value:e,enumerable:!0}):n,e));var qe=_t((yn,Ye)=>{function Pe(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],o=typeof n;(o==="object"||o==="function")&&!Object.isFrozen(n)&&Pe(n)}),e}var oe=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ue(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function B(e,...t){let n=Object.create(null);for(let o in e)n[o]=e[o];return t.forEach(function(o){for(let f in o)n[f]=o[f]}),n}var St="</span>",ve=e=>!!e.scope,yt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((o,f)=>`${o}${"_".repeat(f+1)}`)].join(" ")}return`${t}${e}`},me=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ue(t)}openNode(t){if(!ve(t))return;let n=yt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){ve(t)&&(this.buffer+=St)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Ie=(e={})=>{let t={children:[]};return Object.assign(t,e),t},_e=class e{constructor(){this.rootNode=Ie(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Ie({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(o=>this._walk(t,o)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},Ne=class extends _e{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let o=t.root;n&&(o.scope=`language:${n}`),this.add(o)}toHTML(){return new me(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function q(e){return e?typeof e=="string"?e:e.source:null}function ze(e){return G("(?=",e,")")}function At(e){return G("(?:",e,")*")}function Ot(e){return G("(?:",e,")?")}function G(...e){return e.map(n=>q(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function Se(...e){return"("+(xt(e).capture?"":"?:")+e.map(o=>q(o)).join("|")+")"}function He(e){return new RegExp(e.toString()+"|").exec("").length-1}function Mt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Tt=/\[(?:[^\\\]]|\\.)*\]|\(\??|\\([1-9][0-9]*)|\\./;function ye(e,{joinWith:t}){let n=0;return e.map(o=>{n+=1;let f=n,b=q(o),s="";for(;b.length>0;){let r=Tt.exec(b);if(!r){s+=b;break}s+=b.substring(0,r.index),b=b.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?s+="\\"+String(Number(r[1])+f):(s+=r[0],r[0]==="("&&n++)}return s}).map(o=>`(${o})`).join(t)}var Rt=/\b\B/,$e="[a-zA-Z]\\w*",Ae="[a-zA-Z_]\\w*",Ge="\\b\\d+(\\.\\d+)?",Fe="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Ke="\\b(0b[01]+)",kt="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",vt=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=G(t,/.*\b/,e.binary,/\b.*/)),B({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,o)=>{n.index!==0&&o.ignoreMatch()}},e)},Q={begin:"\\\\[\\s\\S]",relevance:0},It={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[Q]},Ct={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[Q]},Lt={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},le=function(e,t,n={}){let o=B({scope:"comment",begin:e,end:t,contains:[]},n);o.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let f=Se("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return o.contains.push({begin:G(/[ ]+/,"(",f,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),o},Dt=le("//","$"),Bt=le("/\\*","\\*/"),Pt=le("#","$"),Ut={scope:"number",begin:Ge,relevance:0},zt={scope:"number",begin:Fe,relevance:0},Ht={scope:"number",begin:Ke,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[Q,{begin:/\[/,end:/\]/,relevance:0,contains:[Q]}]},Gt={scope:"title",begin:$e,relevance:0},Ft={scope:"title",begin:Ae,relevance:0},Kt={begin:"\\.\\s*"+Ae,relevance:0},Zt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},ae=Object.freeze({__proto__:null,APOS_STRING_MODE:It,BACKSLASH_ESCAPE:Q,BINARY_NUMBER_MODE:Ht,BINARY_NUMBER_RE:Ke,COMMENT:le,C_BLOCK_COMMENT_MODE:Bt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:zt,C_NUMBER_RE:Fe,END_SAME_AS_BEGIN:Zt,HASH_COMMENT_MODE:Pt,IDENT_RE:$e,MATCH_NOTHING_RE:Rt,METHOD_GUARD:Kt,NUMBER_MODE:Ut,NUMBER_RE:Ge,PHRASAL_WORDS_MODE:Lt,QUOTE_STRING_MODE:Ct,REGEXP_MODE:$t,RE_STARTERS_RE:kt,SHEBANG:vt,TITLE_MODE:Gt,UNDERSCORE_IDENT_RE:Ae,UNDERSCORE_TITLE_MODE:Ft});function Wt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function jt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Xt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Wt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Yt(e,t){Array.isArray(e.illegal)&&(e.illegal=Se(...e.illegal))}function qt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Qt(e,t){e.relevance===void 0&&(e.relevance=1)}var Vt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(o=>{delete e[o]}),e.keywords=n.keywords,e.begin=G(n.beforeMatch,ze(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Jt=["of","and","for","in","not","or","if","then","parent","list","value"],en="keyword";function Ze(e,t,n=en){let o=Object.create(null);return typeof e=="string"?f(n,e.split(" ")):Array.isArray(e)?f(n,e):Object.keys(e).forEach(function(b){Object.assign(o,Ze(e[b],t,b))}),o;function f(b,s){t&&(s=s.map(r=>r.toLowerCase())),s.forEach(function(r){let u=r.split("|");o[u[0]]=[b,tn(u[0],u[1])]})}}function tn(e,t){return t?Number(t):nn(e)?0:1}function nn(e){return Jt.includes(e.toLowerCase())}var Ce={},$=e=>{console.error(e)},Le=(e,...t)=>{console.log(`WARN: ${e}`,...t)},j=(e,t)=>{Ce[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),Ce[`${e}/${t}`]=!0)},ce=new Error;function We(e,t,{key:n}){let o=0,f=e[n],b={},s={};for(let r=1;r<=t.length;r++)s[r+o]=f[r],b[r+o]=!0,o+=He(t[r-1]);e[n]=s,e[n]._emit=b,e[n]._multi=!0}function rn(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw $("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),ce;if(typeof e.beginScope!="object"||e.beginScope===null)throw $("beginScope must be object"),ce;We(e,e.begin,{key:"beginScope"}),e.begin=ye(e.begin,{joinWith:""})}}function sn(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw $("skip, excludeEnd, returnEnd not compatible with endScope: {}"),ce;if(typeof e.endScope!="object"||e.endScope===null)throw $("endScope must be object"),ce;We(e,e.end,{key:"endScope"}),e.end=ye(e.end,{joinWith:""})}}function an(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function on(e){an(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),rn(e),sn(e)}function cn(e){function t(s,r){return new RegExp(q(s),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=He(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(ye(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let E=u.findIndex((T,x)=>x>0&&T!==void 0),_=this.matchIndexes[E];return u.splice(0,E),Object.assign(u,_)}}class o{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([E,_])=>u.addRule(E,_)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let E=u.exec(r);if(this.resumingScanAtSamePosition()&&!(E&&E.index===this.lastIndex)){let _=this.getMatcher(0);_.lastIndex=this.lastIndex+1,E=_.exec(r)}return E&&(this.regexIndex+=E.position+1,this.regexIndex===this.count&&this.considerAll()),E}}function f(s){let r=new o;return s.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),s.terminatorEnd&&r.addRule(s.terminatorEnd,{type:"end"}),s.illegal&&r.addRule(s.illegal,{type:"illegal"}),r}function b(s,r){let u=s;if(s.isCompiled)return u;[jt,qt,on,Vt].forEach(_=>_(s,r)),e.compilerExtensions.forEach(_=>_(s,r)),s.__beforeBegin=null,[Xt,Yt,Qt].forEach(_=>_(s,r)),s.isCompiled=!0;let E=null;return typeof s.keywords=="object"&&s.keywords.$pattern&&(s.keywords=Object.assign({},s.keywords),E=s.keywords.$pattern,delete s.keywords.$pattern),E=E||/\w+/,s.keywords&&(s.keywords=Ze(s.keywords,e.case_insensitive)),u.keywordPatternRe=t(E,!0),r&&(s.begin||(s.begin=/\B|\b/),u.beginRe=t(u.begin),!s.end&&!s.endsWithParent&&(s.end=/\B|\b/),s.end&&(u.endRe=t(u.end)),u.terminatorEnd=q(u.end)||"",s.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(s.end?"|":"")+r.terminatorEnd)),s.illegal&&(u.illegalRe=t(s.illegal)),s.contains||(s.contains=[]),s.contains=[].concat(...s.contains.map(function(_){return ln(_==="self"?s:_)})),s.contains.forEach(function(_){b(_,u)}),s.starts&&b(s.starts,r),u.matcher=f(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=B(e.classNameAliases||{}),b(e)}function je(e){return e?e.endsWithParent||je(e.starts):!1}function ln(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return B(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:je(e)?B(e,{starts:e.starts?B(e.starts):null}):Object.isFrozen(e)?B(e):e}var un="11.9.0",we=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},Ee=Ue,De=B,Be=Symbol("nomatch"),dn=7,Xe=function(e){let t=Object.create(null),n=Object.create(null),o=[],f=!0,b="Could not find the language '{}', did you forget to load/include a language module?",s={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:Ne};function u(i){return r.noHighlightRe.test(i)}function E(i){let c=i.className+" ";c+=i.parentNode?i.parentNode.className:"";let g=r.languageDetectRe.exec(c);if(g){let p=R(g[1]);return p||(Le(b.replace("{}",g[1])),Le("Falling back to no-highlight mode for this block.",i)),p?g[1]:"no-highlight"}return c.split(/\s+/).find(p=>u(p)||R(p))}function _(i,c,g){let p="",w="";typeof c=="object"?(p=i,g=c.ignoreIllegals,w=c.language):(j("10.7.0","highlight(lang, code, ...args) has been deprecated."),j("10.7.0",`Please use highlight(code, options) instead.
+https://github.com/highlightjs/highlight.js/issues/2277`),w=i,p=c),g===void 0&&(g=!0);let A={code:p,language:w};W("before:highlight",A);let M=A.result?A.result:T(A.language,A.code,g);return M.code=A.code,W("after:highlight",M),M}function T(i,c,g,p){let w=Object.create(null);function A(a,l){return a.keywords[l]}function M(){if(!d.keywords){S.addText(N);return}let a=0;d.keywordPatternRe.lastIndex=0;let l=d.keywordPatternRe.exec(N),h="";for(;l;){h+=N.substring(a,l.index);let m=v.case_insensitive?l[0].toLowerCase():l[0],y=A(d,m);if(y){let[C,gt]=y;if(S.addText(h),h="",w[m]=(w[m]||0)+1,w[m]<=dn&&(se+=gt),C.startsWith("_"))h+=l[0];else{let ft=v.classNameAliases[C]||C;k(l[0],ft)}}else h+=l[0];a=d.keywordPatternRe.lastIndex,l=d.keywordPatternRe.exec(N)}h+=N.substring(a),S.addText(h)}function ie(){if(N==="")return;let a=null;if(typeof d.subLanguage=="string"){if(!t[d.subLanguage]){S.addText(N);return}a=T(d.subLanguage,N,!0,Re[d.subLanguage]),Re[d.subLanguage]=a._top}else a=L(N,d.subLanguage.length?d.subLanguage:null);d.relevance>0&&(se+=a.relevance),S.__addSublanguage(a._emitter,a.language)}function O(){d.subLanguage!=null?ie():M(),N=""}function k(a,l){a!==""&&(S.startScope(l),S.addText(a),S.endScope())}function Oe(a,l){let h=1,m=l.length-1;for(;h<=m;){if(!a._emit[h]){h++;continue}let y=v.classNameAliases[a[h]]||a[h],C=l[h];y?k(C,y):(N=C,M(),N=""),h++}}function xe(a,l){return a.scope&&typeof a.scope=="string"&&S.openNode(v.classNameAliases[a.scope]||a.scope),a.beginScope&&(a.beginScope._wrap?(k(N,v.classNameAliases[a.beginScope._wrap]||a.beginScope._wrap),N=""):a.beginScope._multi&&(Oe(a.beginScope,l),N="")),d=Object.create(a,{parent:{value:d}}),d}function Me(a,l,h){let m=Mt(a.endRe,h);if(m){if(a["on:end"]){let y=new oe(a);a["on:end"](l,y),y.isMatchIgnored&&(m=!1)}if(m){for(;a.endsParent&&a.parent;)a=a.parent;return a}}if(a.endsWithParent)return Me(a.parent,l,h)}function ot(a){return d.matcher.regexIndex===0?(N+=a[0],1):(be=!0,0)}function ct(a){let l=a[0],h=a.rule,m=new oe(h),y=[h.__beforeBegin,h["on:begin"]];for(let C of y)if(C&&(C(a,m),m.isMatchIgnored))return ot(l);return h.skip?N+=l:(h.excludeBegin&&(N+=l),O(),!h.returnBegin&&!h.excludeBegin&&(N=l)),xe(h,a),h.returnBegin?0:l.length}function lt(a){let l=a[0],h=c.substring(a.index),m=Me(d,a,h);if(!m)return Be;let y=d;d.endScope&&d.endScope._wrap?(O(),k(l,d.endScope._wrap)):d.endScope&&d.endScope._multi?(O(),Oe(d.endScope,a)):y.skip?N+=l:(y.returnEnd||y.excludeEnd||(N+=l),O(),y.excludeEnd&&(N=l));do d.scope&&S.closeNode(),!d.skip&&!d.subLanguage&&(se+=d.relevance),d=d.parent;while(d!==m.parent);return m.starts&&xe(m.starts,a),y.returnEnd?0:l.length}function ut(){let a=[];for(let l=d;l!==v;l=l.parent)l.scope&&a.unshift(l.scope);a.forEach(l=>S.openNode(l))}let re={};function Te(a,l){let h=l&&l[0];if(N+=a,h==null)return O(),0;if(re.type==="begin"&&l.type==="end"&&re.index===l.index&&h===""){if(N+=c.slice(l.index,l.index+1),!f){let m=new Error(`0 width match regex (${i})`);throw m.languageName=i,m.badRule=re.rule,m}return 1}if(re=l,l.type==="begin")return ct(l);if(l.type==="illegal"&&!g){let m=new Error('Illegal lexeme "'+h+'" for mode "'+(d.scope||"<unnamed>")+'"');throw m.mode=d,m}else if(l.type==="end"){let m=lt(l);if(m!==Be)return m}if(l.type==="illegal"&&h==="")return 1;if(pe>1e5&&pe>l.index*3)throw new Error("potential infinite loop, way more iterations than matches");return N+=h,h.length}let v=R(i);if(!v)throw $(b.replace("{}",i)),new Error('Unknown language: "'+i+'"');let dt=cn(v),he="",d=p||dt,Re={},S=new r.__emitter(r);ut();let N="",se=0,H=0,pe=0,be=!1;try{if(v.__emitTokens)v.__emitTokens(c,S);else{for(d.matcher.considerAll();;){pe++,be?be=!1:d.matcher.considerAll(),d.matcher.lastIndex=H;let a=d.matcher.exec(c);if(!a)break;let l=c.substring(H,a.index),h=Te(l,a);H=a.index+h}Te(c.substring(H))}return S.finalize(),he=S.toHTML(),{language:i,value:he,relevance:se,illegal:!1,_emitter:S,_top:d}}catch(a){if(a.message&&a.message.includes("Illegal"))return{language:i,value:Ee(c),illegal:!0,relevance:0,_illegalBy:{message:a.message,index:H,context:c.slice(H-100,H+100),mode:a.mode,resultSoFar:he},_emitter:S};if(f)return{language:i,value:Ee(c),illegal:!1,relevance:0,errorRaised:a,_emitter:S,_top:d};throw a}}function x(i){let c={value:Ee(i),illegal:!1,relevance:0,_top:s,_emitter:new r.__emitter(r)};return c._emitter.addText(i),c}function L(i,c){c=c||r.languages||Object.keys(t);let g=x(i),p=c.filter(R).filter(te).map(O=>T(O,i,!1));p.unshift(g);let w=p.sort((O,k)=>{if(O.relevance!==k.relevance)return k.relevance-O.relevance;if(O.language&&k.language){if(R(O.language).supersetOf===k.language)return 1;if(R(k.language).supersetOf===O.language)return-1}return 0}),[A,M]=w,ie=A;return ie.secondBest=M,ie}function K(i,c,g){let p=c&&n[c]||g;i.classList.add("hljs"),i.classList.add(`language-${p}`)}function D(i){let c=null,g=E(i);if(u(g))return;if(W("before:highlightElement",{el:i,language:g}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("https://github.com/highlightjs/highlight.js/wiki/security"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new we("One of your code blocks includes unescaped HTML.",i.innerHTML);c=i;let p=c.textContent,w=g?_(p,{language:g,ignoreIllegals:!0}):L(p);i.innerHTML=w.value,i.dataset.highlighted="yes",K(i,g,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:p})}function Z(i){r=De(r,i)}let V=()=>{I(),j("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function P(){I(),j("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let U=!1;function I(){if(document.readyState==="loading"){U=!0;return}document.querySelectorAll(r.cssSelector).forEach(D)}function Y(){U&&I()}typeof window<"u"&&window.addEventListener&&window.addEventListener("DOMContentLoaded",Y,!1);function z(i,c){let g=null;try{g=c(e)}catch(p){if($("Language definition for '{}' could not be registered.".replace("{}",i)),f)$(p);else throw p;g=s}g.name||(g.name=i),t[i]=g,g.rawDefinition=c.bind(null,e),g.aliases&&ee(g.aliases,{languageName:i})}function ue(i){delete t[i];for(let c of Object.keys(n))n[c]===i&&delete n[c]}function J(){return Object.keys(t)}function R(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function ee(i,{languageName:c}){typeof i=="string"&&(i=[i]),i.forEach(g=>{n[g.toLowerCase()]=c})}function te(i){let c=R(i);return c&&!c.disableAutodetect}function de(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=c=>{i["before:highlightBlock"](Object.assign({block:c.el},c))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=c=>{i["after:highlightBlock"](Object.assign({block:c.el},c))})}function ge(i){de(i),o.push(i)}function fe(i){let c=o.indexOf(i);c!==-1&&o.splice(c,1)}function W(i,c){let g=i;o.forEach(function(p){p[g]&&p[g](c)})}function ne(i){return j("10.7.0","highlightBlock will be removed entirely in v12.0"),j("10.7.0","Please use highlightElement now."),D(i)}Object.assign(e,{highlight:_,highlightAuto:L,highlightAll:I,highlightElement:D,highlightBlock:ne,configure:Z,initHighlighting:V,initHighlightingOnLoad:P,registerLanguage:z,unregisterLanguage:ue,listLanguages:J,getLanguage:R,registerAliases:ee,autoDetection:te,inherit:De,addPlugin:ge,removePlugin:fe}),e.debugMode=function(){f=!1},e.safeMode=function(){f=!0},e.versionString=un,e.regex={concat:G,lookahead:ze,either:Se,optional:Ot,anyNumberOfTimes:At};for(let i in ae)typeof ae[i]=="object"&&Pe(ae[i]);return Object.assign(e,ae),e},X=Xe({});X.newInstance=()=>Xe({});Ye.exports=X;X.HighlightJS=X;X.default=X});var Qe=wt(qe(),1);var F=Qe.default;var Ve="[A-Za-z$_][0-9A-Za-z$_]*",gn=["as","in","of","if","for","while","finally","var","new","function","do","return","void","else","break","catch","instanceof","with","throw","case","default","try","switch","continue","typeof","delete","let","yield","const","class","debugger","async","await","static","import","from","export","extends"],fn=["true","false","null","undefined","NaN","Infinity"],Je=["Object","Function","Boolean","Symbol","Math","Date","Number","BigInt","String","RegExp","Array","Float32Array","Float64Array","Int8Array","Uint8Array","Uint8ClampedArray","Int16Array","Int32Array","Uint16Array","Uint32Array","BigInt64Array","BigUint64Array","Set","Map","WeakSet","WeakMap","ArrayBuffer","SharedArrayBuffer","Atomics","DataView","JSON","Promise","Generator","GeneratorFunction","AsyncFunction","Reflect","Proxy","Intl","WebAssembly"],et=["Error","EvalError","InternalError","RangeError","ReferenceError","SyntaxError","TypeError","URIError"],tt=["setInterval","setTimeout","clearInterval","clearTimeout","require","exports","eval","isFinite","isNaN","parseFloat","parseInt","decodeURI","decodeURIComponent","encodeURI","encodeURIComponent","escape","unescape"],hn=["arguments","this","super","console","window","document","localStorage","sessionStorage","module","global"],pn=[].concat(tt,Je,et);function nt(e){let t=e.regex,n=(c,{after:g})=>{let p="</"+c[0].slice(1);return c.input.indexOf(p,g)!==-1},o=Ve,f={begin:"<>",end:"</>"},b=/<[A-Za-z0-9\\._:-]+\s*\/>/,s={begin:/<[A-Za-z0-9\\._:-]+/,end:/\/[A-Za-z0-9\\._:-]+>|\/>/,isTrulyOpeningTag:(c,g)=>{let p=c[0].length+c.index,w=c.input[p];if(w==="<"||w===","){g.ignoreMatch();return}w===">"&&(n(c,{after:p})||g.ignoreMatch());let A,M=c.input.substring(p);if(A=M.match(/^\s*=/)){g.ignoreMatch();return}if((A=M.match(/^\s+extends\s+/))&&A.index===0){g.ignoreMatch();return}}},r={$pattern:Ve,keyword:gn,literal:fn,built_in:pn,"variable.language":hn},u="[0-9](_?[0-9])*",E=`\\.(${u})`,_="0|[1-9](_?[0-9])*|0[0-7]*[89][0-9]*",T={className:"number",variants:[{begin:`(\\b(${_})((${E})|\\.)?|(${E}))[eE][+-]?(${u})\\b`},{begin:`\\b(${_})\\b((${E})\\b|\\.)?|(${E})\\b`},{begin:"\\b(0|[1-9](_?[0-9])*)n\\b"},{begin:"\\b0[xX][0-9a-fA-F](_?[0-9a-fA-F])*n?\\b"},{begin:"\\b0[bB][0-1](_?[0-1])*n?\\b"},{begin:"\\b0[oO][0-7](_?[0-7])*n?\\b"},{begin:"\\b0[0-7]+n?\\b"}],relevance:0},x={className:"subst",begin:"\\$\\{",end:"\\}",keywords:r,contains:[]},L={begin:"html`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,x],subLanguage:"xml"}},K={begin:"css`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,x],subLanguage:"css"}},D={begin:"gql`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,x],subLanguage:"graphql"}},Z={className:"string",begin:"`",end:"`",contains:[e.BACKSLASH_ESCAPE,x]},P={className:"comment",variants:[e.COMMENT(/\/\*\*(?!\/)/,"\\*/",{relevance:0,contains:[{begin:"(?=@[A-Za-z]+)",relevance:0,contains:[{className:"doctag",begin:"@[A-Za-z]+"},{className:"type",begin:"\\{",end:"\\}",excludeEnd:!0,excludeBegin:!0,relevance:0},{className:"variable",begin:o+"(?=\\s*(-)|$)",endsParent:!0,relevance:0},{begin:/(?=[^\n])\s/,relevance:0}]}]}),e.C_BLOCK_COMMENT_MODE,e.C_LINE_COMMENT_MODE]},U=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,L,K,D,Z,{match:/\$\d+/},T];x.contains=U.concat({begin:/\{/,end:/\}/,keywords:r,contains:["self"].concat(U)});let I=[].concat(P,x.contains),Y=I.concat([{begin:/\(/,end:/\)/,keywords:r,contains:["self"].concat(I)}]),z={className:"params",begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:r,contains:Y},ue={variants:[{match:[/class/,/\s+/,o,/\s+/,/extends/,/\s+/,t.concat(o,"(",t.concat(/\./,o),")*")],scope:{1:"keyword",3:"title.class",5:"keyword",7:"title.class.inherited"}},{match:[/class/,/\s+/,o],scope:{1:"keyword",3:"title.class"}}]},J={relevance:0,match:t.either(/\bJSON/,/\b[A-Z][a-z]+([A-Z][a-z]*|\d)*/,/\b[A-Z]{2,}([A-Z][a-z]+|\d)+([A-Z][a-z]*)*/,/\b[A-Z]{2,}[a-z]+([A-Z][a-z]+|\d)*([A-Z][a-z]*)*/),className:"title.class",keywords:{_:[...Je,...et]}},R={label:"use_strict",className:"meta",relevance:10,begin:/^\s*['"]use (strict|asm)['"]/},ee={variants:[{match:[/function/,/\s+/,o,/(?=\s*\()/]},{match:[/function/,/\s*(?=\()/]}],className:{1:"keyword",3:"title.function"},label:"func.def",contains:[z],illegal:/%/},te={relevance:0,match:/\b[A-Z][A-Z_0-9]+\b/,className:"variable.constant"};function de(c){return t.concat("(?!",c.join("|"),")")}let ge={match:t.concat(/\b/,de([...tt,"super","import"]),o,t.lookahead(/\(/)),className:"title.function",relevance:0},fe={begin:t.concat(/\./,t.lookahead(t.concat(o,/(?![0-9A-Za-z$_(])/))),end:o,excludeBegin:!0,keywords:"prototype",className:"property",relevance:0},W={match:[/get|set/,/\s+/,o,/(?=\()/],className:{1:"keyword",3:"title.function"},contains:[{begin:/\(\)/},z]},ne="(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|"+e.UNDERSCORE_IDENT_RE+")\\s*=>",i={match:[/const|var|let/,/\s+/,o,/\s*/,/=\s*/,/(async\s*)?/,t.lookahead(ne)],keywords:"async",className:{1:"keyword",3:"title.function"},contains:[z]};return{name:"JavaScript",aliases:["js","jsx","mjs","cjs"],keywords:r,exports:{PARAMS_CONTAINS:Y,CLASS_REFERENCE:J},illegal:/#(?![$_A-z])/,contains:[e.SHEBANG({label:"shebang",binary:"node",relevance:5}),R,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,L,K,D,Z,P,{match:/\$\d+/},T,J,{className:"attr",begin:o+t.lookahead(":"),relevance:0},i,{begin:"("+e.RE_STARTERS_RE+"|\\b(case|return|throw)\\b)\\s*",keywords:"return throw case",relevance:0,contains:[P,e.REGEXP_MODE,{className:"function",begin:ne,returnBegin:!0,end:"\\s*=>",contains:[{className:"params",variants:[{begin:e.UNDERSCORE_IDENT_RE,relevance:0},{className:null,begin:/\(\s*\)/,skip:!0},{begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:r,contains:Y}]}]},{begin:/,/,relevance:0},{match:/\s+/,relevance:0},{variants:[{begin:f.begin,end:f.end},{match:b},{begin:s.begin,"on:begin":s.isTrulyOpeningTag,end:s.end}],subLanguage:"xml",contains:[{begin:s.begin,end:s.end,skip:!0,contains:["self"]}]}]},ee,{beginKeywords:"while if switch catch for"},{begin:"\\b(?!function)"+e.UNDERSCORE_IDENT_RE+"\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)\\s*\\{",returnBegin:!0,label:"func.def",contains:[z,e.inherit(e.TITLE_MODE,{begin:o,className:"title.function"})]},{match:/\.\.\./,relevance:0},fe,{match:"\\$"+o,relevance:0},{match:[/\bconstructor(?=\s*\()/],className:{1:"title.function"},contains:[z]},ge,te,ue,W,{match:/\$[(.]/}]}}function it(e){let t=e.regex,n=t.concat(/[\p{L}_]/u,t.optional(/[\p{L}0-9_.-]*:/u),/[\p{L}0-9_.-]*/u),o=/[\p{L}0-9._:-]+/u,f={className:"symbol",begin:/&[a-z]+;|&#[0-9]+;|&#x[a-f0-9]+;/},b={begin:/\s/,contains:[{className:"keyword",begin:/#?[a-z_][a-z1-9_-]+/,illegal:/\n/}]},s=e.inherit(b,{begin:/\(/,end:/\)/}),r=e.inherit(e.APOS_STRING_MODE,{className:"string"}),u=e.inherit(e.QUOTE_STRING_MODE,{className:"string"}),E={endsWithParent:!0,illegal:/</,relevance:0,contains:[{className:"attr",begin:o,relevance:0},{begin:/=\s*/,relevance:0,contains:[{className:"string",endsParent:!0,variants:[{begin:/"/,end:/"/,contains:[f]},{begin:/'/,end:/'/,contains:[f]},{begin:/[^\s"'=<>`]+/}]}]}]};return{name:"HTML, XML",aliases:["html","xhtml","rss","atom","xjb","xsd","xsl","plist","wsf","svg"],case_insensitive:!0,unicodeRegex:!0,contains:[{className:"meta",begin:/<![a-z]/,end:/>/,relevance:10,contains:[b,u,r,s,{begin:/\[/,end:/\]/,contains:[{className:"meta",begin:/<![a-z]/,end:/>/,contains:[b,s,u,r]}]}]},e.COMMENT(/<!--/,/-->/,{relevance:10}),{begin:/<!\[CDATA\[/,end:/\]\]>/,relevance:10},f,{className:"meta",end:/\?>/,variants:[{begin:/<\?xml/,relevance:10,contains:[u]},{begin:/<\?[a-z][a-z0-9]+/}]},{className:"tag",begin:/<style(?=\s|>)/,end:/>/,keywords:{name:"style"},contains:[E],starts:{end:/<\/style>/,returnEnd:!0,subLanguage:["css","xml"]}},{className:"tag",begin:/<script(?=\s|>)/,end:/>/,keywords:{name:"script"},contains:[E],starts:{end:/<\/script>/,returnEnd:!0,subLanguage:["javascript","handlebars","xml"]}},{className:"tag",begin:/<>|<\/>/},{className:"tag",begin:t.concat(/</,t.lookahead(t.concat(n,t.either(/\/>/,/>/,/\s/)))),end:/\/?>/,contains:[{className:"name",begin:n,relevance:0,starts:E}]},{className:"tag",begin:t.concat(/<\//,t.lookahead(t.concat(n,/>/))),contains:[{className:"name",begin:n,relevance:0},{begin:/>/,relevance:0,endsParent:!0}]}]}}var bn=e=>({IMPORTANT:{scope:"meta",begin:"!important"},BLOCK_COMMENT:e.C_BLOCK_COMMENT_MODE,HEXCOLOR:{scope:"number",begin:/#(([0-9a-fA-F]{3,4})|(([0-9a-fA-F]{2}){3,4}))\b/},FUNCTION_DISPATCH:{className:"built_in",begin:/[\w-]+(?=\()/},ATTRIBUTE_SELECTOR_MODE:{scope:"selector-attr",begin:/\[/,end:/\]/,illegal:"$",contains:[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE]},CSS_NUMBER_MODE:{scope:"number",begin:e.NUMBER_RE+"(%|em|ex|ch|rem|vw|vh|vmin|vmax|cm|mm|in|pt|pc|px|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?",relevance:0},CSS_VARIABLE:{className:"attr",begin:/--[A-Za-z_][A-Za-z0-9_-]*/}}),En=["a","abbr","address","article","aside","audio","b","blockquote","body","button","canvas","caption","cite","code","dd","del","details","dfn","div","dl","dt","em","fieldset","figcaption","figure","footer","form","h1","h2","h3","h4","h5","h6","header","hgroup","html","i","iframe","img","input","ins","kbd","label","legend","li","main","mark","menu","nav","object","ol","p","q","quote","samp","section","span","strong","summary","sup","table","tbody","td","textarea","tfoot","th","thead","time","tr","ul","var","video"],mn=["any-hover","any-pointer","aspect-ratio","color","color-gamut","color-index","device-aspect-ratio","device-height","device-width","display-mode","forced-colors","grid","height","hover","inverted-colors","monochrome","orientation","overflow-block","overflow-inline","pointer","prefers-color-scheme","prefers-contrast","prefers-reduced-motion","prefers-reduced-transparency","resolution","scan","scripting","update","width","min-width","max-width","min-height","max-height"],_n=["active","any-link","blank","checked","current","default","defined","dir","disabled","drop","empty","enabled","first","first-child","first-of-type","fullscreen","future","focus","focus-visible","focus-within","has","host","host-context","hover","indeterminate","in-range","invalid","is","lang","last-child","last-of-type","left","link","local-link","not","nth-child","nth-col","nth-last-child","nth-last-col","nth-last-of-type","nth-of-type","only-child","only-of-type","optional","out-of-range","past","placeholder-shown","read-only","read-write","required","right","root","scope","target","target-within","user-invalid","valid","visited","where"],Nn=["after","backdrop","before","cue","cue-region","first-letter","first-line","grammar-error","marker","part","placeholder","selection","slotted","spelling-error"],wn=["align-content","align-items","align-self","all","animation","animation-delay","animation-direction","animation-duration","animation-fill-mode","animation-iteration-count","animation-name","animation-play-state","animation-timing-function","backface-visibility","background","background-attachment","background-blend-mode","background-clip","background-color","background-image","background-origin","background-position","background-repeat","background-size","block-size","border","border-block","border-block-color","border-block-end","border-block-end-color","border-block-end-style","border-block-end-width","border-block-start","border-block-start-color","border-block-start-style","border-block-start-width","border-block-style","border-block-width","border-bottom","border-bottom-color","border-bottom-left-radius","border-bottom-right-radius","border-bottom-style","border-bottom-width","border-collapse","border-color","border-image","border-image-outset","border-image-repeat","border-image-slice","border-image-source","border-image-width","border-inline","border-inline-color","border-inline-end","border-inline-end-color","border-inline-end-style","border-inline-end-width","border-inline-start","border-inline-start-color","border-inline-start-style","border-inline-start-width","border-inline-style","border-inline-width","border-left","border-left-color","border-left-style","border-left-width","border-radius","border-right","border-right-color","border-right-style","border-right-width","border-spacing","border-style","border-top","border-top-color","border-top-left-radius","border-top-right-radius","border-top-style","border-top-width","border-width","bottom","box-decoration-break","box-shadow","box-sizing","break-after","break-before","break-inside","caption-side","caret-color","clear","clip","clip-path","clip-rule","color","column-count","column-fill","column-gap","column-rule","column-rule-color","column-rule-style","column-rule-width","column-span","column-width","columns","contain","content","content-visibility","counter-increment","counter-reset","cue","cue-after","cue-before","cursor","direction","display","empty-cells","filter","flex","flex-basis","flex-direction","flex-flow","flex-grow","flex-shrink","flex-wrap","float","flow","font","font-display","font-family","font-feature-settings","font-kerning","font-language-override","font-size","font-size-adjust","font-smoothing","font-stretch","font-style","font-synthesis","font-variant","font-variant-caps","font-variant-east-asian","font-variant-ligatures","font-variant-numeric","font-variant-position","font-variation-settings","font-weight","gap","glyph-orientation-vertical","grid","grid-area","grid-auto-columns","grid-auto-flow","grid-auto-rows","grid-column","grid-column-end","grid-column-start","grid-gap","grid-row","grid-row-end","grid-row-start","grid-template","grid-template-areas","grid-template-columns","grid-template-rows","hanging-punctuation","height","hyphens","icon","image-orientation","image-rendering","image-resolution","ime-mode","inline-size","isolation","justify-content","left","letter-spacing","line-break","line-height","list-style","list-style-image","list-style-position","list-style-type","margin","margin-block","margin-block-end","margin-block-start","margin-bottom","margin-inline","margin-inline-end","margin-inline-start","margin-left","margin-right","margin-top","marks","mask","mask-border","mask-border-mode","mask-border-outset","mask-border-repeat","mask-border-slice","mask-border-source","mask-border-width","mask-clip","mask-composite","mask-image","mask-mode","mask-origin","mask-position","mask-repeat","mask-size","mask-type","max-block-size","max-height","max-inline-size","max-width","min-block-size","min-height","min-inline-size","min-width","mix-blend-mode","nav-down","nav-index","nav-left","nav-right","nav-up","none","normal","object-fit","object-position","opacity","order","orphans","outline","outline-color","outline-offset","outline-style","outline-width","overflow","overflow-wrap","overflow-x","overflow-y","padding","padding-block","padding-block-end","padding-block-start","padding-bottom","padding-inline","padding-inline-end","padding-inline-start","padding-left","padding-right","padding-top","page-break-after","page-break-before","page-break-inside","pause","pause-after","pause-before","perspective","perspective-origin","pointer-events","position","quotes","resize","rest","rest-after","rest-before","right","row-gap","scroll-margin","scroll-margin-block","scroll-margin-block-end","scroll-margin-block-start","scroll-margin-bottom","scroll-margin-inline","scroll-margin-inline-end","scroll-margin-inline-start","scroll-margin-left","scroll-margin-right","scroll-margin-top","scroll-padding","scroll-padding-block","scroll-padding-block-end","scroll-padding-block-start","scroll-padding-bottom","scroll-padding-inline","scroll-padding-inline-end","scroll-padding-inline-start","scroll-padding-left","scroll-padding-right","scroll-padding-top","scroll-snap-align","scroll-snap-stop","scroll-snap-type","scrollbar-color","scrollbar-gutter","scrollbar-width","shape-image-threshold","shape-margin","shape-outside","speak","speak-as","src","tab-size","table-layout","text-align","text-align-all","text-align-last","text-combine-upright","text-decoration","text-decoration-color","text-decoration-line","text-decoration-style","text-emphasis","text-emphasis-color","text-emphasis-position","text-emphasis-style","text-indent","text-justify","text-orientation","text-overflow","text-rendering","text-shadow","text-transform","text-underline-position","top","transform","transform-box","transform-origin","transform-style","transition","transition-delay","transition-duration","transition-property","transition-timing-function","unicode-bidi","vertical-align","visibility","voice-balance","voice-duration","voice-family","voice-pitch","voice-range","voice-rate","voice-stress","voice-volume","white-space","widows","width","will-change","word-break","word-spacing","word-wrap","writing-mode","z-index"].reverse();function rt(e){let t=e.regex,n=bn(e),o={begin:/-(webkit|moz|ms|o)-(?=[a-z])/},f="and or not only",b=/@-?\w[\w]*(-\w+)*/,s="[a-zA-Z-][a-zA-Z0-9_-]*",r=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE];return{name:"CSS",case_insensitive:!0,illegal:/[=|'\$]/,keywords:{keyframePosition:"from to"},classNameAliases:{keyframePosition:"selector-tag"},contains:[n.BLOCK_COMMENT,o,n.CSS_NUMBER_MODE,{className:"selector-id",begin:/#[A-Za-z0-9_-]+/,relevance:0},{className:"selector-class",begin:"\\."+s,relevance:0},n.ATTRIBUTE_SELECTOR_MODE,{className:"selector-pseudo",variants:[{begin:":("+_n.join("|")+")"},{begin:":(:)?("+Nn.join("|")+")"}]},n.CSS_VARIABLE,{className:"attribute",begin:"\\b("+wn.join("|")+")\\b"},{begin:/:/,end:/[;}{]/,contains:[n.BLOCK_COMMENT,n.HEXCOLOR,n.IMPORTANT,n.CSS_NUMBER_MODE,...r,{begin:/(url|data-uri)\(/,end:/\)/,relevance:0,keywords:{built_in:"url data-uri"},contains:[...r,{className:"string",begin:/[^)]/,endsWithParent:!0,excludeEnd:!0}]},n.FUNCTION_DISPATCH]},{begin:t.lookahead(/@/),end:"[{;]",relevance:0,illegal:/:/,contains:[{className:"keyword",begin:b},{begin:/\s/,endsWithParent:!0,excludeEnd:!0,relevance:0,keywords:{$pattern:/[a-z-]+/,keyword:f,attribute:mn.join(" ")},contains:[{begin:/[a-z-]+(?=:)/,className:"attribute"},...r,n.CSS_NUMBER_MODE]}]},{className:"selector-tag",begin:"\\b("+En.join("|")+")\\b"}]}}function st(e){let t={className:"attr",begin:/"(\\.|[^\\"\r\n])*"(?=\s*:)/,relevance:1.01},n={match:/[{}[\],:]/,className:"punctuation",relevance:0},o=["true","false","null"],f={scope:"literal",beginKeywords:o.join(" ")};return{name:"JSON",keywords:{literal:o},contains:[t,n,e.QUOTE_STRING_MODE,f,e.C_NUMBER_MODE,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE],illegal:"\\S"}}function at(e){let t=e.regex,n={},o={begin:/\$\{/,end:/\}/,contains:["self",{begin:/:-/,contains:[n]}]};Object.assign(n,{className:"variable",variants:[{begin:t.concat(/\$[\w\d#@][\w\d_]*/,"(?![\\w\\d])(?![$])")},o]});let f={className:"subst",begin:/\$\(/,end:/\)/,contains:[e.BACKSLASH_ESCAPE]},b={begin:/<<-?\s*(?=\w+)/,starts:{contains:[e.END_SAME_AS_BEGIN({begin:/(\w+)/,end:/(\w+)/,className:"string"})]}},s={className:"string",begin:/"/,end:/"/,contains:[e.BACKSLASH_ESCAPE,n,f]};f.contains.push(s);let r={match:/\\"/},u={className:"string",begin:/'/,end:/'/},E={match:/\\'/},_={begin:/\$?\(\(/,end:/\)\)/,contains:[{begin:/\d+#[0-9a-f]+/,className:"number"},e.NUMBER_MODE,n]},T=["fish","bash","zsh","sh","csh","ksh","tcsh","dash","scsh"],x=e.SHEBANG({binary:`(${T.join("|")})`,relevance:10}),L={className:"function",begin:/\w[\w\d_]*\s*\(\s*\)\s*\{/,returnBegin:!0,contains:[e.inherit(e.TITLE_MODE,{begin:/\w[\w\d_]*/})],relevance:0},K=["if","then","else","elif","fi","for","while","until","in","do","done","case","esac","function","select"],D=["true","false"],Z={match:/(\/[a-z._-]+)+/},V=["break","cd","continue","eval","exec","exit","export","getopts","hash","pwd","readonly","return","shift","test","times","trap","umask","unset"],P=["alias","bind","builtin","caller","command","declare","echo","enable","help","let","local","logout","mapfile","printf","read","readarray","source","type","typeset","ulimit","unalias"],U=["autoload","bg","bindkey","bye","cap","chdir","clone","comparguments","compcall","compctl","compdescribe","compfiles","compgroups","compquote","comptags","comptry","compvalues","dirs","disable","disown","echotc","echoti","emulate","fc","fg","float","functions","getcap","getln","history","integer","jobs","kill","limit","log","noglob","popd","print","pushd","pushln","rehash","sched","setcap","setopt","stat","suspend","ttyctl","unfunction","unhash","unlimit","unsetopt","vared","wait","whence","where","which","zcompile","zformat","zftp","zle","zmodload","zparseopts","zprof","zpty","zregexparse","zsocket","zstyle","ztcp"],I=["chcon","chgrp","chown","chmod","cp","dd","df","dir","dircolors","ln","ls","mkdir","mkfifo","mknod","mktemp","mv","realpath","rm","rmdir","shred","sync","touch","truncate","vdir","b2sum","base32","base64","cat","cksum","comm","csplit","cut","expand","fmt","fold","head","join","md5sum","nl","numfmt","od","paste","ptx","pr","sha1sum","sha224sum","sha256sum","sha384sum","sha512sum","shuf","sort","split","sum","tac","tail","tr","tsort","unexpand","uniq","wc","arch","basename","chroot","date","dirname","du","echo","env","expr","factor","groups","hostid","id","link","logname","nice","nohup","nproc","pathchk","pinky","printenv","printf","pwd","readlink","runcon","seq","sleep","stat","stdbuf","stty","tee","test","timeout","tty","uname","unlink","uptime","users","who","whoami","yes"];return{name:"Bash",aliases:["sh"],keywords:{$pattern:/\b[a-z][a-z0-9._-]+\b/,keyword:K,literal:D,built_in:[...V,...P,"set","shopt",...U,...I]},contains:[x,e.SHEBANG(),L,_,e.HASH_COMMENT_MODE,b,Z,s,r,u,E,n]}}F.registerLanguage("javascript",nt);F.registerLanguage("xml",it);F.registerLanguage("css",rt);F.registerLanguage("json",st);F.registerLanguage("bash",at);window.hljs=F;})();
+
+</script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>
