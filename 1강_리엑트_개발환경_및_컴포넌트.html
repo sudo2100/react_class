@@ -362,6 +362,18 @@ server.listen(3000);</code></pre>
         <div><h2 style="margin:6px 0">문서 객체 모델(DOM)</h2><p style="margin:4px 0">여기에 글이 출력됩니다.</p><p style="margin:4px 0;color:blue;background-color:yellow"><b>강조된 문장</b></p></div>
       </div>
     </div>
+    <div class="ex"><div class="lbl">💡 예제 — html 내부에서 javascript 동작 (onclick 이벤트)</div>
+<pre><code class="language-html">&lt;h1 id="switch" onclick="changeText()"&gt;Click on this text!&lt;/h1&gt;
+
+  &lt;script&gt;
+    function changeText(){
+      document.getElementById("switch").style.color = "#ff0000";
+    }
+  &lt;/script&gt;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력 (글자를 클릭해 보세요)</span>
+        <div><h1 style="margin:6px 0;cursor:pointer" onclick="this.style.color='#ff0000'">Click on this text!</h1></div>
+      </div>
+    </div>
     <div class="ex"><div class="lbl">💡 예제 — hello.js 만들고 실행하기</div>
       <span class="fname">ES6/hello.js</span>
 <pre><code class="language-javascript">// 문자열 출력
