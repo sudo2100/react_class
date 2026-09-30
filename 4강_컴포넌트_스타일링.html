@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4강. 컴포넌트 스타일링</title>
+<style>
+/* highlight.js atom-one-dark theme (inlined) */
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*
+
+Atom One Dark by Daniel Gamage
+Original One Dark Syntax theme from https://github.com/atom/one-dark-syntax
+
+base:    #282c34
+mono-1:  #abb2bf
+mono-2:  #818896
+mono-3:  #5c6370
+hue-1:   #56b6c2
+hue-2:   #61aeee
+hue-3:   #c678dd
+hue-4:   #98c379
+hue-5:   #e06c75
+hue-5-2: #be5046
+hue-6:   #d19a66
+hue-6-2: #e6c07b
+
+*/
+.hljs {
+  color: #abb2bf;
+  background: #282c34
+}
+.hljs-comment,
+.hljs-quote {
+  color: #5c6370;
+  font-style: italic
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #c678dd
+}
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+  color: #e06c75
+}
+.hljs-literal {
+  color: #56b6c2
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #98c379
+}
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: #d19a66
+}
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #61aeee
+}
+.hljs-built_in,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: #e6c07b
+}
+.hljs-emphasis {
+  font-style: italic
+}
+.hljs-strong {
+  font-weight: bold
+}
+.hljs-link {
+  text-decoration: underline
+}
+</style>
+<style>
+  :root{--bg:#f4f6f9;--card:#fff;--ink:#1f2933;--muted:#52606d;--line:#e4e7eb;--accent:#2965f1;--accent2:#1b3a8f;--code-bg:#282c34;--goal:#eafaf1;--goal-line:#27ae60;--ex:#eef4ff;--ex-line:#5b8def;--lab:#eef7ff;--lab-line:#2965f1;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Malgun Gothic","맑은 고딕",-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.75;}
+  header.hero{background:linear-gradient(135deg,#2965f1,#1b3a8f 60%,#153e75);color:#fff;padding:52px 24px;text-align:center;}
+  header.hero .eyebrow{letter-spacing:3px;font-size:.78rem;opacity:.92;text-transform:uppercase}
+  header.hero h1{margin:12px 0 8px;font-size:1.9rem}header.hero p{margin:0;opacity:.94}
+  header.hero .tags{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  header.hero .tags span{background:rgba(255,255,255,.18);border-radius:999px;padding:5px 13px;font-size:.82rem}
+  .wrap{max-width:920px;margin:0 auto;padding:32px 20px 80px}
+  nav.toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 26px;margin-bottom:34px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  nav.toc h2{margin:0 0 12px;font-size:1.05rem;color:var(--accent2)}
+  nav.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+  nav.toc a{color:var(--ink);text-decoration:none}nav.toc a:hover{color:var(--accent);text-decoration:underline}
+  section.module{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px 30px;margin-bottom:26px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  section.module > h2{margin:0 0 6px;font-size:1.4rem;color:var(--accent2);display:flex;align-items:center;gap:12px;}
+  section.module > h2 .num{background:var(--accent);color:#fff;font-size:.95rem;font-weight:800;padding:4px 12px;border-radius:10px;min-width:38px;text-align:center;}
+  h3.blk{font-size:1.02rem;margin:22px 0 8px;font-weight:800}
+  .goal{background:var(--goal);border-left:5px solid var(--goal-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:14px 0}
+  .goal .lbl{font-weight:800;color:#1e874b}.goal ul{margin:8px 0 0}
+  .concept h3.blk{color:var(--ink);border-left:4px solid var(--accent);padding-left:10px}
+  .ex{background:var(--ex);border-left:5px solid var(--ex-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .ex .lbl{font-weight:800;color:#2f5fc7}
+  .lab{background:var(--lab);border-left:5px solid var(--lab-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .lab .lbl{font-weight:800;color:#1b4fc0}.lab h4{margin:6px 0 6px;font-size:.98rem}
+  ul{margin:8px 0}li{margin:5px 0}.muted{color:var(--muted)}
+  code{background:#eceef1;padding:2px 6px;border-radius:5px;font-size:.92em;font-family:Consolas,"D2Coding",monospace}
+  pre{background:var(--code-bg);border-radius:10px;padding:0;overflow-x:auto;margin:10px 0}
+  pre code{display:block;padding:16px 18px;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;line-height:1.6;background:var(--code-bg);color:#abb2bf;border-radius:10px;white-space:pre}
+  pre code.hljs{background:var(--code-bg);padding:16px 18px}
+  .fname{display:inline-block;background:#1b3a8f;color:#fff;font-family:Consolas,"D2Coding",monospace;font-size:.8rem;font-weight:700;padding:4px 12px;border-radius:8px 8px 0 0;margin:10px 0 -8px}
+  .fname + pre{border-top-left-radius:0}
+  .out{background:#fff;color:var(--ink);border:1px solid var(--line);border-left:4px solid #27ae60;border-radius:8px;padding:12px 16px;margin:8px 0 0}
+  .out .rt{font-size:.72rem;letter-spacing:1px;color:#27ae60;font-weight:800;text-transform:uppercase;display:block;margin-bottom:6px}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:.93rem}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:#eef2fb;color:var(--accent2)}td.c,th.c{text-align:center}
+  td code,th code{background:#eef1f5}
+  details{margin-top:10px;background:#fff;border:1px solid #cfe0ff;border-radius:8px;padding:8px 14px}
+  details summary{cursor:pointer;font-weight:700;color:#1b4fc0}details pre{margin-top:10px}
+  footer{text-align:center;color:var(--muted);font-size:.85rem;padding:30px 20px}
+  .pill{display:inline-block;background:#eceef1;border-radius:6px;padding:2px 9px;margin:2px;font-size:.85rem}
+  .flow{background:#f7f9fc;border:1px dashed #b9c6de;border-radius:10px;padding:12px 16px;margin:12px 0;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;white-space:pre-wrap;color:#37475f}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}nav.toc ol{columns:1}}
+  .tip{background:#fff8e6;border-left:5px solid #f2b705;border-radius:0 10px 10px 0;padding:12px 18px;margin:14px 0}
+  .tip .lbl{font-weight:800;color:#b57f00}
+  .demo{border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:8px 0 0;background:#fafbfc}
+  .demo button{margin:2px 4px 2px 0;padding:4px 12px;border:1px solid #b9c6de;border-radius:6px;background:#fff;cursor:default}
+  .demo input{padding:4px 8px;border:1px solid #b9c6de;border-radius:6px;margin:2px 0}
+
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="eyebrow">React 심화 · Chapter 04 · 학습 교안</div>
+  <h1>컴포넌트 스타일링</h1>
+  <p>일반 CSS부터 인라인 스타일, 반응형(미디어 쿼리), Flexbox, CSS 변수, styled-components, 그리고 GitHub Pages 배포까지 리엑트 스타일링의 전 과정을 다룹니다.</p>
+  <div class="tags">
+    <span>🏷️ index.css / App.css</span>
+    <span>🏷️ inline style</span>
+    <span>🏷️ Media Query</span>
+    <span>🏷️ Flexbox</span>
+    <span>🏷️ CSS 변수</span>
+    <span>🏷️ styled-components</span>
+    <span>🏷️ GitHub Pages 배포</span>
+  </div>
+</header>
+<div class="wrap">
+  <nav class="toc">
+    <h2>📚 학습 목차</h2>
+    <ol>
+      <li><a href="#m1">리엑트 CSS — index.css vs App.css</a></li>
+      <li><a href="#m2">인라인 스타일(inline style)</a></li>
+      <li><a href="#m3">뷰포트 단위와 미디어 쿼리(반응형)</a></li>
+      <li><a href="#m4">스타일 변수와 CSS 변수 — var()</a></li>
+      <li><a href="#m5">Flexbox 레이아웃 — flex-direction</a></li>
+      <li><a href="#m6">Flexbox 정렬 — justify-content / align-items</a></li>
+      <li><a href="#m7">실전: 컴퓨터 기기 쇼핑몰 CSS</a></li>
+      <li><a href="#m8">styled-components 기초</a></li>
+      <li><a href="#m9">styled-components 페이지 스타일링과 확장</a></li>
+      <li><a href="#m10">styled-components 실전 — Blocks 모형</a></li>
+      <li><a href="#m11">일반 웹페이지 GitHub Pages 배포</a></li>
+      <li><a href="#m12">리엑트(Vite) 앱 GitHub Pages 배포</a></li>
+      <li><a href="#m13">SPA 404 오류 해결</a></li>
+    </ol>
+  </nav>
+
+  <section class="module" id="m1">
+    <h2><span class="num">1</span> 리엑트 CSS — index.css vs App.css</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li>리엑트 프로젝트에서 CSS 파일이 적용되는 범위를 이해한다.</li>
+        <li>전역 스타일(index.css)과 컴포넌트 스타일(App.css)의 역할 차이를 구분한다.</li>
+      </ul>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 index.css — 프로젝트 전체 기본 스타일</h3>
+      <p>프로젝트 전체에 적용되는 기본 스타일입니다. 다음과 같은 특징이 있습니다.</p>
+      <ul>
+        <li>모든 컴포넌트에 영향을 줍니다.</li>
+        <li>HTML 기본 스타일 초기화(reset) 또는 공통 스타일을 정의합니다.</li>
+        <li>폰트, 배경, 기본 색상을 설정합니다.</li>
+      </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — index.css 전역 스타일</div>
+      <span class="fname">src/index.css</span>
+      <pre><code class="language-css">/* index.css */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+}
+h1 {
+  color: #333;
+}</code></pre>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 App.css — 특정 컴포넌트 스타일</h3>
+      <ul>
+        <li>특정 컴포넌트에만 적용됩니다.</li>
+        <li>보통 App.jsx의 UI 스타일을 담당합니다.</li>
+      </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — App.css 컴포넌트 스타일</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* App.css */
+.container {
+  text-align: center;
+  padding: 20px;
+}
+.button {
+  background-color: blue;
+  color: white;
+}</code></pre>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 index.css vs App.css 비교</h3>
+      <table>
+        <tr><th>구분</th><th>index.css</th><th>App.css</th></tr>
+        <tr><td>범위</td><td>전역(Global)</td><td>컴포넌트(Local 느낌)</td></tr>
+        <tr><td>적용 대상</td><td>전체 앱</td><td>특정 컴포넌트</td></tr>
+        <tr><td>import 위치</td><td><code>main.jsx</code></td><td><code>App.jsx</code></td></tr>
+        <tr><td>용도</td><td>초기화, 공통 스타일</td><td>UI 스타일</td></tr>
+      </table>
+      <div class="tip"><span class="lbl">💡 정리</span> index.css는 <code>main.jsx</code>에서 import하여 앱 전체 기본값을 잡고, App.css는 <code>App.jsx</code>에서 import하여 화면 UI를 꾸미는 데 사용합니다. CSS는 실제로는 모두 전역으로 병합되지만, 파일을 목적에 따라 나누면 유지보수가 쉬워집니다.</div>
+    </div>
+  </section>
+
+  <section class="module" id="m2">
+    <h2><span class="num">2</span> 인라인 스타일(inline style)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li>JSX에서 <code>style</code> 속성에 자바스크립트 객체를 전달하는 방법을 익힌다.</li>
+        <li>CSS 속성명을 카멜케이스로 작성하는 규칙을 이해한다.</li>
+      </ul>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 인라인 스타일 규칙</h3>
+      <ul>
+        <li><code>style</code> 속성에 문자열이 아닌 <strong>자바스크립트 객체</strong>를 할당합니다.</li>
+        <li>객체의 키는 <strong>카멜케이스</strong> 형태로 작성합니다. (예: <code>background-color</code> → <code>backgroundColor</code>)</li>
+        <li>중괄호가 이중(<code>{{ }}</code>)인 이유: 바깥 중괄호는 JSX 표현식, 안쪽 중괄호는 객체 리터럴입니다.</li>
+      </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 인라인 스타일 적용</div>
+      <span class="fname">src/App.jsx</span>
+      <pre><code class="language-jsx">return (
+  &lt;&gt;
+    &lt;div&gt;
+      {/* 인라인 스타일 적용 */}
+      &lt;h1
+        style={{
+          color: 'red',
+          fontWeight: 'bold'
+        }}
+      &gt;Hello, World!&lt;/h1&gt;
+    &lt;/div&gt;
+  &lt;/&gt;
+);</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <h1 style="color:red;font-weight:bold;margin:0">Hello, World!</h1>
+      </div>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 2-1. 인라인 스타일로 버튼 꾸미기</h4>
+      <p><code>&lt;button&gt;</code>에 인라인 스타일을 적용해 배경색은 파란색, 글자색은 흰색, 안쪽 여백(padding)은 <code>8px 16px</code>로 만드세요.</p>
+      <details><summary>정답 보기</summary>
+        <pre><code class="language-jsx">&lt;button
+  style={{
+    backgroundColor: 'blue',
+    color: 'white',
+    padding: '8px 16px'
+  }}
+&gt;
+  확인
+&lt;/button&gt;</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m3">
+    <h2><span class="num">3</span> 뷰포트 단위와 미디어 쿼리(반응형)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li>뷰포트(viewport)의 개념과 vw/vh 단위를 이해한다.</li>
+        <li>미디어 쿼리로 화면 크기에 따라 다른 스타일을 적용한다.</li>
+      </ul>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 뷰포트(Viewport) 단위</h3>
+      <ul>
+        <li>뷰포트는 실제 내용이 표시되는 영역입니다.</li>
+        <li>PC 화면과 모바일 화면은 픽셀 표시 방법이 다르기 때문에, 뷰포트를 지정하지 않으면 모바일에서 의도한 대로 표시되지 않습니다.</li>
+        <li>뷰포트를 지정하면 기기 화면에 맞춰 확대/축소해서 내용을 표시합니다.</li>
+      </ul>
+      <p>CSS에서 크기를 지정할 때 <code>px</code>, <code>%</code>는 고정 폰트이고, 브라우저 비율에 따라 글자 크기가 변하는 가변 단위는 <code>vw</code>, <code>vh</code>입니다.</p>
+      <table>
+        <tr><th>단위</th><th>의미</th></tr>
+        <tr><td><code>vw</code> (viewport width)</td><td>1vw = 뷰포트 너비의 1% (너비 1200px일 때 5vw = 60px)</td></tr>
+        <tr><td><code>vh</code> (viewport height)</td><td>1vh = 뷰포트 높이의 1%</td></tr>
+      </table>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 미디어 쿼리(Media Query)</h3>
+      <ul>
+        <li>접속하는 장치(미디어)에 따라 특정한 CSS 스타일을 사용하도록 합니다.</li>
+        <li>반응형 웹디자인에서 가장 많이 사용하는 방식입니다. (가변 그리드 레이아웃, 플렉스박스 레이아웃 등)</li>
+      </ul>
+      <p>기본 구문은 <code>@media 미디어유형 [and 조건] * [and 조건]</code> 형태입니다.</p>
+      <div class="flow">@media 미디어유형 [and 조건] [and 조건] { ... }
+
+예) 미디어 유형이 'screen'이면서 최소 너비 768px, 최대 너비 1023px</div>
+      <span class="fname">예시</span>
+      <pre><code class="language-css">@media screen and (min-width: 768px) and (max-width: 1023px) {
+  /* .... */
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 화면 크기에 따라 배경색 변경</div>
+      <span class="fname">mq.html</span>
+      <pre><code class="language-html">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+&lt;title&gt;미디어 쿼리 예제&lt;/title&gt;
+&lt;style&gt;
+  @media screen and (max-width: 767px) {
+    body{
+      background-color: lightcoral;
+    }
+  }
+
+  @media screen and (min-width: 768px) {
+    body{
+      background-color: lightblue;
+    }
+  }
+
+  @media screen and (min-width: 1200px) {
+    body{
+      background-color: lightgreen;
+    }
+  }
+&lt;/style&gt;</code></pre>
+      <span class="fname">body</span>
+      <pre><code class="language-html">&lt;body&gt;
+  &lt;h2&gt;미디어 쿼리 예제&lt;/h2&gt;
+  &lt;p&gt;화면 크기에 따라 배경색이 변경됩니다.&lt;/p&gt;
+&lt;/body&gt;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div style="background:lightcoral;padding:10px 14px;border-radius:6px;margin-bottom:6px"><strong>모바일(≤767px)</strong> → lightcoral(연분홍)</div>
+        <div style="background:lightblue;padding:10px 14px;border-radius:6px;margin-bottom:6px"><strong>태블릿(≥768px)</strong> → lightblue(하늘색)</div>
+        <div style="background:lightgreen;padding:10px 14px;border-radius:6px"><strong>데스크톱(≥1200px)</strong> → lightgreen(연두색)</div>
+      </div>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 3-1. 모바일 폰트 크기 조정</h4>
+      <p>화면 너비가 600px 이하일 때 <code>h1</code>의 글자 크기를 <code>1.2rem</code>으로 줄이는 미디어 쿼리를 작성하세요.</p>
+      <details><summary>정답 보기</summary>
+        <pre><code class="language-css">@media screen and (max-width: 600px) {
+  h1 {
+    font-size: 1.2rem;
+  }
+}</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m4">
+    <h2><span class="num">4</span> 스타일 변수와 CSS 변수 — var()</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li><code>:root</code>에 CSS 변수를 정의하고 <code>var()</code>로 재사용하는 방법을 익힌다.</li>
+        <li>색상·여백 등 반복되는 값을 변수로 관리하는 이점을 이해한다.</li>
+      </ul>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 CSS 변수 정의 및 사용</h3>
+      <p><code>var()</code> 함수는 "CSS 변수"의 값을 다른 속성의 값으로 지정할 때 사용합니다. 변수는 보통 <code>:root</code>(문서 최상위)에 <code>--변수명</code> 형태로 정의합니다.</p>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — CSS 변수 정의 (:root)</div>
+      <span class="fname">css-style.html</span>
+      <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="ko"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;css 스타일&lt;/title&gt;
+  &lt;style&gt;
+    /* css 변수 정의 */
+    :root{
+      /* 글자색 */
+      --red-color: rgb(212, 60, 60);
+
+      /* 배경색 */
+      --green-color: rgb(45, 238, 45);
+
+      /* 여백 1rem = 16px */
+      --my-2: 0.5rem;
+      --my-3: 1rem;
+    }</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — var()로 변수 사용</div>
+      <span class="fname">css-style.html (이어서)</span>
+      <pre><code class="language-html">    h2{
+      /* color: red; */
+      color: var(--red-color);
+    }
+    div{
+      width: 100px;
+      height: 100px;
+      /*background-color: #0f0;*/
+      background-color: var(--green-color);
+      /*margin: 10px;*/
+      margin: var(--my-3);
+      display: inline-block;
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h2&gt;스타일 변수&lt;/h2&gt;
+  &lt;div&gt;&lt;/div&gt;
+  &lt;div&gt;&lt;/div&gt;
+&lt;/body&gt;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <h2 style="color:rgb(212,60,60);margin:0 0 8px">스타일 변수</h2>
+        <div style="width:70px;height:70px;background:rgb(45,238,45);margin:8px;display:inline-block"></div>
+        <div style="width:70px;height:70px;background:rgb(45,238,45);margin:8px;display:inline-block"></div>
+      </div>
+    </div>
+    <div class="tip"><span class="lbl">💡 정리</span> 한 번 정의한 <code>--red-color</code>, <code>--my-3</code> 같은 변수를 여러 곳에서 <code>var()</code>로 재사용하면, 값을 <code>:root</code> 한 곳에서만 바꿔도 전체 스타일이 일괄 변경됩니다.</div>
+  </section>
+
+  <section class="module" id="m5">
+    <h2><span class="num">5</span> Flexbox 레이아웃 — flex-direction</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li>Flexbox의 컨테이너/아이템 구조와 주축 개념을 이해한다.</li>
+        <li><code>flex-direction</code>으로 가로/세로 배치를 전환한다.</li>
+      </ul>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 플렉스 박스(Flex Box) 레이아웃</h3>
+      <ul>
+        <li>수평이나 수직 방향 중 하나를 <strong>주축</strong>으로 정하고 박스를 배치합니다.</li>
+        <li>여유 공간이 생길 경우 너비나 높이를 적절하게 늘리거나 줄일 수 있습니다.</li>
+      </ul>
+      <div class="flow">┌──────── flex container ────────┐
+│  [flex item] [flex item] [flex item]  │
+└────────────────────────────────┘</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — flex-direction: row / column</div>
+      <span class="fname">flex.html — style</span>
+      <pre><code class="language-css">.container {
+  display: flex;
+  flex-direction: row;    /* 아이템을 가로 방향으로 배치 */
+  flex-direction: column; /* 아이템을 세로 방향으로 배치 */
+  gap: 16px;              /* 아이템 사이의 간격 */
+}
+.box {
+  width: 100px;
+  height: 100px;
+  background-color: lightcoral;
+}</code></pre>
+      <span class="fname">flex.html — body</span>
+      <pre><code class="language-html">&lt;div class="container"&gt;
+  &lt;div class="box"&gt;&lt;/div&gt;
+  &lt;div class="box"&gt;&lt;/div&gt;
+  &lt;div class="box"&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p style="margin:0 0 4px"><strong>row</strong> (가로 배치)</p>
+        <div style="display:flex;flex-direction:row;gap:16px;margin-bottom:12px">
+          <div style="width:60px;height:60px;background:lightcoral"></div>
+          <div style="width:60px;height:60px;background:lightcoral"></div>
+          <div style="width:60px;height:60px;background:lightcoral"></div>
+        </div>
+        <p style="margin:0 0 4px"><strong>column</strong> (세로 배치)</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="width:60px;height:60px;background:lightcoral"></div>
+          <div style="width:60px;height:60px;background:lightcoral"></div>
+          <div style="width:60px;height:60px;background:lightcoral"></div>
+        </div>
+      </div>
+    </div>
+    <div class="tip"><span class="lbl">💡 정리</span> 마지막에 선언된 값이 실제로 적용되므로, 위 코드에서는 <code>column</code>이 최종 적용됩니다. 실제 사용 시에는 원하는 하나의 <code>flex-direction</code>만 남겨 둡니다.</div>
+  </section>
+
+  <section class="module" id="m6">
+    <h2><span class="num">6</span> Flexbox 정렬 — justify-content / align-items</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li><code>justify-content</code>로 주축(main axis) 정렬을 지정한다.</li>
+        <li><code>align-items</code>로 교차축(cross axis) 정렬을 지정한다.</li>
+      </ul>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 justify-content — 주축 정렬</h3>
+      <p>주축(main axis) 방향의 정렬 방법을 지정합니다.</p>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — justify-content 옵션</div>
+      <span class="fname">flex2.html — style</span>
+      <pre><code class="language-css">.container {
+  display: flex;
+  justify-content: center;        /* 아이템을 가로 방향으로 중앙 정렬 */
+  justify-content: flex-start;    /* 아이템을 가로 방향으로 시작 위치에 정렬 */
+  justify-content: space-between; /* 아이템을 가로 방향으로 양 끝에 정렬 */
+  justify-content: space-around;  /* 아이템을 가로 방향으로 고르게 분배 */
+  gap: 16px;                      /* 아이템 사이의 간격 */
+}
+.box {
+  width: 100px;
+  height: 100px;
+  background-color: skyblue;
+}</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p style="margin:0 0 4px"><strong>space-between</strong></p>
+        <div style="display:flex;justify-content:space-between;border:1px solid #ccc;padding:6px">
+          <div style="width:44px;height:44px;background:skyblue"></div>
+          <div style="width:44px;height:44px;background:skyblue"></div>
+          <div style="width:44px;height:44px;background:skyblue"></div>
+        </div>
+      </div>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 align-items — 교차축 정렬</h3>
+      <p>교차축(cross axis) 방향의 정렬 방법을 지정합니다. 아래 예제는 <code>justify-content</code>와 <code>align-items</code>를 함께 사용합니다.</p>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — align-items 옵션</div>
+      <span class="fname">flex3.html — style</span>
+      <pre><code class="language-css">.container {
+  width: 400px;
+  height: 300px;
+  border: 1px solid #000;
+  display: flex;
+  align-items: center;            /* 아이템을 세로 방향으로 중앙 정렬 */
+  align-items: start;             /* 아이템을 세로 방향으로 시작 위치에 정렬 */
+  align-items: end;               /* 아이템을 세로 방향으로 끝 위치에 정렬 */
+  justify-content: space-around;  /* 아이템을 가로 방향으로 고르게 분배 */
+  justify-content: flex-start;    /* 아이템을 가로 방향으로 시작 위치에 정렬 */
+  flex-direction: row-reverse;    /* 아이템을 가로 방향으로 역순 배치 */
+  gap: 16px;                      /* 아이템 사이의 간격 */
+}
+.box {
+  width: 60px;
+  height: 60px;
+  background-color: skyblue;
+}
+p{text-align: center;}</code></pre>
+      <span class="fname">flex3.html — body</span>
+      <pre><code class="language-html">&lt;div class="container"&gt;
+  &lt;div class="box"&gt;&lt;p&gt;1&lt;/p&gt;&lt;/div&gt;
+  &lt;div class="box"&gt;&lt;p&gt;2&lt;/p&gt;&lt;/div&gt;
+  &lt;div class="box"&gt;&lt;p&gt;3&lt;/p&gt;&lt;/div&gt;
+  &lt;div class="box"&gt;&lt;p&gt;4&lt;/p&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p style="margin:0 0 4px"><code>row-reverse</code> + <code>flex-start</code> → 4 3 2 1 순으로 배치</p>
+        <div style="display:flex;flex-direction:row-reverse;justify-content:flex-start;gap:16px;border:1px solid #000;padding:6px;width:320px">
+          <div style="width:40px;height:40px;background:skyblue;text-align:center;line-height:40px">1</div>
+          <div style="width:40px;height:40px;background:skyblue;text-align:center;line-height:40px">2</div>
+          <div style="width:40px;height:40px;background:skyblue;text-align:center;line-height:40px">3</div>
+          <div style="width:40px;height:40px;background:skyblue;text-align:center;line-height:40px">4</div>
+        </div>
+      </div>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 6-1. 가운데 정렬 컨테이너</h4>
+      <p>너비 300px, 높이 200px인 <code>.container</code> 안의 아이템을 가로·세로 모두 정중앙에 배치하세요.</p>
+      <details><summary>정답 보기</summary>
+        <pre><code class="language-css">.container {
+  width: 300px;
+  height: 200px;
+  display: flex;
+  justify-content: center; /* 주축(가로) 중앙 */
+  align-items: center;     /* 교차축(세로) 중앙 */
+}</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m7">
+    <h2><span class="num">7</span> 실전: 컴퓨터 기기 쇼핑몰 CSS</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li>실제 쇼핑몰 화면(홈·목록·상세·등록·로그인)의 UI 구조를 파악한다.</li>
+        <li>App.css로 헤더, 테이블, 폼, 버튼을 스타일링한다.</li>
+      </ul>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 화면 구성</h3>
+      <p>"컴퓨터 기기 쇼핑몰" 예제는 상단 공통 헤더(Home / 상품 목록 / 상품 등록 / 로그인)를 두고, 다음 페이지들로 구성됩니다.</p>
+      <ul>
+        <li><strong>Home</strong>: 타이틀 "컴퓨터 기기 쇼핑몰"과 소개 문구, 대표 이미지</li>
+        <li><strong>상품 목록</strong>: 번호·상품명·가격 테이블 + "상품 등록하기" 버튼</li>
+        <li><strong>상품 정보</strong>: 상품 ID·상품명·가격·설명을 담은 카드 + "목록보기" 버튼</li>
+        <li><strong>상품 등록</strong>: 상품명·가격·설명 입력 폼 + 등록/취소 버튼</li>
+        <li><strong>로그인</strong>: 아이디·비밀번호 입력 + 로그인 버튼</li>
+      </ul>
+      <div class="out"><span class="rt">브라우저 출력</span> 상품 목록 화면(재현)
+        <div style="background:#333;padding:10px;text-align:center;border-radius:6px;margin-bottom:8px">
+          <span style="color:yellow;margin:0 10px">Home</span>
+          <span style="color:yellow;margin:0 10px">상품 목록</span>
+          <span style="color:yellow;margin:0 10px">상품 등록</span>
+          <span style="color:yellow;margin:0 10px">로그인</span>
+        </div>
+        <p style="text-align:center;margin:6px 0"><strong>상품 리스트</strong></p>
+        <table style="width:70%;margin:0 auto">
+          <tr><th class="c">번호</th><th class="c">상품명</th><th class="c">가격</th></tr>
+          <tr><td class="c">1</td><td class="c">모니터</td><td class="c">120000</td></tr>
+          <tr><td class="c">2</td><td class="c">무선마우스</td><td class="c">30000</td></tr>
+          <tr><td class="c">3</td><td class="c">무선키보드</td><td class="c">40000</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — Header 스타일</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* Header 스타일 */
+.header{padding: 20px; background-color: #333;}
+.header a{
+  margin: 0 16px;
+  color: yellow;
+  text-decoration: none;
+}
+.header a:hover{color: #eee;}
+.header-user{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #eee;
+}
+.logout-btn{
+  padding: 6px 12px;
+  border: 1px solid #ff9f1c;
+  border-radius: 6px;
+  background-color: transparent;
+  color: #ff9f1c;
+  cursor: pointer;
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품 목록 스타일</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 상품 목록 스타일 */
+.product-list{padding: 20px;}
+.table-list{
+  width: 60%;
+  border-collapse: collapse;
+  margin: 20px auto;
+}
+.table-list th, td{
+  border: 1px solid #ccc;
+  padding: 6px;
+}
+.table-list thead{background-color: #eee;}
+.table-list a{
+  text-decoration: none;
+  color: #333;
+}
+.table-list a:hover{text-decoration: underline;}
+.btn-add{
+  text-align: right;
+  margin-right: 20%;
+}
+.btn-add button{padding: 6px 12px;}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품 정보 스타일</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 상품 정보 스타일 */
+.product-info{padding: 20px;}
+.product-details{
+  width: 40%;
+  margin: 20px auto;
+  text-align: left;
+  padding: 20px;
+  border: 1px solid #ddd;
+  background-color: #eee;
+  border-radius: 10px;
+}
+.product-details p{margin: 16px;}
+.btn-list{
+  text-align: left;
+  margin-left: 30%;
+}
+.btn-list button{padding: 6px 12px;}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품 등록 폼 스타일</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 상품 등록 스타일 */
+.add-product{padding: 20px;}
+.add-form{width: 40%; margin: 20px auto; text-align: left;}
+.add-form label{display: block; margin: 6px;}
+.add-form input,
+.add-form textarea{
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+.add-form textarea{resize: none;}
+.add-form button{
+  padding: 8px 16px;
+  background-color: #28a745;
+  color: #eee;
+  border-radius: 4px;
+  border: none;
+  font-size: 15px;
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 로그인 폼 스타일</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 로그인 스타일 */
+.sign-in{padding: 20px;}
+.signin-form{width: 30%; margin: 20px auto; text-align: left;}
+.signin-form input{
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+.signin-form button{
+  width: 100%;
+  margin-left: 3%;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: #eee;
+  border-radius: 4px;
+  border: none;
+  font-size: 15px;
+}</code></pre>
+    </div>
+  </section>
+
+  <section class="module" id="m8">
+    <h2><span class="num">8</span> styled-components 기초</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li>CSS-in-JS 개념과 styled-components의 역할을 이해한다.</li>
+        <li>props를 이용한 동적 스타일링 문법을 익힌다.</li>
+      </ul>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 styled-components 란?</h3>
+      <ul>
+        <li>CSS를 JavaScript 안에서 작성할 수 있게 해주는 대표적인 <strong>CSS-in-JS</strong> 라이브러리입니다.</li>
+        <li>기존처럼 <code>.css</code> 파일을 따로 만드는 대신, JS 파일 안에서 <strong>스타일 + 컴포넌트</strong>를 함께 작성합니다.</li>
+      </ul>
+      <span class="fname">설치</span>
+      <pre><code class="language-bash">npm install styled-components</code></pre>
+      <span class="fname">package.json — dependencies</span>
+      <pre><code class="language-json">"dependencies": {
+  "axios": "^1.14.0",
+  "react": "^19.2.4",
+  "react-dom": "^19.2.4",
+  "styled-components": "^6.3.12"
+},</code></pre>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 동적 스타일링 문법</h3>
+      <p><code>${props =&gt; props.color}</code>는 styled-components의 동적 스타일링 문법입니다.</p>
+      <ul>
+        <li><code>${}</code> = JavaScript 템플릿 리터럴 (백틱 내에서 JS 실행)</li>
+        <li><code>props =&gt; props.color</code> = 화살표 함수로 props 객체에서 color 값 추출</li>
+        <li>결과 = 컴포넌트에 전달된 <code>color</code> prop을 CSS 값으로 사용</li>
+      </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 버튼 컴포넌트 정의(Button.jsx)</div>
+      <span class="fname">src/Button.jsx</span>
+      <pre><code class="language-jsx">import styled from 'styled-components';
+
+const Button = styled.button`
+  margin: 5px;
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.5; // 버튼의 높이를 텍스트의 높이에 맞게 조정
+
+  // props를 이용하여 스타일을 동적으로 변경
+  color: ${props =&gt; props.color || 'black'};
+  background-color: ${props =&gt; props.backgroundColor || 'white'};
+
+  // primary prop이 true일 때 추가 스타일 적용
+  ${props =&gt; props.primary &amp;&amp; `
+    color: white;
+    background-color: purple;
+  `}
+`;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 버튼 사용(ButtonSample.jsx)</div>
+      <span class="fname">src/ButtonSample.jsx</span>
+      <pre><code class="language-jsx">const ButtonSample = () =&gt; {
+  return (
+    &lt;&gt;
+      &lt;Button&gt;기본 버튼&lt;/Button&gt;
+      {/* props를 이용하여 스타일을 동적으로 변경 */}
+      &lt;Button color="green" backgroundColor="yellow"&gt;
+        녹색 버튼
+      &lt;/Button&gt;
+      {/* primary prop이 true일 때 추가 스타일 적용 */}
+      &lt;Button primary&gt;보라 버튼&lt;/Button&gt;
+    &lt;/&gt;
+  );
+};
+
+export default ButtonSample;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div class="demo" style="border:none;background:none">
+          <button style="margin:5px;padding:8px 16px;border:1px solid #ccc;border-radius:8px;background:white;color:black">기본 버튼</button>
+          <button style="margin:5px;padding:8px 16px;border:1px solid #ccc;border-radius:8px;background:yellow;color:green">녹색 버튼</button>
+          <button style="margin:5px;padding:8px 16px;border:1px solid #ccc;border-radius:8px;background:purple;color:white">보라 버튼</button>
+        </div>
+      </div>
+    </div>
+    <div class="tip"><span class="lbl">💡 정리</span> 브라우저 개발자 도구로 보면 styled-components는 <code>sc-bpqTzb</code> 같은 자동 생성 클래스명을 각 요소에 부여합니다. 같은 <code>Button</code>이라도 전달된 props에 따라 다른 스타일이 적용됩니다.</div>
+  </section>
+
+  <section class="module" id="m9">
+    <h2><span class="num">9</span> styled-components 페이지 스타일링과 확장</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li><code>styled.div</code>, <code>styled.h1</code> 등으로 레이아웃 컴포넌트를 만든다.</li>
+        <li><code>styled(기존컴포넌트)</code>로 스타일을 상속(확장)한다.</li>
+      </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — Main 페이지 스타일 정의</div>
+      <span class="fname">src/MainPage.jsx</span>
+      <pre><code class="language-jsx">import styled from 'styled-components';
+
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  // 100vh는 브라우저 창의 높이를 의미, 예) 창 높이 1000px일때,
+  // 50vh(viewport height) = 50*(창높이/100) = 500px
+  height: 100vh;
+`;
+
+const Title = styled.h1`
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 20px;
+`;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — Button 정의와 컴포넌트 확장(상속)</div>
+      <span class="fname">src/MainPage.jsx (이어서)</span>
+      <pre><code class="language-jsx">const Button = styled.button`
+  padding: 10px 20px;
+  margin: 10px;
+  font-size: 1rem;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  &amp;:hover {
+    background-color: #0056b3;
+  }
+`;
+
+/* RoundedButton 컴포넌트는 Button 컴포넌트를
+   상속받아 border-radius를 50px로 설정*/
+const RoundedButton = styled(Button)`
+  border-radius: 50px;
+`;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — MainPage 렌더링</div>
+      <span class="fname">src/MainPage.jsx (이어서)</span>
+      <pre><code class="language-jsx">const MainPage = () =&gt; {
+  return (
+    &lt;Wrapper&gt;
+      &lt;Title&gt;Hello~ React!&lt;/Title&gt;
+      &lt;Button&gt;Click Me&lt;/Button&gt;
+      &lt;RoundedButton&gt;Click Me&lt;/RoundedButton&gt;
+    &lt;/Wrapper&gt;
+  );
+};
+
+export default MainPage;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div style="text-align:center">
+          <h1 style="font-size:1.8rem;color:#333;margin:6px 0">Hello~ React!</h1>
+          <button style="padding:10px 20px;margin:6px;color:#fff;background:#007bff;border:none;border-radius:5px">Click Me</button><br>
+          <button style="padding:10px 20px;margin:6px;color:#fff;background:#007bff;border:none;border-radius:50px">Click Me</button>
+        </div>
+      </div>
+    </div>
+    <div class="tip"><span class="lbl">💡 정리</span> <code>styled(Button)</code>처럼 기존 styled 컴포넌트를 인자로 넘기면 해당 스타일을 그대로 물려받고, 새로 작성한 규칙만 덮어씁니다. <code>RoundedButton</code>은 Button의 파란 배경·hover 효과를 유지하면서 모서리만 둥글게 바뀝니다.</div>
+  </section>
+
+  <section class="module" id="m10">
+    <h2><span class="num">10</span> styled-components 실전 — Blocks 모형</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li>props로 색상을 전달해 동적으로 스타일되는 블록을 만든다.</li>
+        <li><code>useState</code>와 <code>onClick</code>을 결합해 클릭한 색상을 표시한다.</li>
+      </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — Blocks 컴포넌트 로직</div>
+      <span class="fname">src/Blocks.jsx</span>
+      <pre><code class="language-jsx">const Blocks = () =&gt; {
+  // 클릭한 블록의 색상을 저장하는 상태
+  const [clicked, setClicked] = useState(null);
+
+  const handleClick = (color) =&gt; {
+    setClicked(color);
+  };
+
+  return (
+    &lt;Wrapper&gt;
+      &lt;Block
+        color="#f00"
+        onClick={() =&gt; handleClick('red')}
+      /&gt;
+      &lt;Block
+        color="#0f0"
+        onClick={() =&gt; handleClick('green')}
+      /&gt;
+      &lt;Block
+        color="#00f"
+        onClick={() =&gt; handleClick('blue')}
+      /&gt;
+      {clicked &amp;&amp; &lt;p&gt;클릭한 색상: {clicked}&lt;/p&gt;}
+    &lt;/Wrapper&gt;
+  );
+};
+
+export default Blocks;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — Wrapper / Block 스타일 (props 동적)</div>
+      <span class="fname">src/Blocks.jsx (스타일)</span>
+      <pre><code class="language-jsx">const Wrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px;
+  background-color: lightgray;
+  height: 100vh;
+`;
+
+const Block = styled.div`
+  width: 100px;
+  height: 100px;
+  background-color: ${props =&gt; props.color};
+  border-radius: 8px;
+  cursor: pointer;
+`;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div style="display:flex;gap:20px;background:lightgray;padding:16px;align-items:center">
+          <div style="width:56px;height:56px;background:#f00;border-radius:8px"></div>
+          <div style="width:56px;height:56px;background:#0f0;border-radius:8px"></div>
+          <div style="width:56px;height:56px;background:#00f;border-radius:8px"></div>
+          <span style="color:#222">클릭한 색상: green</span>
+        </div>
+      </div>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 10-1. 블록 추가하기</h4>
+      <p>노란색 블록을 하나 더 추가하고, 클릭 시 "yellow"가 표시되도록 만드세요.</p>
+      <details><summary>정답 보기</summary>
+        <pre><code class="language-jsx">&lt;Block
+  color="#ff0"
+  onClick={() =&gt; handleClick('yellow')}
+/&gt;</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m11">
+    <h2><span class="num">11</span> 일반 웹페이지 GitHub Pages 배포</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li>정적 웹페이지를 GitHub 저장소에 올리고 Pages로 배포하는 절차를 익힌다.</li>
+        <li>간단한 시계(clock) 예제를 만들어 배포 결과를 확인한다.</li>
+      </ul>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 웹 페이지 배포 절차</h3>
+      <ol>
+        <li>test web을 깃허브 저장소에 업로드합니다.</li>
+        <li>Settings &gt; Pages 설정하기
+          <ul>
+            <li>Settings → Pages</li>
+            <li>Build and deployment — Source: <strong>Deploy from a branch</strong></li>
+            <li>Branch: <strong>main</strong> 선택 / Folder: <strong>/ (root)</strong> 선택</li>
+            <li>Save</li>
+          </ul>
+        </li>
+      </ol>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — index.html</div>
+      <span class="fname">index.html</span>
+      <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;Welcome~ Home&lt;/title&gt;
+  &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class="container"&gt;
+    &lt;h1&gt;홈페이지 방문을 환영합니다!!&lt;/h1&gt;
+    &lt;div id="demo" class="clock"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;script src="clock.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — style.css</div>
+      <span class="fname">style.css</span>
+      <pre><code class="language-css">.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.clock {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #00f;
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — clock.js (실시간 시계)</div>
+      <span class="fname">clock.js</span>
+      <pre><code class="language-javascript">setInterval(() =&gt; {
+  let date = new Date();
+  let now = date.toLocaleTimeString();
+  document.getElementById("demo").innerText = now;
+}, 1000);</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div style="text-align:center">
+          <h1 style="margin:6px 0">홈페이지 방문을 환영합니다!!</h1>
+          <div style="font-size:1.3em;font-weight:bold;color:#00f">오후 3:17:44</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="module" id="m12">
+    <h2><span class="num">12</span> 리엑트(Vite) 앱 GitHub Pages 배포</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li>Vite 리엑트 앱을 GitHub Pages에 배포하는 전체 흐름을 이해한다.</li>
+        <li>gh-pages, package.json, vite.config.js 설정을 올바르게 작성한다.</li>
+      </ul>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 사전 작업</h3>
+      <ol>
+        <li>Product_mall 앱을 미리 깃허브 저장소에 업로드합니다.</li>
+        <li>Settings &gt; Pages 설정: Source <strong>Deploy from a branch</strong>, Branch <strong>main</strong>, Folder <strong>/ (root)</strong>, Save.</li>
+      </ol>
+    </div>
+    <div class="ex"><div class="lbl">💡 1단계 — 필수 패키지 설치</div>
+      <pre><code class="language-bash">npm install
+npm install gh-pages --save-dev</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 2단계 — package.json 설정</div>
+      <span class="fname">package.json</span>
+      <pre><code class="language-json">{
+  "name": "todo-app",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "homepage": "https://username.github.io/repository-name/",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
+    "preview": "vite preview"
+  },
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 3단계 — vite.config.js 설정</div>
+      <span class="fname">vite.config.js</span>
+      <pre><code class="language-javascript">import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  base: '/repository-name/',   // GitHub Pages 경로
+  server: {
+    port: 5173
+  }
+})</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 4단계 — index.html 설정 (상대 경로 사용)</div>
+      <span class="fname">index.html</span>
+      <pre><code class="language-html">&lt;!doctype html&gt;
+&lt;html lang="ko"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8" /&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
+    &lt;title&gt;할 일 관리 앱&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id="root"&gt;&lt;/div&gt;
+    &lt;!-- ✅ 상대 경로 사용 (절대 경로 X) --&gt;
+    &lt;script type="module" src="./src/main.jsx"&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      <div class="tip"><span class="lbl">💡 주의</span> 스크립트 경로를 <code>/src/main.jsx</code>(절대 경로)가 아니라 <code>./src/main.jsx</code>(상대 경로)로 지정해야 GitHub Pages 하위 경로에서도 정상 로딩됩니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 5단계 — 로컬 테스트</div>
+      <span class="fname">개발 서버 / 프로덕션 빌드</span>
+      <pre><code class="language-bash"># 개발 서버 실행 (http://localhost:5173, 실시간 핫 리로드)
+npm run dev
+
+# 프로덕션 빌드 테스트 (dist/ 폴더 생성)
+npm run build
+npm run preview</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 6단계 — 업데이트 시 배포</div>
+      <pre><code class="language-bash"># 1. 로컬 변경사항 커밋 & 푸시 (선택)
+git add .
+git commit -m "변경사항 설명"
+git push origin main
+
+# 2. 배포
+npm run deploy</code></pre>
+      <div class="out"><span class="rt">터미널 출력</span>
+        <pre><code class="language-bash">&gt; todo-app2@0.0.1 predeploy
+&gt; npm run build
+&gt; vite build
+
+vite v4.5.14 building for production...
+✓ 34 modules transformed.
+dist/index.html                   0.41 kB
+dist/assets/index-d2ef3821.css    1.69 kB
+dist/assets/index-fa09a36a.js   144.01 kB
+✓ built in 880ms
+
+&gt; gh-pages -d dist
+Published</code></pre>
+      </div>
+    </div>
+    <div class="ex"><div class="lbl">💡 7단계 — 배포하기 & GitHub Pages 활성화</div>
+      <p>7.1 배포 명령어: <code>npm run deploy</code></p>
+      <p>7.2 GitHub Pages 활성화:</p>
+      <ol>
+        <li>GitHub 저장소 접속</li>
+        <li><strong>Settings</strong> → <strong>Pages</strong></li>
+        <li><strong>Build and deployment</strong>: Source <strong>Deploy from a branch</strong>, Branch <strong>gh-pages</strong> 선택, Folder <strong>/ (root)</strong> 선택 (gh-pages 브랜치의 루트 폴더)</li>
+        <li>Save</li>
+      </ol>
+      <div class="out"><span class="rt">배포 결과</span>
+        Your site is live at <strong>https://sudo2100.github.io/products/</strong> — Published (배포됨)
+      </div>
+    </div>
+    <div class="tip"><span class="lbl">💡 정리</span> 최종 접속 주소는 <code>https://아이디.github.io/리포지터리</code> 형식입니다. <code>vite.config.js</code>의 <code>base</code>와 리포지터리 이름이 일치해야 CSS/JS가 올바르게 로드됩니다.</div>
+  </section>
+
+  <section class="module" id="m13">
+    <h2><span class="num">13</span> SPA 404 오류 해결</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li>SPA 라우팅에서 새로고침 시 발생하는 404 오류의 원인을 이해한다.</li>
+        <li>Vite 빌드 시 <code>index.html</code>을 <code>404.html</code>로 복사해 문제를 해결한다.</li>
+      </ul>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 404 오류 — File Not Found</h3>
+      <p><strong>문제:</strong> 새로고침 시 <code>/product_shop/products</code> 같은 경로로 직접 접근하면, GitHub Pages가 해당 파일을 찾으려 하는데 실제 파일이 없어 404가 발생합니다.</p>
+      <p><strong>해결방법:</strong> <code>public/404.html</code>을 생성하여 <code>index.html</code>과 동일한 내용으로 설정하면, GitHub Pages가 존재하지 않는 모든 경로를 자동으로 <code>index.html</code>로 라우팅합니다.</p>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 스크립트 경로 문제</h3>
+      <p>문제는 <code>404.html</code>의 스크립트 경로입니다. Vite 빌드 후 <code>404.html</code>은 단순 복사되므로 <code>main.jsx</code> 경로가 무효가 됩니다. 가장 간단한 해결책은 <strong>Vite 빌드 후 자동으로 <code>index.html</code>을 <code>404.html</code>로 복사</strong>하도록 설정하는 것입니다.</p>
+      <span class="fname">public/404.html (참고 — 원본 index.html)</span>
+      <pre><code class="language-html">&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8" /&gt;
+    &lt;link rel="icon" type="image/svg+xml" href="/favicon.svg" /&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
+    &lt;title&gt;router&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id="root"&gt;&lt;/div&gt;
+    &lt;script type="module" src="./src/main.jsx"&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — vite.config.js에 copy-404 플러그인 추가</div>
+      <span class="fname">vite.config.js</span>
+      <pre><code class="language-javascript">// https://vite.dev/config/
+export default defineConfig({
+  plugins: [
+    react(),
+    {
+      name: 'copy-404',
+      writeBundle() {
+        // 빌드 후 dist/index.html을 dist/404.html로 복사
+        const distPath = path.resolve(__dirname, 'dist')
+        const indexPath = path.join(distPath, 'index.html')
+        const notFoundPath = path.join(distPath, '404.html')
+        if (fs.existsSync(indexPath)) {
+          fs.copyFileSync(indexPath, notFoundPath)
+        }
+      }
+    }
+  ],
+  base: '/product_shop/'
+})</code></pre>
+    </div>
+    <div class="tip"><span class="lbl">💡 정리</span> <code>writeBundle()</code>는 빌드 산출물이 <code>dist/</code>에 모두 기록된 뒤 실행됩니다. 이때 <code>index.html</code>을 그대로 <code>404.html</code>로 복사하면 스크립트 경로가 이미 빌드된 정상 경로이므로, 새로고침·직접 접근 시에도 앱이 올바르게 로드됩니다. (상단에 <code>import path from 'path'</code>, <code>import fs from 'fs'</code> 필요)</div>
+  </section>
+
+  <footer>4강. 컴포넌트 스타일링 · 학습 교안<br>모듈별 학습목표 · 개념 · 예제 · 실습문제 구성</footer>
+</div>
+
+<script>
+(()=>{var wn=Object.create;var Ce=Object.defineProperty;var On=Object.getOwnPropertyDescriptor;var Rn=Object.getOwnPropertyNames;var xn=Object.getPrototypeOf,Mn=Object.prototype.hasOwnProperty;var vn=(e,n)=>()=>{try{return n||e((n={exports:{}}).exports,n),n.exports}catch(t){throw n=0,t}};var kn=(e,n,t,s)=>{if(n&&typeof n=="object"||typeof n=="function")for(let g of Rn(n))!Mn.call(e,g)&&g!==t&&Ce(e,g,{get:()=>n[g],enumerable:!(s=On(n,g))||s.enumerable});return e};var In=(e,n,t)=>(t=e!=null?wn(xn(e)):{},kn(n||!e||!e.__esModule?Ce(t,"default",{value:e,enumerable:!0}):t,e));var Ve=vn((Lt,Je)=>{function $e(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(n=>{let t=e[n],s=typeof t;(s==="object"||s==="function")&&!Object.isFrozen(t)&&$e(t)}),e}var de=class{constructor(n){n.data===void 0&&(n.data={}),this.data=n.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function He(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function K(e,...n){let t=Object.create(null);for(let s in e)t[s]=e[s];return n.forEach(function(s){for(let g in s)t[g]=s[g]}),t}var Cn="</span>",Le=e=>!!e.scope,Ln=(e,{prefix:n})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let t=e.split(".");return[`${n}${t.shift()}`,...t.map((s,g)=>`${s}${"_".repeat(g+1)}`)].join(" ")}return`${n}${e}`},_e=class{constructor(n,t){this.buffer="",this.classPrefix=t.classPrefix,n.walk(this)}addText(n){this.buffer+=He(n)}openNode(n){if(!Le(n))return;let t=Ln(n.scope,{prefix:this.classPrefix});this.span(t)}closeNode(n){Le(n)&&(this.buffer+=Cn)}value(){return this.buffer}span(n){this.buffer+=`<span class="${n}">`}},De=(e={})=>{let n={children:[]};return Object.assign(n,e),n},Ne=class e{constructor(){this.rootNode=De(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(n){this.top.children.push(n)}openNode(n){let t=De({scope:n});this.add(t),this.stack.push(t)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(n){return this.constructor._walk(n,this.rootNode)}static _walk(n,t){return typeof t=="string"?n.addText(t):t.children&&(n.openNode(t),t.children.forEach(s=>this._walk(n,s)),n.closeNode(t)),n}static _collapse(n){typeof n!="string"&&n.children&&(n.children.every(t=>typeof t=="string")?n.children=[n.children.join("")]:n.children.forEach(t=>{e._collapse(t)}))}},Se=class extends Ne{constructor(n){super(),this.options=n}addText(n){n!==""&&this.add(n)}startScope(n){this.openNode(n)}endScope(){this.closeNode()}__addSublanguage(n,t){let s=n.root;t&&(s.scope=`language:${t}`),this.add(s)}toHTML(){return new _e(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function re(e){return e?typeof e=="string"?e:e.source:null}function Ge(e){return j("(?=",e,")")}function Dn(e){return j("(?:",e,")*")}function Bn(e){return j("(?:",e,")?")}function j(...e){return e.map(t=>re(t)).join("")}function Un(e){let n=e[e.length-1];return typeof n=="object"&&n.constructor===Object?(e.splice(e.length-1,1),n):{}}function ye(...e){return"("+(Un(e).capture?"":"?:")+e.map(s=>re(s)).join("|")+")"}function Fe(e){return new RegExp(e.toString()+"|").exec("").length-1}function Pn(e,n){let t=e&&e.exec(n);return t&&t.index===0}var zn=/\[(?:[^\\\]]|\\.)*\]|\(\??|\\([1-9][0-9]*)|\\./;function Te(e,{joinWith:n}){let t=0;return e.map(s=>{t+=1;let g=t,E=re(s),a="";for(;E.length>0;){let i=zn.exec(E);if(!i){a+=E;break}a+=E.substring(0,i.index),E=E.substring(i.index+i[0].length),i[0][0]==="\\"&&i[1]?a+="\\"+String(Number(i[1])+g):(a+=i[0],i[0]==="("&&t++)}return a}).map(s=>`(${s})`).join(n)}var $n=/\b\B/,Ke="[a-zA-Z]\\w*",we="[a-zA-Z_]\\w*",Ze="\\b\\d+(\\.\\d+)?",We="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Xe="\\b(0b[01]+)",Hn="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",Gn=(e={})=>{let n=/^#![ ]*\//;return e.binary&&(e.begin=j(n,/.*\b/,e.binary,/\b.*/)),K({scope:"meta",begin:n,end:/$/,relevance:0,"on:begin":(t,s)=>{t.index!==0&&s.ignoreMatch()}},e)},ae={begin:"\\\\[\\s\\S]",relevance:0},Fn={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[ae]},Kn={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[ae]},Zn={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},fe=function(e,n,t={}){let s=K({scope:"comment",begin:e,end:n,contains:[]},t);s.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let g=ye("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return s.contains.push({begin:j(/[ ]+/,"(",g,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),s},Wn=fe("//","$"),Xn=fe("/\\*","\\*/"),Yn=fe("#","$"),jn={scope:"number",begin:Ze,relevance:0},qn={scope:"number",begin:We,relevance:0},Qn={scope:"number",begin:Xe,relevance:0},Jn={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[ae,{begin:/\[/,end:/\]/,relevance:0,contains:[ae]}]},Vn={scope:"title",begin:Ke,relevance:0},et={scope:"title",begin:we,relevance:0},nt={begin:"\\.\\s*"+we,relevance:0},tt=function(e){return Object.assign(e,{"on:begin":(n,t)=>{t.data._beginMatch=n[1]},"on:end":(n,t)=>{t.data._beginMatch!==n[1]&&t.ignoreMatch()}})},ue=Object.freeze({__proto__:null,APOS_STRING_MODE:Fn,BACKSLASH_ESCAPE:ae,BINARY_NUMBER_MODE:Qn,BINARY_NUMBER_RE:Xe,COMMENT:fe,C_BLOCK_COMMENT_MODE:Xn,C_LINE_COMMENT_MODE:Wn,C_NUMBER_MODE:qn,C_NUMBER_RE:We,END_SAME_AS_BEGIN:tt,HASH_COMMENT_MODE:Yn,IDENT_RE:Ke,MATCH_NOTHING_RE:$n,METHOD_GUARD:nt,NUMBER_MODE:jn,NUMBER_RE:Ze,PHRASAL_WORDS_MODE:Zn,QUOTE_STRING_MODE:Kn,REGEXP_MODE:Jn,RE_STARTERS_RE:Hn,SHEBANG:Gn,TITLE_MODE:Vn,UNDERSCORE_IDENT_RE:we,UNDERSCORE_TITLE_MODE:et});function it(e,n){e.input[e.index-1]==="."&&n.ignoreMatch()}function st(e,n){e.className!==void 0&&(e.scope=e.className,delete e.className)}function rt(e,n){n&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=it,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function at(e,n){Array.isArray(e.illegal)&&(e.illegal=ye(...e.illegal))}function ot(e,n){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function ct(e,n){e.relevance===void 0&&(e.relevance=1)}var lt=(e,n)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let t=Object.assign({},e);Object.keys(e).forEach(s=>{delete e[s]}),e.keywords=t.keywords,e.begin=j(t.beforeMatch,Ge(t.begin)),e.starts={relevance:0,contains:[Object.assign(t,{endsParent:!0})]},e.relevance=0,delete t.beforeMatch},ut=["of","and","for","in","not","or","if","then","parent","list","value"],dt="keyword";function Ye(e,n,t=dt){let s=Object.create(null);return typeof e=="string"?g(t,e.split(" ")):Array.isArray(e)?g(t,e):Object.keys(e).forEach(function(E){Object.assign(s,Ye(e[E],n,E))}),s;function g(E,a){n&&(a=a.map(i=>i.toLowerCase())),a.forEach(function(i){let l=i.split("|");s[l[0]]=[E,gt(l[0],l[1])]})}}function gt(e,n){return n?Number(n):ft(e)?0:1}function ft(e){return ut.includes(e.toLowerCase())}var Be={},Y=e=>{console.error(e)},Ue=(e,...n)=>{console.log(`WARN: ${e}`,...n)},J=(e,n)=>{Be[`${e}/${n}`]||(console.log(`Deprecated as of ${e}. ${n}`),Be[`${e}/${n}`]=!0)},ge=new Error;function je(e,n,{key:t}){let s=0,g=e[t],E={},a={};for(let i=1;i<=n.length;i++)a[i+s]=g[i],E[i+s]=!0,s+=Fe(n[i-1]);e[t]=a,e[t]._emit=E,e[t]._multi=!0}function bt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw Y("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),ge;if(typeof e.beginScope!="object"||e.beginScope===null)throw Y("beginScope must be object"),ge;je(e,e.begin,{key:"beginScope"}),e.begin=Te(e.begin,{joinWith:""})}}function pt(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw Y("skip, excludeEnd, returnEnd not compatible with endScope: {}"),ge;if(typeof e.endScope!="object"||e.endScope===null)throw Y("endScope must be object"),ge;je(e,e.end,{key:"endScope"}),e.end=Te(e.end,{joinWith:""})}}function ht(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function Et(e){ht(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),bt(e),pt(e)}function mt(e){function n(a,i){return new RegExp(re(a),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(i?"g":""))}class t{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(i,l){l.position=this.position++,this.matchIndexes[this.matchAt]=l,this.regexes.push([l,i]),this.matchAt+=Fe(i)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let i=this.regexes.map(l=>l[1]);this.matcherRe=n(Te(i,{joinWith:"|"}),!0),this.lastIndex=0}exec(i){this.matcherRe.lastIndex=this.lastIndex;let l=this.matcherRe.exec(i);if(!l)return null;let f=l.findIndex((w,S)=>S>0&&w!==void 0),m=this.matchIndexes[f];return l.splice(0,f),Object.assign(l,m)}}class s{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(i){if(this.multiRegexes[i])return this.multiRegexes[i];let l=new t;return this.rules.slice(i).forEach(([f,m])=>l.addRule(f,m)),l.compile(),this.multiRegexes[i]=l,l}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(i,l){this.rules.push([i,l]),l.type==="begin"&&this.count++}exec(i){let l=this.getMatcher(this.regexIndex);l.lastIndex=this.lastIndex;let f=l.exec(i);if(this.resumingScanAtSamePosition()&&!(f&&f.index===this.lastIndex)){let m=this.getMatcher(0);m.lastIndex=this.lastIndex+1,f=m.exec(i)}return f&&(this.regexIndex+=f.position+1,this.regexIndex===this.count&&this.considerAll()),f}}function g(a){let i=new s;return a.contains.forEach(l=>i.addRule(l.begin,{rule:l,type:"begin"})),a.terminatorEnd&&i.addRule(a.terminatorEnd,{type:"end"}),a.illegal&&i.addRule(a.illegal,{type:"illegal"}),i}function E(a,i){let l=a;if(a.isCompiled)return l;[st,ot,Et,lt].forEach(m=>m(a,i)),e.compilerExtensions.forEach(m=>m(a,i)),a.__beforeBegin=null,[rt,at,ct].forEach(m=>m(a,i)),a.isCompiled=!0;let f=null;return typeof a.keywords=="object"&&a.keywords.$pattern&&(a.keywords=Object.assign({},a.keywords),f=a.keywords.$pattern,delete a.keywords.$pattern),f=f||/\w+/,a.keywords&&(a.keywords=Ye(a.keywords,e.case_insensitive)),l.keywordPatternRe=n(f,!0),i&&(a.begin||(a.begin=/\B|\b/),l.beginRe=n(l.begin),!a.end&&!a.endsWithParent&&(a.end=/\B|\b/),a.end&&(l.endRe=n(l.end)),l.terminatorEnd=re(l.end)||"",a.endsWithParent&&i.terminatorEnd&&(l.terminatorEnd+=(a.end?"|":"")+i.terminatorEnd)),a.illegal&&(l.illegalRe=n(a.illegal)),a.contains||(a.contains=[]),a.contains=[].concat(...a.contains.map(function(m){return _t(m==="self"?a:m)})),a.contains.forEach(function(m){E(m,l)}),a.starts&&E(a.starts,i),l.matcher=g(l),l}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=K(e.classNameAliases||{}),E(e)}function qe(e){return e?e.endsWithParent||qe(e.starts):!1}function _t(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(n){return K(e,{variants:null},n)})),e.cachedVariants?e.cachedVariants:qe(e)?K(e,{starts:e.starts?K(e.starts):null}):Object.isFrozen(e)?K(e):e}var Nt="11.9.0",Ae=class extends Error{constructor(n,t){super(n),this.name="HTMLInjectionError",this.html=t}},me=He,Pe=K,ze=Symbol("nomatch"),St=7,Qe=function(e){let n=Object.create(null),t=Object.create(null),s=[],g=!0,E="Could not find the language '{}', did you forget to load/include a language module?",a={disableAutodetect:!0,name:"Plain text",contains:[]},i={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:Se};function l(r){return i.noHighlightRe.test(r)}function f(r){let o=r.className+" ";o+=r.parentNode?r.parentNode.className:"";let d=i.languageDetectRe.exec(o);if(d){let h=D(d[1]);return h||(Ue(E.replace("{}",d[1])),Ue("Falling back to no-highlight mode for this block.",r)),h?d[1]:"no-highlight"}return o.split(/\s+/).find(h=>l(h)||D(h))}function m(r,o,d){let h="",_="";typeof o=="object"?(h=r,d=o.ignoreIllegals,_=o.language):(J("10.7.0","highlight(lang, code, ...args) has been deprecated."),J("10.7.0",`Please use highlight(code, options) instead.
+https://github.com/highlightjs/highlight.js/issues/2277`),_=r,h=o),d===void 0&&(d=!0);let T={code:h,language:_};F("before:highlight",T);let v=T.result?T.result:w(T.language,T.code,d);return v.code=T.code,F("after:highlight",v),v}function w(r,o,d,h){let _=Object.create(null);function T(c,u){return c.keywords[u]}function v(){if(!b.keywords){O.addText(A);return}let c=0;b.keywordPatternRe.lastIndex=0;let u=b.keywordPatternRe.exec(A),p="";for(;u;){p+=A.substring(c,u.index);let N=$.case_insensitive?u[0].toLowerCase():u[0],R=T(b,N);if(R){let[G,yn]=R;if(O.addText(p),p="",_[N]=(_[N]||0)+1,_[N]<=St&&(le+=yn),G.startsWith("_"))p+=u[0];else{let Tn=$.classNameAliases[G]||G;z(u[0],Tn)}}else p+=u[0];c=b.keywordPatternRe.lastIndex,u=b.keywordPatternRe.exec(A)}p+=A.substring(c),O.addText(p)}function oe(){if(A==="")return;let c=null;if(typeof b.subLanguage=="string"){if(!n[b.subLanguage]){O.addText(A);return}c=w(b.subLanguage,A,!0,Ie[b.subLanguage]),Ie[b.subLanguage]=c._top}else c=y(A,b.subLanguage.length?b.subLanguage:null);b.relevance>0&&(le+=c.relevance),O.__addSublanguage(c._emitter,c.language)}function I(){b.subLanguage!=null?oe():v(),A=""}function z(c,u){c!==""&&(O.startScope(u),O.addText(c),O.endScope())}function xe(c,u){let p=1,N=u.length-1;for(;p<=N;){if(!c._emit[p]){p++;continue}let R=$.classNameAliases[c[p]]||c[p],G=u[p];R?z(G,R):(A=G,v(),A=""),p++}}function Me(c,u){return c.scope&&typeof c.scope=="string"&&O.openNode($.classNameAliases[c.scope]||c.scope),c.beginScope&&(c.beginScope._wrap?(z(A,$.classNameAliases[c.beginScope._wrap]||c.beginScope._wrap),A=""):c.beginScope._multi&&(xe(c.beginScope,u),A="")),b=Object.create(c,{parent:{value:b}}),b}function ve(c,u,p){let N=Pn(c.endRe,p);if(N){if(c["on:end"]){let R=new de(c);c["on:end"](u,R),R.isMatchIgnored&&(N=!1)}if(N){for(;c.endsParent&&c.parent;)c=c.parent;return c}}if(c.endsWithParent)return ve(c.parent,u,p)}function mn(c){return b.matcher.regexIndex===0?(A+=c[0],1):(Ee=!0,0)}function _n(c){let u=c[0],p=c.rule,N=new de(p),R=[p.__beforeBegin,p["on:begin"]];for(let G of R)if(G&&(G(c,N),N.isMatchIgnored))return mn(u);return p.skip?A+=u:(p.excludeBegin&&(A+=u),I(),!p.returnBegin&&!p.excludeBegin&&(A=u)),Me(p,c),p.returnBegin?0:u.length}function Nn(c){let u=c[0],p=o.substring(c.index),N=ve(b,c,p);if(!N)return ze;let R=b;b.endScope&&b.endScope._wrap?(I(),z(u,b.endScope._wrap)):b.endScope&&b.endScope._multi?(I(),xe(b.endScope,c)):R.skip?A+=u:(R.returnEnd||R.excludeEnd||(A+=u),I(),R.excludeEnd&&(A=u));do b.scope&&O.closeNode(),!b.skip&&!b.subLanguage&&(le+=b.relevance),b=b.parent;while(b!==N.parent);return N.starts&&Me(N.starts,c),R.returnEnd?0:u.length}function Sn(){let c=[];for(let u=b;u!==$;u=u.parent)u.scope&&c.unshift(u.scope);c.forEach(u=>O.openNode(u))}let ce={};function ke(c,u){let p=u&&u[0];if(A+=c,p==null)return I(),0;if(ce.type==="begin"&&u.type==="end"&&ce.index===u.index&&p===""){if(A+=o.slice(u.index,u.index+1),!g){let N=new Error(`0 width match regex (${r})`);throw N.languageName=r,N.badRule=ce.rule,N}return 1}if(ce=u,u.type==="begin")return _n(u);if(u.type==="illegal"&&!d){let N=new Error('Illegal lexeme "'+p+'" for mode "'+(b.scope||"<unnamed>")+'"');throw N.mode=b,N}else if(u.type==="end"){let N=Nn(u);if(N!==ze)return N}if(u.type==="illegal"&&p==="")return 1;if(he>1e5&&he>u.index*3)throw new Error("potential infinite loop, way more iterations than matches");return A+=p,p.length}let $=D(r);if(!$)throw Y(E.replace("{}",r)),new Error('Unknown language: "'+r+'"');let An=mt($),pe="",b=h||An,Ie={},O=new i.__emitter(i);Sn();let A="",le=0,X=0,he=0,Ee=!1;try{if($.__emitTokens)$.__emitTokens(o,O);else{for(b.matcher.considerAll();;){he++,Ee?Ee=!1:b.matcher.considerAll(),b.matcher.lastIndex=X;let c=b.matcher.exec(o);if(!c)break;let u=o.substring(X,c.index),p=ke(u,c);X=c.index+p}ke(o.substring(X))}return O.finalize(),pe=O.toHTML(),{language:r,value:pe,relevance:le,illegal:!1,_emitter:O,_top:b}}catch(c){if(c.message&&c.message.includes("Illegal"))return{language:r,value:me(o),illegal:!0,relevance:0,_illegalBy:{message:c.message,index:X,context:o.slice(X-100,X+100),mode:c.mode,resultSoFar:pe},_emitter:O};if(g)return{language:r,value:me(o),illegal:!1,relevance:0,errorRaised:c,_emitter:O,_top:b};throw c}}function S(r){let o={value:me(r),illegal:!1,relevance:0,_top:a,_emitter:new i.__emitter(i)};return o._emitter.addText(r),o}function y(r,o){o=o||i.languages||Object.keys(n);let d=S(r),h=o.filter(D).filter(Q).map(I=>w(I,r,!1));h.unshift(d);let _=h.sort((I,z)=>{if(I.relevance!==z.relevance)return z.relevance-I.relevance;if(I.language&&z.language){if(D(I.language).supersetOf===z.language)return 1;if(D(z.language).supersetOf===I.language)return-1}return 0}),[T,v]=_,oe=T;return oe.secondBest=v,oe}function C(r,o,d){let h=o&&t[o]||d;r.classList.add("hljs"),r.classList.add(`language-${h}`)}function x(r){let o=null,d=f(r);if(l(d))return;if(F("before:highlightElement",{el:r,language:d}),r.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",r);return}if(r.children.length>0&&(i.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("https://github.com/highlightjs/highlight.js/wiki/security"),console.warn("The element with unescaped HTML:"),console.warn(r)),i.throwUnescapedHTML))throw new Ae("One of your code blocks includes unescaped HTML.",r.innerHTML);o=r;let h=o.textContent,_=d?m(h,{language:d,ignoreIllegals:!0}):y(h);r.innerHTML=_.value,r.dataset.highlighted="yes",C(r,d,_.language),r.result={language:_.language,re:_.relevance,relevance:_.relevance},_.secondBest&&(r.secondBest={language:_.secondBest.language,relevance:_.secondBest.relevance}),F("after:highlightElement",{el:r,result:_,text:h})}function M(r){i=Pe(i,r)}let ee=()=>{L(),J("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function B(){L(),J("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let P=!1;function L(){if(document.readyState==="loading"){P=!0;return}document.querySelectorAll(i.cssSelector).forEach(x)}function H(){P&&L()}typeof window<"u"&&window.addEventListener&&window.addEventListener("DOMContentLoaded",H,!1);function k(r,o){let d=null;try{d=o(e)}catch(h){if(Y("Language definition for '{}' could not be registered.".replace("{}",r)),g)Y(h);else throw h;d=a}d.name||(d.name=r),n[r]=d,d.rawDefinition=o.bind(null,e),d.aliases&&q(d.aliases,{languageName:r})}function ne(r){delete n[r];for(let o of Object.keys(t))t[o]===r&&delete t[o]}function Z(){return Object.keys(n)}function D(r){return r=(r||"").toLowerCase(),n[r]||n[t[r]]}function q(r,{languageName:o}){typeof r=="string"&&(r=[r]),r.forEach(d=>{t[d.toLowerCase()]=o})}function Q(r){let o=D(r);return o&&!o.disableAutodetect}function te(r){r["before:highlightBlock"]&&!r["before:highlightElement"]&&(r["before:highlightElement"]=o=>{r["before:highlightBlock"](Object.assign({block:o.el},o))}),r["after:highlightBlock"]&&!r["after:highlightElement"]&&(r["after:highlightElement"]=o=>{r["after:highlightBlock"](Object.assign({block:o.el},o))})}function ie(r){te(r),s.push(r)}function se(r){let o=s.indexOf(r);o!==-1&&s.splice(o,1)}function F(r,o){let d=r;s.forEach(function(h){h[d]&&h[d](o)})}function W(r){return J("10.7.0","highlightBlock will be removed entirely in v12.0"),J("10.7.0","Please use highlightElement now."),x(r)}Object.assign(e,{highlight:m,highlightAuto:y,highlightAll:L,highlightElement:x,highlightBlock:W,configure:M,initHighlighting:ee,initHighlightingOnLoad:B,registerLanguage:k,unregisterLanguage:ne,listLanguages:Z,getLanguage:D,registerAliases:q,autoDetection:Q,inherit:Pe,addPlugin:ie,removePlugin:se}),e.debugMode=function(){g=!1},e.safeMode=function(){g=!0},e.versionString=Nt,e.regex={concat:j,lookahead:Ge,either:ye,optional:Bn,anyNumberOfTimes:Dn};for(let r in ue)typeof ue[r]=="object"&&$e(ue[r]);return Object.assign(e,ue),e},V=Qe({});V.newInstance=()=>Qe({});Je.exports=V;V.HighlightJS=V;V.default=V});var en=In(Ve(),1);var U=en.default;var nn="[A-Za-z$_][0-9A-Za-z$_]*",At=["as","in","of","if","for","while","finally","var","new","function","do","return","void","else","break","catch","instanceof","with","throw","case","default","try","switch","continue","typeof","delete","let","yield","const","class","debugger","async","await","static","import","from","export","extends"],yt=["true","false","null","undefined","NaN","Infinity"],tn=["Object","Function","Boolean","Symbol","Math","Date","Number","BigInt","String","RegExp","Array","Float32Array","Float64Array","Int8Array","Uint8Array","Uint8ClampedArray","Int16Array","Int32Array","Uint16Array","Uint32Array","BigInt64Array","BigUint64Array","Set","Map","WeakSet","WeakMap","ArrayBuffer","SharedArrayBuffer","Atomics","DataView","JSON","Promise","Generator","GeneratorFunction","AsyncFunction","Reflect","Proxy","Intl","WebAssembly"],sn=["Error","EvalError","InternalError","RangeError","ReferenceError","SyntaxError","TypeError","URIError"],rn=["setInterval","setTimeout","clearInterval","clearTimeout","require","exports","eval","isFinite","isNaN","parseFloat","parseInt","decodeURI","decodeURIComponent","encodeURI","encodeURIComponent","escape","unescape"],Tt=["arguments","this","super","console","window","document","localStorage","sessionStorage","module","global"],wt=[].concat(rn,tn,sn);function Oe(e){let n=e.regex,t=(o,{after:d})=>{let h="</"+o[0].slice(1);return o.input.indexOf(h,d)!==-1},s=nn,g={begin:"<>",end:"</>"},E=/<[A-Za-z0-9\\._:-]+\s*\/>/,a={begin:/<[A-Za-z0-9\\._:-]+/,end:/\/[A-Za-z0-9\\._:-]+>|\/>/,isTrulyOpeningTag:(o,d)=>{let h=o[0].length+o.index,_=o.input[h];if(_==="<"||_===","){d.ignoreMatch();return}_===">"&&(t(o,{after:h})||d.ignoreMatch());let T,v=o.input.substring(h);if(T=v.match(/^\s*=/)){d.ignoreMatch();return}if((T=v.match(/^\s+extends\s+/))&&T.index===0){d.ignoreMatch();return}}},i={$pattern:nn,keyword:At,literal:yt,built_in:wt,"variable.language":Tt},l="[0-9](_?[0-9])*",f=`\\.(${l})`,m="0|[1-9](_?[0-9])*|0[0-7]*[89][0-9]*",w={className:"number",variants:[{begin:`(\\b(${m})((${f})|\\.)?|(${f}))[eE][+-]?(${l})\\b`},{begin:`\\b(${m})\\b((${f})\\b|\\.)?|(${f})\\b`},{begin:"\\b(0|[1-9](_?[0-9])*)n\\b"},{begin:"\\b0[xX][0-9a-fA-F](_?[0-9a-fA-F])*n?\\b"},{begin:"\\b0[bB][0-1](_?[0-1])*n?\\b"},{begin:"\\b0[oO][0-7](_?[0-7])*n?\\b"},{begin:"\\b0[0-7]+n?\\b"}],relevance:0},S={className:"subst",begin:"\\$\\{",end:"\\}",keywords:i,contains:[]},y={begin:"html`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"xml"}},C={begin:"css`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"css"}},x={begin:"gql`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"graphql"}},M={className:"string",begin:"`",end:"`",contains:[e.BACKSLASH_ESCAPE,S]},B={className:"comment",variants:[e.COMMENT(/\/\*\*(?!\/)/,"\\*/",{relevance:0,contains:[{begin:"(?=@[A-Za-z]+)",relevance:0,contains:[{className:"doctag",begin:"@[A-Za-z]+"},{className:"type",begin:"\\{",end:"\\}",excludeEnd:!0,excludeBegin:!0,relevance:0},{className:"variable",begin:s+"(?=\\s*(-)|$)",endsParent:!0,relevance:0},{begin:/(?=[^\n])\s/,relevance:0}]}]}),e.C_BLOCK_COMMENT_MODE,e.C_LINE_COMMENT_MODE]},P=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,{match:/\$\d+/},w];S.contains=P.concat({begin:/\{/,end:/\}/,keywords:i,contains:["self"].concat(P)});let L=[].concat(B,S.contains),H=L.concat([{begin:/\(/,end:/\)/,keywords:i,contains:["self"].concat(L)}]),k={className:"params",begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H},ne={variants:[{match:[/class/,/\s+/,s,/\s+/,/extends/,/\s+/,n.concat(s,"(",n.concat(/\./,s),")*")],scope:{1:"keyword",3:"title.class",5:"keyword",7:"title.class.inherited"}},{match:[/class/,/\s+/,s],scope:{1:"keyword",3:"title.class"}}]},Z={relevance:0,match:n.either(/\bJSON/,/\b[A-Z][a-z]+([A-Z][a-z]*|\d)*/,/\b[A-Z]{2,}([A-Z][a-z]+|\d)+([A-Z][a-z]*)*/,/\b[A-Z]{2,}[a-z]+([A-Z][a-z]+|\d)*([A-Z][a-z]*)*/),className:"title.class",keywords:{_:[...tn,...sn]}},D={label:"use_strict",className:"meta",relevance:10,begin:/^\s*['"]use (strict|asm)['"]/},q={variants:[{match:[/function/,/\s+/,s,/(?=\s*\()/]},{match:[/function/,/\s*(?=\()/]}],className:{1:"keyword",3:"title.function"},label:"func.def",contains:[k],illegal:/%/},Q={relevance:0,match:/\b[A-Z][A-Z_0-9]+\b/,className:"variable.constant"};function te(o){return n.concat("(?!",o.join("|"),")")}let ie={match:n.concat(/\b/,te([...rn,"super","import"]),s,n.lookahead(/\(/)),className:"title.function",relevance:0},se={begin:n.concat(/\./,n.lookahead(n.concat(s,/(?![0-9A-Za-z$_(])/))),end:s,excludeBegin:!0,keywords:"prototype",className:"property",relevance:0},F={match:[/get|set/,/\s+/,s,/(?=\()/],className:{1:"keyword",3:"title.function"},contains:[{begin:/\(\)/},k]},W="(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|"+e.UNDERSCORE_IDENT_RE+")\\s*=>",r={match:[/const|var|let/,/\s+/,s,/\s*/,/=\s*/,/(async\s*)?/,n.lookahead(W)],keywords:"async",className:{1:"keyword",3:"title.function"},contains:[k]};return{name:"JavaScript",aliases:["js","jsx","mjs","cjs"],keywords:i,exports:{PARAMS_CONTAINS:H,CLASS_REFERENCE:Z},illegal:/#(?![$_A-z])/,contains:[e.SHEBANG({label:"shebang",binary:"node",relevance:5}),D,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,B,{match:/\$\d+/},w,Z,{className:"attr",begin:s+n.lookahead(":"),relevance:0},r,{begin:"("+e.RE_STARTERS_RE+"|\\b(case|return|throw)\\b)\\s*",keywords:"return throw case",relevance:0,contains:[B,e.REGEXP_MODE,{className:"function",begin:W,returnBegin:!0,end:"\\s*=>",contains:[{className:"params",variants:[{begin:e.UNDERSCORE_IDENT_RE,relevance:0},{className:null,begin:/\(\s*\)/,skip:!0},{begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H}]}]},{begin:/,/,relevance:0},{match:/\s+/,relevance:0},{variants:[{begin:g.begin,end:g.end},{match:E},{begin:a.begin,"on:begin":a.isTrulyOpeningTag,end:a.end}],subLanguage:"xml",contains:[{begin:a.begin,end:a.end,skip:!0,contains:["self"]}]}]},q,{beginKeywords:"while if switch catch for"},{begin:"\\b(?!function)"+e.UNDERSCORE_IDENT_RE+"\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)\\s*\\{",returnBegin:!0,label:"func.def",contains:[k,e.inherit(e.TITLE_MODE,{begin:s,className:"title.function"})]},{match:/\.\.\./,relevance:0},se,{match:"\\$"+s,relevance:0},{match:[/\bconstructor(?=\s*\()/],className:{1:"title.function"},contains:[k]},ie,Q,ne,F,{match:/\$[(.]/}]}}var be="[A-Za-z$_][0-9A-Za-z$_]*",an=["as","in","of","if","for","while","finally","var","new","function","do","return","void","else","break","catch","instanceof","with","throw","case","default","try","switch","continue","typeof","delete","let","yield","const","class","debugger","async","await","static","import","from","export","extends"],on=["true","false","null","undefined","NaN","Infinity"],cn=["Object","Function","Boolean","Symbol","Math","Date","Number","BigInt","String","RegExp","Array","Float32Array","Float64Array","Int8Array","Uint8Array","Uint8ClampedArray","Int16Array","Int32Array","Uint16Array","Uint32Array","BigInt64Array","BigUint64Array","Set","Map","WeakSet","WeakMap","ArrayBuffer","SharedArrayBuffer","Atomics","DataView","JSON","Promise","Generator","GeneratorFunction","AsyncFunction","Reflect","Proxy","Intl","WebAssembly"],ln=["Error","EvalError","InternalError","RangeError","ReferenceError","SyntaxError","TypeError","URIError"],un=["setInterval","setTimeout","clearInterval","clearTimeout","require","exports","eval","isFinite","isNaN","parseFloat","parseInt","decodeURI","decodeURIComponent","encodeURI","encodeURIComponent","escape","unescape"],dn=["arguments","this","super","console","window","document","localStorage","sessionStorage","module","global"],gn=[].concat(un,cn,ln);function Ot(e){let n=e.regex,t=(o,{after:d})=>{let h="</"+o[0].slice(1);return o.input.indexOf(h,d)!==-1},s=be,g={begin:"<>",end:"</>"},E=/<[A-Za-z0-9\\._:-]+\s*\/>/,a={begin:/<[A-Za-z0-9\\._:-]+/,end:/\/[A-Za-z0-9\\._:-]+>|\/>/,isTrulyOpeningTag:(o,d)=>{let h=o[0].length+o.index,_=o.input[h];if(_==="<"||_===","){d.ignoreMatch();return}_===">"&&(t(o,{after:h})||d.ignoreMatch());let T,v=o.input.substring(h);if(T=v.match(/^\s*=/)){d.ignoreMatch();return}if((T=v.match(/^\s+extends\s+/))&&T.index===0){d.ignoreMatch();return}}},i={$pattern:be,keyword:an,literal:on,built_in:gn,"variable.language":dn},l="[0-9](_?[0-9])*",f=`\\.(${l})`,m="0|[1-9](_?[0-9])*|0[0-7]*[89][0-9]*",w={className:"number",variants:[{begin:`(\\b(${m})((${f})|\\.)?|(${f}))[eE][+-]?(${l})\\b`},{begin:`\\b(${m})\\b((${f})\\b|\\.)?|(${f})\\b`},{begin:"\\b(0|[1-9](_?[0-9])*)n\\b"},{begin:"\\b0[xX][0-9a-fA-F](_?[0-9a-fA-F])*n?\\b"},{begin:"\\b0[bB][0-1](_?[0-1])*n?\\b"},{begin:"\\b0[oO][0-7](_?[0-7])*n?\\b"},{begin:"\\b0[0-7]+n?\\b"}],relevance:0},S={className:"subst",begin:"\\$\\{",end:"\\}",keywords:i,contains:[]},y={begin:"html`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"xml"}},C={begin:"css`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"css"}},x={begin:"gql`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"graphql"}},M={className:"string",begin:"`",end:"`",contains:[e.BACKSLASH_ESCAPE,S]},B={className:"comment",variants:[e.COMMENT(/\/\*\*(?!\/)/,"\\*/",{relevance:0,contains:[{begin:"(?=@[A-Za-z]+)",relevance:0,contains:[{className:"doctag",begin:"@[A-Za-z]+"},{className:"type",begin:"\\{",end:"\\}",excludeEnd:!0,excludeBegin:!0,relevance:0},{className:"variable",begin:s+"(?=\\s*(-)|$)",endsParent:!0,relevance:0},{begin:/(?=[^\n])\s/,relevance:0}]}]}),e.C_BLOCK_COMMENT_MODE,e.C_LINE_COMMENT_MODE]},P=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,{match:/\$\d+/},w];S.contains=P.concat({begin:/\{/,end:/\}/,keywords:i,contains:["self"].concat(P)});let L=[].concat(B,S.contains),H=L.concat([{begin:/\(/,end:/\)/,keywords:i,contains:["self"].concat(L)}]),k={className:"params",begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H},ne={variants:[{match:[/class/,/\s+/,s,/\s+/,/extends/,/\s+/,n.concat(s,"(",n.concat(/\./,s),")*")],scope:{1:"keyword",3:"title.class",5:"keyword",7:"title.class.inherited"}},{match:[/class/,/\s+/,s],scope:{1:"keyword",3:"title.class"}}]},Z={relevance:0,match:n.either(/\bJSON/,/\b[A-Z][a-z]+([A-Z][a-z]*|\d)*/,/\b[A-Z]{2,}([A-Z][a-z]+|\d)+([A-Z][a-z]*)*/,/\b[A-Z]{2,}[a-z]+([A-Z][a-z]+|\d)*([A-Z][a-z]*)*/),className:"title.class",keywords:{_:[...cn,...ln]}},D={label:"use_strict",className:"meta",relevance:10,begin:/^\s*['"]use (strict|asm)['"]/},q={variants:[{match:[/function/,/\s+/,s,/(?=\s*\()/]},{match:[/function/,/\s*(?=\()/]}],className:{1:"keyword",3:"title.function"},label:"func.def",contains:[k],illegal:/%/},Q={relevance:0,match:/\b[A-Z][A-Z_0-9]+\b/,className:"variable.constant"};function te(o){return n.concat("(?!",o.join("|"),")")}let ie={match:n.concat(/\b/,te([...un,"super","import"]),s,n.lookahead(/\(/)),className:"title.function",relevance:0},se={begin:n.concat(/\./,n.lookahead(n.concat(s,/(?![0-9A-Za-z$_(])/))),end:s,excludeBegin:!0,keywords:"prototype",className:"property",relevance:0},F={match:[/get|set/,/\s+/,s,/(?=\()/],className:{1:"keyword",3:"title.function"},contains:[{begin:/\(\)/},k]},W="(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|"+e.UNDERSCORE_IDENT_RE+")\\s*=>",r={match:[/const|var|let/,/\s+/,s,/\s*/,/=\s*/,/(async\s*)?/,n.lookahead(W)],keywords:"async",className:{1:"keyword",3:"title.function"},contains:[k]};return{name:"JavaScript",aliases:["js","jsx","mjs","cjs"],keywords:i,exports:{PARAMS_CONTAINS:H,CLASS_REFERENCE:Z},illegal:/#(?![$_A-z])/,contains:[e.SHEBANG({label:"shebang",binary:"node",relevance:5}),D,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,B,{match:/\$\d+/},w,Z,{className:"attr",begin:s+n.lookahead(":"),relevance:0},r,{begin:"("+e.RE_STARTERS_RE+"|\\b(case|return|throw)\\b)\\s*",keywords:"return throw case",relevance:0,contains:[B,e.REGEXP_MODE,{className:"function",begin:W,returnBegin:!0,end:"\\s*=>",contains:[{className:"params",variants:[{begin:e.UNDERSCORE_IDENT_RE,relevance:0},{className:null,begin:/\(\s*\)/,skip:!0},{begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H}]}]},{begin:/,/,relevance:0},{match:/\s+/,relevance:0},{variants:[{begin:g.begin,end:g.end},{match:E},{begin:a.begin,"on:begin":a.isTrulyOpeningTag,end:a.end}],subLanguage:"xml",contains:[{begin:a.begin,end:a.end,skip:!0,contains:["self"]}]}]},q,{beginKeywords:"while if switch catch for"},{begin:"\\b(?!function)"+e.UNDERSCORE_IDENT_RE+"\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)\\s*\\{",returnBegin:!0,label:"func.def",contains:[k,e.inherit(e.TITLE_MODE,{begin:s,className:"title.function"})]},{match:/\.\.\./,relevance:0},se,{match:"\\$"+s,relevance:0},{match:[/\bconstructor(?=\s*\()/],className:{1:"title.function"},contains:[k]},ie,Q,ne,F,{match:/\$[(.]/}]}}function Re(e){let n=Ot(e),t=be,s=["any","void","number","boolean","string","object","never","symbol","bigint","unknown"],g={beginKeywords:"namespace",end:/\{/,excludeEnd:!0,contains:[n.exports.CLASS_REFERENCE]},E={beginKeywords:"interface",end:/\{/,excludeEnd:!0,keywords:{keyword:"interface extends",built_in:s},contains:[n.exports.CLASS_REFERENCE]},a={className:"meta",relevance:10,begin:/^\s*['"]use strict['"]/},i=["type","namespace","interface","public","private","protected","implements","declare","abstract","readonly","enum","override"],l={$pattern:be,keyword:an.concat(i),literal:on,built_in:gn.concat(s),"variable.language":dn},f={className:"meta",begin:"@"+t},m=(S,y,C)=>{let x=S.contains.findIndex(M=>M.label===y);if(x===-1)throw new Error("can not find mode to replace");S.contains.splice(x,1,C)};Object.assign(n.keywords,l),n.exports.PARAMS_CONTAINS.push(f),n.contains=n.contains.concat([f,g,E]),m(n,"shebang",e.SHEBANG()),m(n,"use_strict",a);let w=n.contains.find(S=>S.label==="func.def");return w.relevance=0,Object.assign(n,{name:"TypeScript",aliases:["ts","tsx","mts","cts"]}),n}function fn(e){let n=e.regex,t=n.concat(/[\p{L}_]/u,n.optional(/[\p{L}0-9_.-]*:/u),/[\p{L}0-9_.-]*/u),s=/[\p{L}0-9._:-]+/u,g={className:"symbol",begin:/&[a-z]+;|&#[0-9]+;|&#x[a-f0-9]+;/},E={begin:/\s/,contains:[{className:"keyword",begin:/#?[a-z_][a-z1-9_-]+/,illegal:/\n/}]},a=e.inherit(E,{begin:/\(/,end:/\)/}),i=e.inherit(e.APOS_STRING_MODE,{className:"string"}),l=e.inherit(e.QUOTE_STRING_MODE,{className:"string"}),f={endsWithParent:!0,illegal:/</,relevance:0,contains:[{className:"attr",begin:s,relevance:0},{begin:/=\s*/,relevance:0,contains:[{className:"string",endsParent:!0,variants:[{begin:/"/,end:/"/,contains:[g]},{begin:/'/,end:/'/,contains:[g]},{begin:/[^\s"'=<>`]+/}]}]}]};return{name:"HTML, XML",aliases:["html","xhtml","rss","atom","xjb","xsd","xsl","plist","wsf","svg"],case_insensitive:!0,unicodeRegex:!0,contains:[{className:"meta",begin:/<![a-z]/,end:/>/,relevance:10,contains:[E,l,i,a,{begin:/\[/,end:/\]/,contains:[{className:"meta",begin:/<![a-z]/,end:/>/,contains:[E,a,l,i]}]}]},e.COMMENT(/<!--/,/-->/,{relevance:10}),{begin:/<!\[CDATA\[/,end:/\]\]>/,relevance:10},g,{className:"meta",end:/\?>/,variants:[{begin:/<\?xml/,relevance:10,contains:[l]},{begin:/<\?[a-z][a-z0-9]+/}]},{className:"tag",begin:/<style(?=\s|>)/,end:/>/,keywords:{name:"style"},contains:[f],starts:{end:/<\/style>/,returnEnd:!0,subLanguage:["css","xml"]}},{className:"tag",begin:/<script(?=\s|>)/,end:/>/,keywords:{name:"script"},contains:[f],starts:{end:/<\/script>/,returnEnd:!0,subLanguage:["javascript","handlebars","xml"]}},{className:"tag",begin:/<>|<\/>/},{className:"tag",begin:n.concat(/</,n.lookahead(n.concat(t,n.either(/\/>/,/>/,/\s/)))),end:/\/?>/,contains:[{className:"name",begin:t,relevance:0,starts:f}]},{className:"tag",begin:n.concat(/<\//,n.lookahead(n.concat(t,/>/))),contains:[{className:"name",begin:t,relevance:0},{begin:/>/,relevance:0,endsParent:!0}]}]}}var Rt=e=>({IMPORTANT:{scope:"meta",begin:"!important"},BLOCK_COMMENT:e.C_BLOCK_COMMENT_MODE,HEXCOLOR:{scope:"number",begin:/#(([0-9a-fA-F]{3,4})|(([0-9a-fA-F]{2}){3,4}))\b/},FUNCTION_DISPATCH:{className:"built_in",begin:/[\w-]+(?=\()/},ATTRIBUTE_SELECTOR_MODE:{scope:"selector-attr",begin:/\[/,end:/\]/,illegal:"$",contains:[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE]},CSS_NUMBER_MODE:{scope:"number",begin:e.NUMBER_RE+"(%|em|ex|ch|rem|vw|vh|vmin|vmax|cm|mm|in|pt|pc|px|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?",relevance:0},CSS_VARIABLE:{className:"attr",begin:/--[A-Za-z_][A-Za-z0-9_-]*/}}),xt=["a","abbr","address","article","aside","audio","b","blockquote","body","button","canvas","caption","cite","code","dd","del","details","dfn","div","dl","dt","em","fieldset","figcaption","figure","footer","form","h1","h2","h3","h4","h5","h6","header","hgroup","html","i","iframe","img","input","ins","kbd","label","legend","li","main","mark","menu","nav","object","ol","p","q","quote","samp","section","span","strong","summary","sup","table","tbody","td","textarea","tfoot","th","thead","time","tr","ul","var","video"],Mt=["any-hover","any-pointer","aspect-ratio","color","color-gamut","color-index","device-aspect-ratio","device-height","device-width","display-mode","forced-colors","grid","height","hover","inverted-colors","monochrome","orientation","overflow-block","overflow-inline","pointer","prefers-color-scheme","prefers-contrast","prefers-reduced-motion","prefers-reduced-transparency","resolution","scan","scripting","update","width","min-width","max-width","min-height","max-height"],vt=["active","any-link","blank","checked","current","default","defined","dir","disabled","drop","empty","enabled","first","first-child","first-of-type","fullscreen","future","focus","focus-visible","focus-within","has","host","host-context","hover","indeterminate","in-range","invalid","is","lang","last-child","last-of-type","left","link","local-link","not","nth-child","nth-col","nth-last-child","nth-last-col","nth-last-of-type","nth-of-type","only-child","only-of-type","optional","out-of-range","past","placeholder-shown","read-only","read-write","required","right","root","scope","target","target-within","user-invalid","valid","visited","where"],kt=["after","backdrop","before","cue","cue-region","first-letter","first-line","grammar-error","marker","part","placeholder","selection","slotted","spelling-error"],It=["align-content","align-items","align-self","all","animation","animation-delay","animation-direction","animation-duration","animation-fill-mode","animation-iteration-count","animation-name","animation-play-state","animation-timing-function","backface-visibility","background","background-attachment","background-blend-mode","background-clip","background-color","background-image","background-origin","background-position","background-repeat","background-size","block-size","border","border-block","border-block-color","border-block-end","border-block-end-color","border-block-end-style","border-block-end-width","border-block-start","border-block-start-color","border-block-start-style","border-block-start-width","border-block-style","border-block-width","border-bottom","border-bottom-color","border-bottom-left-radius","border-bottom-right-radius","border-bottom-style","border-bottom-width","border-collapse","border-color","border-image","border-image-outset","border-image-repeat","border-image-slice","border-image-source","border-image-width","border-inline","border-inline-color","border-inline-end","border-inline-end-color","border-inline-end-style","border-inline-end-width","border-inline-start","border-inline-start-color","border-inline-start-style","border-inline-start-width","border-inline-style","border-inline-width","border-left","border-left-color","border-left-style","border-left-width","border-radius","border-right","border-right-color","border-right-style","border-right-width","border-spacing","border-style","border-top","border-top-color","border-top-left-radius","border-top-right-radius","border-top-style","border-top-width","border-width","bottom","box-decoration-break","box-shadow","box-sizing","break-after","break-before","break-inside","caption-side","caret-color","clear","clip","clip-path","clip-rule","color","column-count","column-fill","column-gap","column-rule","column-rule-color","column-rule-style","column-rule-width","column-span","column-width","columns","contain","content","content-visibility","counter-increment","counter-reset","cue","cue-after","cue-before","cursor","direction","display","empty-cells","filter","flex","flex-basis","flex-direction","flex-flow","flex-grow","flex-shrink","flex-wrap","float","flow","font","font-display","font-family","font-feature-settings","font-kerning","font-language-override","font-size","font-size-adjust","font-smoothing","font-stretch","font-style","font-synthesis","font-variant","font-variant-caps","font-variant-east-asian","font-variant-ligatures","font-variant-numeric","font-variant-position","font-variation-settings","font-weight","gap","glyph-orientation-vertical","grid","grid-area","grid-auto-columns","grid-auto-flow","grid-auto-rows","grid-column","grid-column-end","grid-column-start","grid-gap","grid-row","grid-row-end","grid-row-start","grid-template","grid-template-areas","grid-template-columns","grid-template-rows","hanging-punctuation","height","hyphens","icon","image-orientation","image-rendering","image-resolution","ime-mode","inline-size","isolation","justify-content","left","letter-spacing","line-break","line-height","list-style","list-style-image","list-style-position","list-style-type","margin","margin-block","margin-block-end","margin-block-start","margin-bottom","margin-inline","margin-inline-end","margin-inline-start","margin-left","margin-right","margin-top","marks","mask","mask-border","mask-border-mode","mask-border-outset","mask-border-repeat","mask-border-slice","mask-border-source","mask-border-width","mask-clip","mask-composite","mask-image","mask-mode","mask-origin","mask-position","mask-repeat","mask-size","mask-type","max-block-size","max-height","max-inline-size","max-width","min-block-size","min-height","min-inline-size","min-width","mix-blend-mode","nav-down","nav-index","nav-left","nav-right","nav-up","none","normal","object-fit","object-position","opacity","order","orphans","outline","outline-color","outline-offset","outline-style","outline-width","overflow","overflow-wrap","overflow-x","overflow-y","padding","padding-block","padding-block-end","padding-block-start","padding-bottom","padding-inline","padding-inline-end","padding-inline-start","padding-left","padding-right","padding-top","page-break-after","page-break-before","page-break-inside","pause","pause-after","pause-before","perspective","perspective-origin","pointer-events","position","quotes","resize","rest","rest-after","rest-before","right","row-gap","scroll-margin","scroll-margin-block","scroll-margin-block-end","scroll-margin-block-start","scroll-margin-bottom","scroll-margin-inline","scroll-margin-inline-end","scroll-margin-inline-start","scroll-margin-left","scroll-margin-right","scroll-margin-top","scroll-padding","scroll-padding-block","scroll-padding-block-end","scroll-padding-block-start","scroll-padding-bottom","scroll-padding-inline","scroll-padding-inline-end","scroll-padding-inline-start","scroll-padding-left","scroll-padding-right","scroll-padding-top","scroll-snap-align","scroll-snap-stop","scroll-snap-type","scrollbar-color","scrollbar-gutter","scrollbar-width","shape-image-threshold","shape-margin","shape-outside","speak","speak-as","src","tab-size","table-layout","text-align","text-align-all","text-align-last","text-combine-upright","text-decoration","text-decoration-color","text-decoration-line","text-decoration-style","text-emphasis","text-emphasis-color","text-emphasis-position","text-emphasis-style","text-indent","text-justify","text-orientation","text-overflow","text-rendering","text-shadow","text-transform","text-underline-position","top","transform","transform-box","transform-origin","transform-style","transition","transition-delay","transition-duration","transition-property","transition-timing-function","unicode-bidi","vertical-align","visibility","voice-balance","voice-duration","voice-family","voice-pitch","voice-range","voice-rate","voice-stress","voice-volume","white-space","widows","width","will-change","word-break","word-spacing","word-wrap","writing-mode","z-index"].reverse();function bn(e){let n=e.regex,t=Rt(e),s={begin:/-(webkit|moz|ms|o)-(?=[a-z])/},g="and or not only",E=/@-?\w[\w]*(-\w+)*/,a="[a-zA-Z-][a-zA-Z0-9_-]*",i=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE];return{name:"CSS",case_insensitive:!0,illegal:/[=|'\$]/,keywords:{keyframePosition:"from to"},classNameAliases:{keyframePosition:"selector-tag"},contains:[t.BLOCK_COMMENT,s,t.CSS_NUMBER_MODE,{className:"selector-id",begin:/#[A-Za-z0-9_-]+/,relevance:0},{className:"selector-class",begin:"\\."+a,relevance:0},t.ATTRIBUTE_SELECTOR_MODE,{className:"selector-pseudo",variants:[{begin:":("+vt.join("|")+")"},{begin:":(:)?("+kt.join("|")+")"}]},t.CSS_VARIABLE,{className:"attribute",begin:"\\b("+It.join("|")+")\\b"},{begin:/:/,end:/[;}{]/,contains:[t.BLOCK_COMMENT,t.HEXCOLOR,t.IMPORTANT,t.CSS_NUMBER_MODE,...i,{begin:/(url|data-uri)\(/,end:/\)/,relevance:0,keywords:{built_in:"url data-uri"},contains:[...i,{className:"string",begin:/[^)]/,endsWithParent:!0,excludeEnd:!0}]},t.FUNCTION_DISPATCH]},{begin:n.lookahead(/@/),end:"[{;]",relevance:0,illegal:/:/,contains:[{className:"keyword",begin:E},{begin:/\s/,endsWithParent:!0,excludeEnd:!0,relevance:0,keywords:{$pattern:/[a-z-]+/,keyword:g,attribute:Mt.join(" ")},contains:[{begin:/[a-z-]+(?=:)/,className:"attribute"},...i,t.CSS_NUMBER_MODE]}]},{className:"selector-tag",begin:"\\b("+xt.join("|")+")\\b"}]}}function pn(e){let n={className:"attr",begin:/"(\\.|[^\\"\r\n])*"(?=\s*:)/,relevance:1.01},t={match:/[{}[\],:]/,className:"punctuation",relevance:0},s=["true","false","null"],g={scope:"literal",beginKeywords:s.join(" ")};return{name:"JSON",keywords:{literal:s},contains:[n,t,e.QUOTE_STRING_MODE,g,e.C_NUMBER_MODE,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE],illegal:"\\S"}}function hn(e){let n=e.regex,t={},s={begin:/\$\{/,end:/\}/,contains:["self",{begin:/:-/,contains:[t]}]};Object.assign(t,{className:"variable",variants:[{begin:n.concat(/\$[\w\d#@][\w\d_]*/,"(?![\\w\\d])(?![$])")},s]});let g={className:"subst",begin:/\$\(/,end:/\)/,contains:[e.BACKSLASH_ESCAPE]},E={begin:/<<-?\s*(?=\w+)/,starts:{contains:[e.END_SAME_AS_BEGIN({begin:/(\w+)/,end:/(\w+)/,className:"string"})]}},a={className:"string",begin:/"/,end:/"/,contains:[e.BACKSLASH_ESCAPE,t,g]};g.contains.push(a);let i={match:/\\"/},l={className:"string",begin:/'/,end:/'/},f={match:/\\'/},m={begin:/\$?\(\(/,end:/\)\)/,contains:[{begin:/\d+#[0-9a-f]+/,className:"number"},e.NUMBER_MODE,t]},w=["fish","bash","zsh","sh","csh","ksh","tcsh","dash","scsh"],S=e.SHEBANG({binary:`(${w.join("|")})`,relevance:10}),y={className:"function",begin:/\w[\w\d_]*\s*\(\s*\)\s*\{/,returnBegin:!0,contains:[e.inherit(e.TITLE_MODE,{begin:/\w[\w\d_]*/})],relevance:0},C=["if","then","else","elif","fi","for","while","until","in","do","done","case","esac","function","select"],x=["true","false"],M={match:/(\/[a-z._-]+)+/},ee=["break","cd","continue","eval","exec","exit","export","getopts","hash","pwd","readonly","return","shift","test","times","trap","umask","unset"],B=["alias","bind","builtin","caller","command","declare","echo","enable","help","let","local","logout","mapfile","printf","read","readarray","source","type","typeset","ulimit","unalias"],P=["autoload","bg","bindkey","bye","cap","chdir","clone","comparguments","compcall","compctl","compdescribe","compfiles","compgroups","compquote","comptags","comptry","compvalues","dirs","disable","disown","echotc","echoti","emulate","fc","fg","float","functions","getcap","getln","history","integer","jobs","kill","limit","log","noglob","popd","print","pushd","pushln","rehash","sched","setcap","setopt","stat","suspend","ttyctl","unfunction","unhash","unlimit","unsetopt","vared","wait","whence","where","which","zcompile","zformat","zftp","zle","zmodload","zparseopts","zprof","zpty","zregexparse","zsocket","zstyle","ztcp"],L=["chcon","chgrp","chown","chmod","cp","dd","df","dir","dircolors","ln","ls","mkdir","mkfifo","mknod","mktemp","mv","realpath","rm","rmdir","shred","sync","touch","truncate","vdir","b2sum","base32","base64","cat","cksum","comm","csplit","cut","expand","fmt","fold","head","join","md5sum","nl","numfmt","od","paste","ptx","pr","sha1sum","sha224sum","sha256sum","sha384sum","sha512sum","shuf","sort","split","sum","tac","tail","tr","tsort","unexpand","uniq","wc","arch","basename","chroot","date","dirname","du","echo","env","expr","factor","groups","hostid","id","link","logname","nice","nohup","nproc","pathchk","pinky","printenv","printf","pwd","readlink","runcon","seq","sleep","stat","stdbuf","stty","tee","test","timeout","tty","uname","unlink","uptime","users","who","whoami","yes"];return{name:"Bash",aliases:["sh"],keywords:{$pattern:/\b[a-z][a-z0-9._-]+\b/,keyword:C,literal:x,built_in:[...ee,...B,"set","shopt",...P,...L]},contains:[S,e.SHEBANG(),y,m,e.HASH_COMMENT_MODE,E,M,a,i,l,f,t]}}function En(e){let n=e.regex,t={begin:/<\/?[A-Za-z_]/,end:">",subLanguage:"xml",relevance:0},s={begin:"^[-\\*]{3,}",end:"$"},g={className:"code",variants:[{begin:"(`{3,})[^`](.|\\n)*?\\1`*[ ]*"},{begin:"(~{3,})[^~](.|\\n)*?\\1~*[ ]*"},{begin:"```",end:"```+[ ]*$"},{begin:"~~~",end:"~~~+[ ]*$"},{begin:"`.+?`"},{begin:"(?=^( {4}|\\t))",contains:[{begin:"^( {4}|\\t)",end:"(\\n)$"}],relevance:0}]},E={className:"bullet",begin:"^[ 	]*([*+-]|(\\d+\\.))(?=\\s+)",end:"\\s+",excludeEnd:!0},a={begin:/^\[[^\n]+\]:/,returnBegin:!0,contains:[{className:"symbol",begin:/\[/,end:/\]/,excludeBegin:!0,excludeEnd:!0},{className:"link",begin:/:\s*/,end:/$/,excludeBegin:!0}]},i=/[A-Za-z][A-Za-z0-9+.-]*/,l={variants:[{begin:/\[.+?\]\[.*?\]/,relevance:0},{begin:/\[.+?\]\(((data|javascript|mailto):|(?:http|ftp)s?:\/\/).*?\)/,relevance:2},{begin:n.concat(/\[.+?\]\(/,i,/:\/\/.*?\)/),relevance:2},{begin:/\[.+?\]\([./?&#].*?\)/,relevance:1},{begin:/\[.*?\]\(.*?\)/,relevance:0}],returnBegin:!0,contains:[{match:/\[(?=\])/},{className:"string",relevance:0,begin:"\\[",end:"\\]",excludeBegin:!0,returnEnd:!0},{className:"link",relevance:0,begin:"\\]\\(",end:"\\)",excludeBegin:!0,excludeEnd:!0},{className:"symbol",relevance:0,begin:"\\]\\[",end:"\\]",excludeBegin:!0,excludeEnd:!0}]},f={className:"strong",contains:[],variants:[{begin:/_{2}(?!\s)/,end:/_{2}/},{begin:/\*{2}(?!\s)/,end:/\*{2}/}]},m={className:"emphasis",contains:[],variants:[{begin:/\*(?![*\s])/,end:/\*/},{begin:/_(?![_\s])/,end:/_/,relevance:0}]},w=e.inherit(f,{contains:[]}),S=e.inherit(m,{contains:[]});f.contains.push(S),m.contains.push(w);let y=[t,l];return[f,m,w,S].forEach(M=>{M.contains=M.contains.concat(y)}),y=y.concat(f,m),{name:"Markdown",aliases:["md","mkdown","mkd"],contains:[{className:"section",variants:[{begin:"^#{1,6}",end:"$",contains:y},{begin:"(?=^.+?\\n[=-]{2,}$)",contains:[{begin:"^[=-]*$"},{begin:"^",end:"\\n",contains:y}]}]},t,E,f,m,{className:"quote",begin:"^>\\s+",contains:y,end:"$"},g,s,l,a]}}U.registerLanguage("javascript",Oe);U.registerLanguage("typescript",Re);U.registerLanguage("tsx",Re);U.registerLanguage("jsx",Oe);U.registerLanguage("xml",fn);U.registerLanguage("css",bn);U.registerLanguage("json",pn);U.registerLanguage("bash",hn);U.registerLanguage("markdown",En);window.hljs=U;})();
+
+</script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>
