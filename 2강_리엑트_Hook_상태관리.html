@@ -745,26 +745,37 @@ const User = () => {
 
     <div class="ex"><div class="lbl">💡 STEP 1 — 상태와 공통 핸들러 (SignUp.jsx)</div>
       <span class="fname">src/components/SignUp.jsx</span>
-<pre><code class="language-jsx">const SignUp = () => {
-  // 폼 데이터를 객체 형태로 관리
+<pre><code class="language-jsx">const SignUp = () =&gt; {
+  // 폼 데이터 상태 관리
   const [formData, setFormData] = useState({
-    name: '',
-    job: '직장인',
-    gender: '',
-    text: ''
-  })
+    name: "",
+    job: "회사원",
+    gender: "male",
+    memo: ""      //자기 소개
+  });
 
   // 모든 입력 필드의 변경을 처리하는 함수
-  const handleInputChange = (e) => {
+  const handleInputChange = (e) =&gt; {
     const {name, value} = e.target;
 
-    setFormData({...formData, [name]: value})
+    setFormData({
+      ...formData,
+      [name]: value //name 속성: 값
+    });
   }
 
-  // 폼 제출 시 데이터를 콘솔에 출력하는 함수
-  const handleSubmit = (e) => {
-    e.preventDefault(); // 폼 제출 시 페이지 새로고침 방지
+  // 폼 제출을 처리하는 함수
+  const handleSubmit = (e) =&gt; {
+    e.preventDefault();
     console.log("제출 데이터: ", formData);
+
+    // 입력 필드 초기화
+    setFormData({
+      name: "",
+      job: "회사원",
+      gender: "male",
+      memo: ""
+    });
   }</code></pre>
       <div class="tip"><span class="lbl">💡 핵심 기법</span> — 각 입력에 <code>name</code>을 주고 <code>[name]: value</code>(계산된 속성명)를 쓰면, <b>필드마다 핸들러를 따로 만들 필요 없이</b> 하나의 <code>handleInputChange</code>로 모두 처리할 수 있다.</div>
     </div>
@@ -772,58 +783,61 @@ const User = () => {
     <div class="ex"><div class="lbl">💡 STEP 2 — 폼 렌더링</div>
 <pre><code class="language-jsx">  return(
     &lt;div className="sign-up"&gt;
-      &lt;h2&gt;회원가입&lt;/h2&gt;
+      &lt;h2&gt;회원 가입&lt;/h2&gt;
       &lt;form onSubmit={handleSubmit}&gt;
-        &lt;p&gt;
-          &lt;label htmlFor="name"&gt;이름&lt;/label&gt;
-          &lt;input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            placeholder="이름을 입력하세요"
-          /&gt;
-        &lt;/p&gt;
-        &lt;p&gt;
-          &lt;label htmlFor="job"&gt;직업&lt;/label&gt;
-          &lt;select
-            name="job"
-            value={formData.job}
-            onChange={handleInputChange}
-          &gt;
-            &lt;option value="직장인"&gt;직장인&lt;/option&gt;
-            &lt;option value="학생"&gt;학생&lt;/option&gt;
-            &lt;option value="프리랜서"&gt;프리랜서&lt;/option&gt;
-          &lt;/select&gt;
-        &lt;/p&gt;
-        &lt;p&gt;
-          &lt;label htmlFor="gender"&gt;성별&lt;/label&gt;
-          &lt;label&gt;&lt;input
-            type="radio"
-            name="gender"
-            value="남자"
-            checked={formData.gender === "남자"}
-            onChange={handleInputChange}
-          /&gt;남자&lt;/label&gt;
-          &lt;label&gt;&lt;input
-            type="radio"
-            name="gender"
-            value="여자"
-            checked={formData.gender === "여자"}
-            onChange={handleInputChange}
-          /&gt;여자&lt;/label&gt;
-        &lt;/p&gt;
-        &lt;p&gt;
-          &lt;label htmlFor="text"&gt;자기소개&lt;/label&gt;
-          &lt;textarea
-            name="text"
-            value={formData.text}
-            onChange={handleInputChange}
-            rows={5}
-            cols={10}
-          /&gt;
-        &lt;/p&gt;
-        &lt;button type="submit"&gt;가입&lt;/button&gt;
+        &lt;ul&gt;
+          &lt;li&gt;
+            &lt;label&gt;이름&lt;/label&gt;
+            &lt;input 
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+            /&gt;
+          &lt;/li&gt;
+          &lt;li&gt;
+            &lt;label&gt;직업&lt;/label&gt;
+            &lt;select
+              name="job"
+              value={formData.job}
+              onChange={handleInputChange}
+            &gt;
+              &lt;option value="employee"&gt;회사원&lt;/option&gt;
+              &lt;option value="student"&gt;학생&lt;/option&gt;
+              &lt;option value="freelancer"&gt;프리랜서&lt;/option&gt;
+            &lt;/select&gt;
+          &lt;/li&gt;
+          &lt;li&gt;
+            &lt;label&gt;성별&lt;/label&gt;
+            &lt;label&gt;&lt;input 
+              type="radio"
+              name="gender"
+              value="male"
+              checked={formData.gender === "male"}
+              onChange={handleInputChange}
+            /&gt;남자&lt;/label&gt;
+            &lt;label&gt;&lt;input 
+              type="radio"
+              name="gender"
+              value="female"
+              checked={formData.gender === "female"}
+              onChange={handleInputChange}
+            /&gt;여자&lt;/label&gt;
+          &lt;/li&gt;
+          &lt;li&gt;
+            &lt;label&gt;자기소개&lt;/label&gt;
+            &lt;textarea 
+              name="memo" 
+              rows={5}
+              column={10}
+              value={formData.memo}
+              onChange={handleInputChange}
+            /&gt;
+          &lt;/li&gt;
+          &lt;li&gt;
+            &lt;button type="submit"&gt;가입&lt;/button&gt;
+          &lt;/li&gt;
+        &lt;/ul&gt;
       &lt;/form&gt;
     &lt;/div&gt;
   )
@@ -832,9 +846,9 @@ const User = () => {
 export default SignUp;</code></pre>
       <div class="out"><span class="rt">브라우저 출력</span>
         <div class="demo" style="max-width:360px">
-          <div style="text-align:center;font-weight:800;margin-bottom:6px">회원가입</div>
+          <div style="text-align:center;font-weight:800;margin-bottom:6px">회원 가입</div>
           <div>이름 <input value="우영우" style="width:60%"></div>
-          <div style="margin-top:4px">직업 <select><option>직장인</option></select></div>
+          <div style="margin-top:4px">직업 <select><option>회사원</option></select></div>
           <div style="margin-top:4px">성별 <input type="radio"> 남자 <input type="radio" checked> 여자</div>
           <div style="margin-top:4px">자기소개 <textarea rows="2" style="width:60%;vertical-align:top">안녕하세요~</textarea></div>
           <div style="text-align:center;margin-top:6px"><button>가입</button></div>
@@ -844,21 +858,44 @@ export default SignUp;</code></pre>
 
     <div class="ex"><div class="lbl">💡 STEP 3 — 스타일 (App.css)</div>
       <span class="fname">src/App.css</span>
-<pre><code class="language-css">.sign-up h2{
-  margin-bottom: 20px;
+<pre><code class="language-css">.sign-up {
+  width: 500px;
+  margin: 30px auto;
 }
-.sign-up form p{
-  margin-bottom: 10px;
+.sign-up h2{
+  margin-bottom: 30px;
 }
-.sign-up form label{
-  display: inline-block;
+.sign-up ul{
+  list-style: none;
+  padding-left: 100px;
+}
+.sign-up ul li{
+  margin: 20px;
+  text-align: left;
+}
+.sign-up ul li:last-child{
+  text-align: center; /* 버튼 */
+}
+.sign-up ul li &gt; label:first-child{
+  /* 첫 번째 라벨 */
+  float: left; /* 라벨을 왼쪽으로 띄움 */
   width: 80px;
+  margin-right: 10px;
 }
-.sign-up form input[type="text"],
-.sign-up form input[type="password"],
-.sign-up form select,
-.sign-up form textarea{
+.sign-up ul li input[type="text"],
+.sign-up ul li select,
+.sign-up ul li textarea{
+  padding: 5px;
   width: 200px;
+}
+.sign-up ul li textarea{
+  resize: none;
+  vertical-align: top; /* 텍스트 영역 상단 정렬 */
+}
+.sign-up ul li button{
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
 }</code></pre>
     </div>
   </section>
@@ -873,91 +910,133 @@ export default SignUp;</code></pre>
 
     <div class="ex"><div class="lbl">💡 STEP 1 — 데이터·상태·핸들러 (SignIn.jsx)</div>
       <span class="fname">src/components/SignIn.jsx</span>
-<pre><code class="language-jsx">// 임시 데이터(객체 리스트) 생성
+<pre><code class="language-jsx">import { useState } from "react";
+
 const users = [
-  {username: 'user1', password: 'user1111'},
-  {username: 'user2', password: 'user2222'},
-  {username: 'admin', password: 'admin0000'}
+  {username: "user1", password: 'user1111'},
+  {username: "user2", password: 'user2222'},
+  {username: "admin", password: 'admin0000'},
 ]
 
-const SignIn = () => {
-  // 객체 상태 관리
-  const [formData, setFormData] = useState(
-    {username: '', password: ''}
-  )
-  // 로그인 결과 상태 관리
+const SignIn = () =&gt; {
+  const [formData, setFormData] = useState({
+    username: "",
+    password: ""
+  });
+
+  //로그인 결과 상태 관리
   const [result, setResult] = useState(null);
 
-  // 입력 필드 변경 핸들러
-  const handleInputChange = (e) => {
+  const handleInputChange = (e) =&gt; {
     const {name, value} = e.target;
-    // console.log(e);
+
     setFormData({
       ...formData,
-      [name]: value //name 속성과 값
+      [name]: value
     })
+  }
+
+  const handleSubmit = (e) =&gt; {
+    e.preventDefault(); //기본 동작 막기
+    console.log("제출 데이터: ", formData);
+
+    // 로그인 결과 처리
+    const {username, password} = formData;
+
+    // 데이터 일치 여부
+    // find() - 조건에 맞는 첫 요소를 반환하고, 없으면 undefined를 반환한다.
+    const matched = users.find((user) =&gt; 
+      user.username === username &amp;&amp; user.password === password);
+
+    // 로그인 성공여부에 따라 결과 상태 업데이트
+    setResult(matched ? "success" : "fail");
+
+    // 입력 필드 초기화
+    setFormData({username: "", password: ""});
   }</code></pre>
     </div>
 
     <div class="ex"><div class="lbl">💡 STEP 2 — 검증 · 조건부 메시지</div>
-<pre><code class="language-jsx">  const handleSubmit = (e) => {
-    e.preventDefault();
-    const {username, password} = formData;
-    //데이터 일치 여부 - find() 메서드
-    const matched = users.find((user) =>
-      user.username === username && user.password === password);
-
-    //로그인 성공여부에 따라 결과 상태 업데이트
-    setResult(matched ? 'success' : 'fail');
-  }
-
-  return(
+<pre><code class="language-jsx">  return(
     &lt;div className="sign-in"&gt;
       &lt;h2&gt;로그인&lt;/h2&gt;
       &lt;form onSubmit={handleSubmit}&gt;
-        &lt;p&gt;
-          &lt;input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleInputChange}
-            placeholder="아이디를 입력하세요"
-          /&gt;
-        &lt;/p&gt;
-        &lt;p&gt;
-          &lt;input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
-            placeholder="비밀번호를 입력하세요"
-          /&gt;
-        &lt;/p&gt;
-        &lt;button type="submit"&gt;로그인&lt;/button&gt;
+        &lt;ul&gt;
+          &lt;li&gt;
+            &lt;input 
+              type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleInputChange}
+              placeholder="아이디 입력"
+            /&gt;
+          &lt;/li&gt;
+          &lt;li&gt;
+            &lt;input 
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              placeholder="비밀번호 입력"
+            /&gt;
+          &lt;/li&gt;
+          &lt;li&gt;
+            &lt;button type="submit"&gt;로그인&lt;/button&gt;
+          &lt;/li&gt;
+        &lt;/ul&gt;
       &lt;/form&gt;
       {/* 결과 메시지 출력 */}
-      {result === 'success' &amp;&amp; (
-        &lt;p className="result-msg" style={{color: 'blue'}}&gt;
-          환영합니다. {formData.username}님!
-        &lt;/p&gt;
+      {result === "success" &amp;&amp; (
+        &lt;p style={{color: 'blue'}}&gt;환영합니다.&lt;/p&gt;
       )}
-      {result === 'fail' &amp;&amp; (
-        &lt;p className="result-msg" style={{color: 'red'}}&gt;
-          아이디 또는 비밀번호가 일치하지 않습니다.
-        &lt;/p&gt;
+      {result === "fail" &amp;&amp; (
+        &lt;p style={{color: 'red'}}&gt;아이디 또는 비밀번호가 일치하지 않습니다.&lt;/p&gt;
       )}
     &lt;/div&gt;
   )
-}</code></pre>
+}
+
+export default SignIn;</code></pre>
       <div class="grid2">
         <div class="out"><span class="rt">성공 (user1 / user1111)</span>
-          <div class="demo" style="text-align:center">로그인<br><input value="user1"><br><input type="password" value="1234567"><br><button>로그인</button><br><b style="color:blue">환영합니다. user1님!</b></div>
+          <div class="demo" style="text-align:center">로그인<br><input value="user1"><br><input type="password" value="1234567"><br><button>로그인</button><br><b style="color:blue">환영합니다.</b></div>
         </div>
         <div class="out"><span class="rt">실패</span>
           <div class="demo" style="text-align:center">로그인<br><input value="cloud"><br><input type="password" value="1234567"><br><button>로그인</button><br><b style="color:red">아이디 또는 비밀번호가 일치하지 않습니다.</b></div>
         </div>
       </div>
       <div class="tip"><span class="lbl">💡 핵심</span> — <code>find()</code>는 조건에 맞는 <b>첫 요소</b>를 반환하고, 없으면 <code>undefined</code>를 반환한다. 이 결과로 성공/실패를 판단하고 <code>{조건 &amp;&amp; JSX}</code>로 메시지를 조건부 렌더링한다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 STEP 3 — 스타일 (App.css)</div>
+      <span class="fname">src/App.css</span>
+<pre><code class="language-css">/* 로그인 폼 스타일 */
+.sign-in {
+  width: 500px;
+  margin: 30px auto;
+}
+.sign-in h2{
+  margin-bottom: 30px;
+}
+.sign-in ul{
+  list-style: none;
+  padding-left: 0;
+}
+.sign-in ul li{
+  margin: 20px;
+}
+.sign-in ul li:last-child{
+  text-align: center; /* 버튼 */
+}
+.sign-in ul li input[type="text"],
+.sign-in ul li input[type="password"] {
+  padding: 5px;
+  width: 200px;
+}
+.sign-in ul li button{
+  padding: 6px 12px;
+  font-size: 16px;
+  cursor: pointer;
+}</code></pre>
     </div>
   </section>
 
