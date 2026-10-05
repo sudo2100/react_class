@@ -179,7 +179,6 @@ hue-6-2: #e6c07b
       <li><a href="#m8">useNavigate와 상품 등록 폼</a></li>
       <li><a href="#m9">상품 목록 테이블 만들기</a></li>
       <li><a href="#m10">로그인 / 로그아웃 메뉴와 상태 관리</a></li>
-      <li><a href="#m11">종합 실습 문제</a></li>
     </ol>
   </nav>
 
@@ -213,6 +212,7 @@ hue-6-2: #e6c07b
           <tr><td>Routes &amp; Route</td><td>경로를 정의합니다. path 속성에는 URL을, element에는 해당 주소에서 보여줄 컴포넌트를 넣습니다.</td></tr>
           <tr><td>Link</td><td>HTML의 &lt;a&gt; 태그와 비슷하지만, 페이지 새로고침을 막고 라우터를 통해 이동하게 합니다.</td></tr>
           <tr><td>useNavigate</td><td>특정 이벤트(버튼 클릭 등)가 발생했을 때 프로그래밍 방식으로 페이지를 이동시킬 때 쓰는 Hook입니다.</td></tr>
+          <tr><td>useParams</td><td>URL 경로에 포함된 동적 값(파라미터)을 객체로 가져오는 Hook입니다. 예: <code>/product/:id</code> 경로에서 <code>const { id } = useParams();</code>로 id 값을 읽습니다.</td></tr>
         </tbody>
       </table>
     </div>
@@ -235,6 +235,8 @@ hue-6-2: #e6c07b
       <li>BrowserRouter로 앱 전체를 감싸는 구조를 만들 수 있다.</li>
       <li>Link로 메뉴를, Routes/Route로 경로별 화면을 연결할 수 있다.</li>
       <li>Link가 브라우저에서 &lt;a&gt; 태그로 렌더링되는 것을 확인한다.</li>
+      <li>여러 페이지를 만들고 메뉴 클릭으로 이동하는 라우팅을 스스로 구현한다.</li>
+      <li>URL 파라미터를 이용한 동적 라우팅을 구현한다.</li>
     </ul></div>
     <div class="concept">
       <h3 class="blk">📖 routes 프로젝트 구조</h3>
@@ -292,14 +294,55 @@ export default App</code></pre>
     <div class="concept">
       <h3 class="blk">📖 Link는 &lt;a&gt; 태그로 렌더링된다</h3>
       <p>개발자 도구로 확인하면 각 Link는 실제 HTML에서 <code>&lt;a&gt;</code> 태그로 그려집니다. 다만 라우터가 클릭을 가로채 새로고침 없이 화면만 바꿉니다.</p>
-      <pre><code class="language-html">&lt;section class="app"&gt;
-  &lt;div class="header"&gt;
-    &lt;a href="/" data-discover="true"&gt;Home&lt;/a&gt;
-    &lt;a href="/sign-in" data-discover="true"&gt;로그인&lt;/a&gt;
-    &lt;a href="/sign-up" data-discover="true"&gt;회원가입&lt;/a&gt;
-  &lt;/div&gt;
-  &lt;div class="contents"&gt;...&lt;/div&gt;
-&lt;/section&gt;</code></pre>
+      <span class="fname">src/App.css</span>
+<pre><code class="language-css">/* Header 스타일 */
+.header{
+  margin: 30px;
+}
+.header a{
+  margin: 10px;
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — Header 컴포넌트 (Header.jsx)</div>
+      <span class="fname">src/components/Header.jsx</span>
+<pre><code class="language-jsx">import {Link} from 'react-router-dom'
+
+const Header = () =&gt; {
+
+  return(
+    &lt;div className='header'&gt;
+      &lt;Link to="/"&gt;Home&lt;/Link&gt;
+      &lt;Link to="/sign-in"&gt;로그인&lt;/Link&gt;
+      &lt;Link to="/sign-up"&gt;회원가입&lt;/Link&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default Header;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — Header 컴포넌트 사용 (App.jsx)</div>
+      <span class="fname">src/App.jsx</span>
+<pre><code class="language-jsx">function App() {
+
+  return (
+    &lt;&gt;
+      &lt;section className="app"&gt;
+        &lt;BrowserRouter&gt;
+          &lt;Header /&gt;
+          &lt;div&gt;
+            &lt;Routes&gt;
+              &lt;Route path='/' element={&lt;Home /&gt;} /&gt;
+              &lt;Route path="/sign-in" element={&lt;SignIn /&gt;} /&gt;
+              &lt;Route path="/sign-up" element={&lt;SignUp /&gt;} /&gt;
+            &lt;/Routes&gt;
+          &lt;/div&gt;
+        &lt;/BrowserRouter&gt;
+      &lt;/section&gt;
+    &lt;/&gt;
+  )
+}
+
+export default App</code></pre>
     </div>
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
       <h4>실습 3-1. 세 번째 메뉴 추가하기</h4>
@@ -312,18 +355,74 @@ export default App</code></pre>
 &lt;Route path="/about" element={&lt;About /&gt;} /&gt;</code></pre>
       </details>
     </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 3-2. 3개 페이지 라우팅</h4>
+      <p>리엑트 라우터를 이용하여 3개의 페이지(Home, About, Board)를 만들고, 상단 메뉴를 클릭하면 각 페이지로 이동하도록 만드세요.</p>
+      <details><summary>정답 보기</summary>
+      <span class="fname">src/App.jsx</span>
+      <pre><code class="language-jsx">import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import Home from './pages/Home'
+import About from './pages/About'
+import Board from './pages/Board'
+
+function App() {
+  return (
+    &lt;BrowserRouter&gt;
+      &lt;nav&gt;
+        &lt;Link to="/"&gt;Home&lt;/Link&gt;
+        &lt;Link to="/about"&gt;About&lt;/Link&gt;
+        &lt;Link to="/board"&gt;Board&lt;/Link&gt;
+      &lt;/nav&gt;
+      &lt;Routes&gt;
+        &lt;Route path="/" element={&lt;Home /&gt;} /&gt;
+        &lt;Route path="/about" element={&lt;About /&gt;} /&gt;
+        &lt;Route path="/board" element={&lt;Board /&gt;} /&gt;
+      &lt;/Routes&gt;
+    &lt;/BrowserRouter&gt;
+  )
+}
+
+export default App</code></pre>
+      </details>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 3-3. 동적 라우팅 구현</h4>
+      <p><code>/board/1</code>, <code>/board/2</code> 처럼 게시글 번호에 따라 다른 화면을 보여주는 동적 라우팅을 구현하세요.</p>
+      <details><summary>정답 보기</summary>
+      <span class="fname">src/App.jsx (Route 추가)</span>
+      <pre><code class="language-jsx">&lt;Route path="/board/:id" element={&lt;BoardDetail /&gt;} /&gt;</code></pre>
+      <span class="fname">src/pages/BoardDetail.jsx</span>
+      <pre><code class="language-jsx">import { useParams } from 'react-router-dom'
+
+const BoardDetail = () =&gt; {
+  const { id } = useParams()  // URL의 번호를 읽어옴
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;게시글 상세&lt;/h2&gt;
+      &lt;p&gt;{id}번 게시글입니다.&lt;/p&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default BoardDetail</code></pre>
+      <span class="fname">Board.jsx (목록에서 링크)</span>
+      <pre><code class="language-jsx">&lt;Link to="/board/1"&gt;1번 글&lt;/Link&gt;
+&lt;Link to="/board/2"&gt;2번 글&lt;/Link&gt;</code></pre>
+      </details>
+    </div>
   </section>
 
   <section class="module" id="m4">
     <h2><span class="num">4</span> 상품 관리 앱 – 구조와 BrowserRouter 배치</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
-      <li>layouts / pages / datas로 나눈 프로젝트 구조를 이해한다.</li>
+      <li>layouts / pages / data로 나눈 프로젝트 구조를 이해한다.</li>
       <li>Header, Main 컴포넌트를 만들고 BrowserRouter로 감쌀 수 있다.</li>
     </ul></div>
     <div class="concept">
       <h3 class="blk">📖 상품 관리 프로젝트 구조</h3>
       <div class="flow">src/
- ├─ datas/
+ ├─ data/
  │    └─ products.js
  ├─ layouts/
  │    ├─ Header.jsx
@@ -463,17 +562,18 @@ return (
       <li>map()으로 상품 목록을 반복 렌더링할 수 있다.</li>
     </ul></div>
     <div class="ex"><div class="lbl">💡 예제 — 상품 데이터 정의</div>
-      <span class="fname">src/datas/products.js</span>
-      <pre><code class="language-javascript">export const products = [
+      <span class="fname">src/data/products.js</span>
+      <pre><code class="language-javascript">// 상품 데이터 목록 - data/products.js
+const products = [
   {
     id: 1,
-    name: '모니터',
+    name: '모니터', 
     price: 130000,
     description: '22인치 최신 모니터입니다.',
   },
   {
     id: 2,
-    name: '마우스',
+    name: '마우스', 
     price: 30000,
     description: '무선 마우스입니다.',
   },
@@ -487,7 +587,7 @@ return (
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ProductList.jsx (map으로 목록 렌더링)</div>
       <span class="fname">src/pages/ProductList.jsx</span>
-      <pre><code class="language-jsx">import {products} from "../datas/products"
+      <pre><code class="language-jsx">import products from "../data/products"
 import { Link} from "react-router-dom";
 
 const ProductList = () =&gt; {
@@ -584,55 +684,41 @@ const ProductInfo = () =&gt; {
     </div>
     <div class="ex"><div class="lbl">💡 예제 — useNavigate로 목록 이동 + 상품 찾기</div>
       <span class="fname">src/pages/ProductInfo.jsx</span>
-      <pre><code class="language-jsx">import { useParams, useNavigate } from "react-router-dom";
-import {products} from "../datas/products"
+      <pre><code class="language-jsx">import { useNavigate, useParams } from 'react-router-dom'
+import { products } from '../data/products'
 
-const ProductInfo = () =&gt; {
+const ProductInfo = () =&gt; { 
   // URL 파라미터에서 id 값을 추출
-  const {id} = useParams()
-  // 페이지 이동 hook
+  // useParams 훅을 사용하여 URL에서 id 값을 가져옵니다.
+  const { id } = useParams();
   const navigate = useNavigate();
 
-  // products 리스트에 id와 일치하는 상품 찾기
-  const product = products.find(product =&gt;
-      product.id === parseInt(id))
+  // products 배열에서 id와 일치하는 상품을 찾습니다.
+  // id는 숫자형으로 반드시 변환하기
+  const product = products.find((p) =&gt; p.id === Number(id))
 
-  // 페이지 이동 핸들러
-  const doClick = () =&gt; {
-    navigate('/products');
-  }
+  return (
+    &lt;section className="product-info"&gt;
+      &lt;h2&gt;상품 정보&lt;/h2&gt;
+      &lt;div className="product-details"&gt;
+        &lt;p&gt;상품 ID: {id}&lt;/p&gt;
+        &lt;p&gt;상품 이름: {product.name}&lt;/p&gt;
+        &lt;p&gt;상품 가격: {product.price}&lt;/p&gt;
+        &lt;p&gt;상품 설명: {product.description}&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div className='btn-list'&gt;
+        &lt;button onClick={() =&gt; {navigate('/products')}}&gt;목록보기&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+  ) 
+}
 
-  return(
-    &lt;div className="product-info"&gt;
-      &lt;h3&gt;상품 ID: {id}&lt;/h3&gt;
-      {/* &lt;p&gt;가격: {products[id-1].price}&lt;/p&gt;
-      &lt;p&gt;설명: {products[id-1].description}&lt;/p&gt; */}
-      &lt;p&gt;이름: {product.name}&lt;/p&gt;
-      &lt;p&gt;가격: {product.price}&lt;/p&gt;
-      &lt;p&gt;설명: {product.description}&lt;/p&gt;
-
-      {/* &lt;button onClick={() =&gt; {navigate('/products')}}&gt;목록보기&lt;/button&gt; */}
-      &lt;button onClick={doClick}&gt;목록보기&lt;/button&gt;
-    &lt;/div&gt;
-  )
-}</code></pre>
+export default ProductInfo</code></pre>
       <div class="out"><span class="rt">브라우저 출력</span>
         <p style="text-align:center;font-weight:bold;">상품 정보</p>
-        <p><strong>상품 ID: 1</strong></p>
-        <p>가격: 120000<br>설명: 22인치 최신 모니터입니다.</p>
+        <p>상품 ID: 1<br>상품 이름: 모니터<br>상품 가격: 130000<br>상품 설명: 22인치 최신 모니터입니다.</p>
         <div class="demo"><button>목록보기</button></div>
       </div>
-    </div>
-    <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 7-1. useParams로 값 확인하기</h4>
-      <p><code>/products/:id</code> 경로에서 useParams로 받은 id는 문자열입니다. 데이터의 숫자형 id와 비교하려면 어떻게 처리해야 할까요? 위 코드에서 근거를 찾아 설명하고 코드로 나타내세요.</p>
-      <details><summary>정답 보기</summary>
-      <p>useParams가 반환하는 값은 항상 문자열이므로, 숫자형 <code>product.id</code>와 <code>===</code>로 비교하려면 parseInt()로 변환해야 합니다.</p>
-      <pre><code class="language-jsx">const { id } = useParams()               // "1" (문자열)
-const product = products.find(
-  (product) =&gt; product.id === parseInt(id) // 숫자로 변환 후 비교
-)</code></pre>
-      </details>
     </div>
   </section>
 
@@ -852,30 +938,72 @@ export default AddProduct;</code></pre>
   &lt;/tbody&gt;
 &lt;/table&gt;</code></pre>
     </div>
-    <div class="ex"><div class="lbl">💡 예제 — 테이블 스타일 (App.css)</div>
+    <div class="ex"><div class="lbl">💡 예제 — 스타일(App.css) 추가</div>
       <span class="fname">src/App.css</span>
       <pre><code class="language-css">/* 상품 목록 스타일 */
-.product-list{padding: 20px;}
-.table-list{
-  width: 60%;
-  border-collapse: collapse;
-  margin: 20px auto;
+.product-list {width: 1000px; margin: 0 auto; text-align: left;}
+.table-list {width: 60%; margin: 0 auto; border-collapse: collapse;}
+.table-list th, .table-list td {border: 1px solid #ddd;padding: 8px;}
+.table-list th {text-align: center; background-color: #f2f2f2;}
+.product-list .btn-add {text-align: right; margin-top: 20px; margin-right: 20%;}
+.product-list .btn-add button {
+  padding: 10px 20px;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
 }
-.table-list th, td{
-  border: 1px solid #ccc;
-  padding: 6px;
+.btn-add button:hover {background-color: #0056b3;}
+
+/* 상품 상세 정보 */
+.product-info{width: 60%; margin: 0 auto;}
+.product-details {
+  width: 50%;
+  margin: 0 auto;
+  text-align: left;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #f0f0f0;
 }
-.table-list thead{background-color: #eee;}
-.table-list a{
-  text-decoration: none;
-  color: #333;
-}
-.table-list a:hover{text-decoration: underline;}
-.btn-add{
+.product-details p {margin-bottom: 10px;}
+.product-info .btn-list{
   text-align: right;
-  margin-right: 20%;
+  margin-top: 20px;
+  margin-right: 25%;
 }
-.btn-add button{padding: 6px 12px;}</code></pre>
+.product-info .btn-list button{
+  padding: 10px 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+/* 상품 등록 폼 */
+.add-form {width: 40%; margin: 0 auto; text-align: left;}
+.add-form label {display: block; margin-bottom: 8px; font-weight: bold;}
+.add-form input,
+.add-form textarea {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.add-form button {
+  padding: 10px 20px;
+  border-radius: 4px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.add-form button:hover {background-color: #218838;}
+.add-form button[type="submit"] {margin-right: 10px;}
+.add-form button[type="button"] {background-color: #6c757d}
+.add-form button[type="button"]:hover {background-color: #5a6268;}</code></pre>
       <div class="out"><span class="rt">브라우저 출력</span>
         <table>
           <thead><tr><th>번호</th><th>상품명</th><th>가격</th></tr></thead>
@@ -897,24 +1025,35 @@ export default AddProduct;</code></pre>
       <li>로그인 여부에 따라 헤더 메뉴를 조건부로 렌더링할 수 있다.</li>
       <li>SignIn에서 로그인 성공 시 onLogin 콜백과 navigate로 처리할 수 있다.</li>
     </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — 사용자 데이터 (users.js)</div>
+      <span class="fname">src/data/users.js</span>
+      <pre><code class="language-javascript">// 임시 사용자 데이터 (실제 프로젝트에서는 서버에서 받아옴)
+const users = [
+  { username: 'user1', password: 'u1111' },
+  { username: 'user2', password: 'u2222' },
+  { username: 'admin', password: '0000' },
+];
+
+export default users;</code></pre>
+    </div>
     <div class="ex"><div class="lbl">💡 예제 — App.jsx ① 로그인 상태와 핸들러</div>
       <span class="fname">src/App.jsx</span>
       <pre><code class="language-jsx">function App() {
   // 로그인 상태 관리
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   // 로그인한 사용자 ID 관리
-  const [userId, setUserId] = useState('')
+  const [username, setUsername] = useState('')
 
   // 로그인 핸들러
-  const handleLogin = (userId) =&gt; {
+  const handleLogin = (username) =&gt; {
     setIsLoggedIn(true) // 로그인 성공 시 상태 업데이트
-    setUserId(userId)   // 로그인한 사용자 ID 저장
+    setUsername(username) // 로그인한 사용자 ID 저장
   }
 
   // 로그아웃 핸들러
   const handleLogout = () =&gt; {
     setIsLoggedIn(false)
-    setUserId('')
+    setUsername('')
   }</code></pre>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — App.jsx ② 상태 전달과 signin 경로</div>
@@ -923,8 +1062,7 @@ export default AddProduct;</code></pre>
     &lt;&gt;
       &lt;div className="app"&gt;
         &lt;BrowserRouter&gt;
-          &lt;Header isLoggedIn={isLoggedIn} userId={userId} onLogout={handleLogout} /&gt;
-          {/* &lt;Main /&gt; */}
+          &lt;Header isLoggedIn={isLoggedIn} username={username} onLogout={handleLogout} /&gt;
           &lt;Routes&gt;
             &lt;Route path="/" element={&lt;Main /&gt;} /&gt;
             &lt;Route path="/products" element={&lt;ProductList /&gt;} /&gt;
@@ -936,14 +1074,16 @@ export default AddProduct;</code></pre>
       &lt;/div&gt;
     &lt;/&gt;
   )
-}</code></pre>
+}
+
+export default App</code></pre>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — Header.jsx (조건부 메뉴)</div>
       <span class="fname">src/layouts/Header.jsx</span>
       <pre><code class="language-jsx">import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 
-const Header = ({ isLoggedIn, userId, onLogout }) =&gt; {
+const Header = ({ isLoggedIn, username, onLogout }) =&gt; {
   const navigate = useNavigate() // 페이지 이동을 위한 훅
 
   return (
@@ -953,10 +1093,10 @@ const Header = ({ isLoggedIn, userId, onLogout }) =&gt; {
       &lt;Link to="/add-product"&gt;상품 등록&lt;/Link&gt;
       {isLoggedIn ? (
         &lt;div className="header-user"&gt;
-          &lt;span&gt;{userId}님&lt;/span&gt;
-          &lt;button
-            type="button"
-            className="logout-btn"
+          &lt;span&gt;{username}님&lt;/span&gt;
+          &lt;button 
+            type="button" 
+            className="logout-btn" 
             onClick={() =&gt; { onLogout(); navigate('/'); }}
           &gt;
             로그아웃
@@ -967,7 +1107,9 @@ const Header = ({ isLoggedIn, userId, onLogout }) =&gt; {
       )}
     &lt;/header&gt;
   )
-}</code></pre>
+}
+
+export default Header</code></pre>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — App.css (사용자/로그아웃 버튼 스타일)</div>
       <span class="fname">src/App.css</span>
@@ -993,11 +1135,13 @@ const Header = ({ isLoggedIn, userId, onLogout }) =&gt; {
     </div>
     <div class="ex"><div class="lbl">💡 예제 — SignIn.jsx ① 상태와 입력 핸들러</div>
       <span class="fname">src/pages/SignIn.jsx</span>
-      <pre><code class="language-jsx">const SignIn = ({ onLogin }) =&gt; {
+      <pre><code class="language-jsx">import users from '../data/users';
+
+const SignIn = ({ onLogin }) =&gt; {
   const navigate = useNavigate(); // 페이지 이동을 위한 훅
   // 1. 입력 데이터를 객체로 통합
   const [loginData, setLoginData] = useState(
-    { userId: '', password: '' }
+    { username: '', password: '' }
   );
   // 로그인 결과 상태 (성공, 실패, 또는 null)
   const [result, setResult] = useState(null);
@@ -1006,7 +1150,7 @@ const Header = ({ isLoggedIn, userId, onLogout }) =&gt; {
   const handleChange = (e) =&gt; {
     const { name, value } = e.target;
     console.log(e);
-
+    
     setLoginData({ ...loginData, [name]: value });
     setResult(null); // 입력 시 결과 메시지 숨김
   };</code></pre>
@@ -1016,40 +1160,39 @@ const Header = ({ isLoggedIn, userId, onLogout }) =&gt; {
       <pre><code class="language-jsx">  // 3. 제출 핸들러
   const handleSubmit = (e) =&gt; {
     e.preventDefault();
-    const { userId, password } = loginData;
+    const { username, password } = loginData;
 
     //find 메서드로 사용자 데이터에서 첫번째 일치하는 항목 찾기
     const matched = users.find(
-      (user) =&gt; user.userId === userId &amp;&amp; user.password === password
+      (user) =&gt; user.username === username &amp;&amp; user.password === password
     );
 
     // 로그인 성공 여부에 따라 결과 상태 업데이트
     if (matched) {
       setResult('success');
-      onLogin(userId); // App에 로그인 정보 전달
+      onLogin(username); // App에 로그인 정보 전달
       navigate('/');
     } else {
       setResult('fail');
     }
   };</code></pre>
-      <div class="tip"><span class="lbl">💡 정리</span> 위 코드는 <code>users</code> 배열(예: <code>[{ userId: 'cloud', password: '1234' }]</code>)이 파일 내에 정의되어 있다고 가정합니다. 강의 슬라이드에는 users 데이터 정의 화면이 별도로 등장하지 않았습니다.</div>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — SignIn.jsx ③ 폼과 결과 메시지</div>
       <span class="fname">src/pages/SignIn.jsx (이어서)</span>
       <pre><code class="language-jsx">  return (
     &lt;div className='sign-in'&gt;
       &lt;h2&gt;로그인&lt;/h2&gt;
-      &lt;form onSubmit={handleSubmit}&gt;
-        &lt;p&gt;
+      &lt;form onSubmit={handleSubmit} className='signin-form'&gt;
+        &lt;div&gt;
           &lt;input
-            name="userId" // name 추가
+            name="username" // name 추가
             type="text"
             placeholder="ID 입력"
-            value={loginData.userId}
+            value={loginData.username}
             onChange={handleChange}
           /&gt;
-        &lt;/p&gt;
-        &lt;p&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
           &lt;input
             name="password" // name 추가
             type="password"
@@ -1057,16 +1200,19 @@ const Header = ({ isLoggedIn, userId, onLogout }) =&gt; {
             value={loginData.password}
             onChange={handleChange}
           /&gt;
-        &lt;/p&gt;
-        &lt;button type="submit"&gt;로그인&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;button type="submit"&gt;로그인&lt;/button&gt;
+        &lt;/div&gt;
       &lt;/form&gt;
 
       {/* 결과 메시지 부분 */}
-      {result === 'success' &amp;&amp; (
-        &lt;p style={{ color: 'green' }}&gt;환영합니다, {loginData.userId}님.&lt;/p&gt;
-      )}
       {result === 'fail' &amp;&amp; (
-        &lt;p style={{ color: 'red' }}&gt;아이디 또는 비밀번호가 올바르지 않습니다.&lt;/p&gt;
+        &lt;p style={{ 
+          color: 'red', 
+          textAlign: 'center',
+          marginTop: '10px'
+        }}&gt;아이디 또는 비밀번호가 올바르지 않습니다.&lt;/p&gt;
       )}
     &lt;/div&gt;
   );
@@ -1090,70 +1236,6 @@ export default SignIn;</code></pre>
 ) : (
   &lt;Link to="/signin"&gt;로그인&lt;/Link&gt;
 )}</code></pre>
-      </details>
-    </div>
-  </section>
-
-  <section class="module" id="m11">
-    <h2><span class="num">11</span> 종합 실습 문제</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
-      <li>여러 페이지를 만들고 메뉴 클릭으로 이동하는 라우팅을 스스로 구현한다.</li>
-      <li>URL 파라미터를 이용한 동적 라우팅을 구현한다.</li>
-    </ul></div>
-    <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 11-1. 3개 페이지 라우팅</h4>
-      <p>리엑트 라우터를 이용하여 3개의 페이지(Home, About, Board)를 만들고, 상단 메뉴를 클릭하면 각 페이지로 이동하도록 만드세요.</p>
-      <details><summary>정답 보기</summary>
-      <span class="fname">src/App.jsx</span>
-      <pre><code class="language-jsx">import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
-import Home from './pages/Home'
-import About from './pages/About'
-import Board from './pages/Board'
-
-function App() {
-  return (
-    &lt;BrowserRouter&gt;
-      &lt;nav&gt;
-        &lt;Link to="/"&gt;Home&lt;/Link&gt;
-        &lt;Link to="/about"&gt;About&lt;/Link&gt;
-        &lt;Link to="/board"&gt;Board&lt;/Link&gt;
-      &lt;/nav&gt;
-      &lt;Routes&gt;
-        &lt;Route path="/" element={&lt;Home /&gt;} /&gt;
-        &lt;Route path="/about" element={&lt;About /&gt;} /&gt;
-        &lt;Route path="/board" element={&lt;Board /&gt;} /&gt;
-      &lt;/Routes&gt;
-    &lt;/BrowserRouter&gt;
-  )
-}
-
-export default App</code></pre>
-      </details>
-    </div>
-    <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 11-2. 동적 라우팅 구현</h4>
-      <p><code>/board/1</code>, <code>/board/2</code> 처럼 게시글 번호에 따라 다른 화면을 보여주는 동적 라우팅을 구현하세요.</p>
-      <details><summary>정답 보기</summary>
-      <span class="fname">src/App.jsx (Route 추가)</span>
-      <pre><code class="language-jsx">&lt;Route path="/board/:id" element={&lt;BoardDetail /&gt;} /&gt;</code></pre>
-      <span class="fname">src/pages/BoardDetail.jsx</span>
-      <pre><code class="language-jsx">import { useParams } from 'react-router-dom'
-
-const BoardDetail = () =&gt; {
-  const { id } = useParams()  // URL의 번호를 읽어옴
-
-  return (
-    &lt;div&gt;
-      &lt;h2&gt;게시글 상세&lt;/h2&gt;
-      &lt;p&gt;{id}번 게시글입니다.&lt;/p&gt;
-    &lt;/div&gt;
-  )
-}
-
-export default BoardDetail</code></pre>
-      <span class="fname">Board.jsx (목록에서 링크)</span>
-      <pre><code class="language-jsx">&lt;Link to="/board/1"&gt;1번 글&lt;/Link&gt;
-&lt;Link to="/board/2"&gt;2번 글&lt;/Link&gt;</code></pre>
       </details>
     </div>
   </section>
