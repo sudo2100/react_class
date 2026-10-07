@@ -982,17 +982,17 @@ export default AddProduct;</code></pre>
 }
 
 /* 상품 등록 폼 */
-.add-form {width: 40%; margin: 0 auto; text-align: left;}
-.add-form label {display: block; margin-bottom: 8px; font-weight: bold;}
-.add-form input,
-.add-form textarea {
+.add-product{width: 40%; margin: 0 auto; text-align: left;}
+.add-product form label {display: block; margin-bottom: 8px; font-weight: bold;}
+.add-product form input,
+.add-product form textarea {
   width: 100%;
   padding: 8px;
   margin-bottom: 16px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
-.add-form button {
+.add-product form button {
   padding: 10px 20px;
   border-radius: 4px;
   background-color: #28a745;
@@ -1000,10 +1000,10 @@ export default AddProduct;</code></pre>
   border: none;
   cursor: pointer;
 }
-.add-form button:hover {background-color: #218838;}
-.add-form button[type="submit"] {margin-right: 10px;}
-.add-form button[type="button"] {background-color: #6c757d}
-.add-form button[type="button"]:hover {background-color: #5a6268;}</code></pre>
+.add-product form button:hover {background-color: #218838;}
+.add-product form button[type="submit"] {margin-right: 10px;}
+.add-product form button[type="button"] {background-color: #6c757d}
+.add-product form button[type="button"]:hover {background-color: #5a6268;}</code></pre>
       <div class="out"><span class="rt">브라우저 출력</span>
         <table>
           <thead><tr><th>번호</th><th>상품명</th><th>가격</th></tr></thead>
@@ -1182,7 +1182,7 @@ const SignIn = ({ onLogin }) =&gt; {
       <pre><code class="language-jsx">  return (
     &lt;div className='sign-in'&gt;
       &lt;h2&gt;로그인&lt;/h2&gt;
-      &lt;form onSubmit={handleSubmit} className='signin-form'&gt;
+      &lt;form onSubmit={handleSubmit}&gt;
         &lt;div&gt;
           &lt;input
             name="username" // name 추가
@@ -1194,7 +1194,7 @@ const SignIn = ({ onLogin }) =&gt; {
         &lt;/div&gt;
         &lt;div&gt;
           &lt;input
-            name="password" // name 추가
+            name="password" //name 추가
             type="password"
             placeholder="패스워드 입력"
             value={loginData.password}
@@ -1205,6 +1205,11 @@ const SignIn = ({ onLogin }) =&gt; {
           &lt;button type="submit"&gt;로그인&lt;/button&gt;
         &lt;/div&gt;
       &lt;/form&gt;
+
+      {/* 회원 가입 링크 */}
+      &lt;p className='signup-link'&gt;
+        아직 계정이 없으신가요? &lt;Link to="/signup" &gt;회원가입&lt;/Link&gt;
+      &lt;/p&gt;
 
       {/* 결과 메시지 부분 */}
       {result === 'fail' &amp;&amp; (
@@ -1225,6 +1230,41 @@ export default SignIn;</code></pre>
         </div>
         <p>로그인 성공 시 헤더에 "<strong>cloud님</strong>"과 로그아웃 버튼이 나타나고, 실패 시 빨간 글씨로 오류 메시지가 표시됩니다.</p>
       </div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 로그인 폼 스타일 (App.css)</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 로그인 폼 */
+.sign-in{width: 30%; margin: 0 auto; text-align: left;}
+.sign-in form input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.sign-in form button {
+  width: 100%;
+  padding: 10px 20px;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-left: 3%;
+}
+.sign-in form button:hover {background-color: #0056b3;}
+.signup-link{
+  text-align: center;
+  margin-top: 15px;
+}
+.signup-link a{
+  color: #007bff;
+  font-size: 17px;
+  text-decoration: none;
+}
+.signup-link a:hover {
+  text-decoration: underline;
+}</code></pre>
     </div>
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
       <h4>실습 10-1. 조건부 렌더링으로 메뉴 바꾸기</h4>
