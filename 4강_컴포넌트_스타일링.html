@@ -154,7 +154,7 @@ hue-6-2: #e6c07b
 <header class="hero">
   <div class="eyebrow">React 심화 · Chapter 04 · 학습 교안</div>
   <h1>컴포넌트 스타일링</h1>
-  <p>일반 CSS부터 인라인 스타일, 반응형(미디어 쿼리), Flexbox, CSS 변수, styled-components, 그리고 GitHub Pages 배포까지 리엑트 스타일링의 전 과정을 다룹니다.</p>
+  <p>일반 CSS부터 인라인 스타일, 반응형(미디어 쿼리), Flexbox, CSS 변수, styled-components까지 리엑트 스타일링의 전 과정을 다룹니다.</p>
   <div class="tags">
     <span>🏷️ index.css / App.css</span>
     <span>🏷️ inline style</span>
@@ -162,7 +162,6 @@ hue-6-2: #e6c07b
     <span>🏷️ Flexbox</span>
     <span>🏷️ CSS 변수</span>
     <span>🏷️ styled-components</span>
-    <span>🏷️ GitHub Pages 배포</span>
   </div>
 </header>
 <div class="wrap">
@@ -175,13 +174,9 @@ hue-6-2: #e6c07b
       <li><a href="#m4">스타일 변수와 CSS 변수 — var()</a></li>
       <li><a href="#m5">Flexbox 레이아웃 — flex-direction</a></li>
       <li><a href="#m6">Flexbox 정렬 — justify-content / align-items</a></li>
-      <li><a href="#m7">실전: 컴퓨터 기기 쇼핑몰 CSS</a></li>
-      <li><a href="#m8">styled-components 기초</a></li>
-      <li><a href="#m9">styled-components 페이지 스타일링과 확장</a></li>
-      <li><a href="#m10">styled-components 실전 — Blocks 모형</a></li>
-      <li><a href="#m11">일반 웹페이지 GitHub Pages 배포</a></li>
-      <li><a href="#m12">리엑트(Vite) 앱 GitHub Pages 배포</a></li>
-      <li><a href="#m13">SPA 404 오류 해결</a></li>
+      <li><a href="#m7">styled-components 기초</a></li>
+      <li><a href="#m8">styled-components 페이지 스타일링과 확장</a></li>
+      <li><a href="#m9">styled-components 실전 — Blocks 모형</a></li>
     </ol>
   </nav>
 
@@ -339,23 +334,29 @@ h1 {
       <span class="fname">mq.html</span>
       <pre><code class="language-html">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
 &lt;title&gt;미디어 쿼리 예제&lt;/title&gt;
-&lt;style&gt;
+&lt;style&gt; 
   @media screen and (max-width: 767px) {
+    /* 화면 너비가 767px 이하일 때 적용 */
     body{
       background-color: lightcoral;
     }
+    h1{font-size: 1.5rem;} /* 1.5 * 16 = 24px */
   }
 
+  /* 화면 너비가 768px 이상일 때 적용 */
   @media screen and (min-width: 768px) {
     body{
       background-color: lightblue;
     }
+    h1{font-size: 2rem;}
   }
 
-  @media screen and (min-width: 1200px) {
+  /* 화면 너비가 1100px 이상일 때 적용 */
+  @media screen and (min-width: 1100px) {
     body{
       background-color: lightgreen;
     }
+    h1{font-size: 2.5rem;}
   }
 &lt;/style&gt;</code></pre>
       <span class="fname">body</span>
@@ -366,7 +367,7 @@ h1 {
       <div class="out"><span class="rt">브라우저 출력</span>
         <div style="background:lightcoral;padding:10px 14px;border-radius:6px;margin-bottom:6px"><strong>모바일(≤767px)</strong> → lightcoral(연분홍)</div>
         <div style="background:lightblue;padding:10px 14px;border-radius:6px;margin-bottom:6px"><strong>태블릿(≥768px)</strong> → lightblue(하늘색)</div>
-        <div style="background:lightgreen;padding:10px 14px;border-radius:6px"><strong>데스크톱(≥1200px)</strong> → lightgreen(연두색)</div>
+        <div style="background:lightgreen;padding:10px 14px;border-radius:6px"><strong>데스크톱(≥1100px)</strong> → lightgreen(연두색)</div>
       </div>
     </div>
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
@@ -596,160 +597,7 @@ p{text-align: center;}</code></pre>
   </section>
 
   <section class="module" id="m7">
-    <h2><span class="num">7</span> 실전: 컴퓨터 기기 쇼핑몰 CSS</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div>
-      <ul>
-        <li>실제 쇼핑몰 화면(홈·목록·상세·등록·로그인)의 UI 구조를 파악한다.</li>
-        <li>App.css로 헤더, 테이블, 폼, 버튼을 스타일링한다.</li>
-      </ul>
-    </div>
-    <div class="concept">
-      <h3 class="blk">📖 화면 구성</h3>
-      <p>"컴퓨터 기기 쇼핑몰" 예제는 상단 공통 헤더(Home / 상품 목록 / 상품 등록 / 로그인)를 두고, 다음 페이지들로 구성됩니다.</p>
-      <ul>
-        <li><strong>Home</strong>: 타이틀 "컴퓨터 기기 쇼핑몰"과 소개 문구, 대표 이미지</li>
-        <li><strong>상품 목록</strong>: 번호·상품명·가격 테이블 + "상품 등록하기" 버튼</li>
-        <li><strong>상품 정보</strong>: 상품 ID·상품명·가격·설명을 담은 카드 + "목록보기" 버튼</li>
-        <li><strong>상품 등록</strong>: 상품명·가격·설명 입력 폼 + 등록/취소 버튼</li>
-        <li><strong>로그인</strong>: 아이디·비밀번호 입력 + 로그인 버튼</li>
-      </ul>
-      <div class="out"><span class="rt">브라우저 출력</span> 상품 목록 화면(재현)
-        <div style="background:#333;padding:10px;text-align:center;border-radius:6px;margin-bottom:8px">
-          <span style="color:yellow;margin:0 10px">Home</span>
-          <span style="color:yellow;margin:0 10px">상품 목록</span>
-          <span style="color:yellow;margin:0 10px">상품 등록</span>
-          <span style="color:yellow;margin:0 10px">로그인</span>
-        </div>
-        <p style="text-align:center;margin:6px 0"><strong>상품 리스트</strong></p>
-        <table style="width:70%;margin:0 auto">
-          <tr><th class="c">번호</th><th class="c">상품명</th><th class="c">가격</th></tr>
-          <tr><td class="c">1</td><td class="c">모니터</td><td class="c">120000</td></tr>
-          <tr><td class="c">2</td><td class="c">무선마우스</td><td class="c">30000</td></tr>
-          <tr><td class="c">3</td><td class="c">무선키보드</td><td class="c">40000</td></tr>
-        </table>
-      </div>
-    </div>
-    <div class="ex"><div class="lbl">💡 예제 — Header 스타일</div>
-      <span class="fname">src/App.css</span>
-      <pre><code class="language-css">/* Header 스타일 */
-.header{padding: 20px; background-color: #333;}
-.header a{
-  margin: 0 16px;
-  color: yellow;
-  text-decoration: none;
-}
-.header a:hover{color: #eee;}
-.header-user{
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: #eee;
-}
-.logout-btn{
-  padding: 6px 12px;
-  border: 1px solid #ff9f1c;
-  border-radius: 6px;
-  background-color: transparent;
-  color: #ff9f1c;
-  cursor: pointer;
-}</code></pre>
-    </div>
-    <div class="ex"><div class="lbl">💡 예제 — 상품 목록 스타일</div>
-      <span class="fname">src/App.css</span>
-      <pre><code class="language-css">/* 상품 목록 스타일 */
-.product-list{padding: 20px;}
-.table-list{
-  width: 60%;
-  border-collapse: collapse;
-  margin: 20px auto;
-}
-.table-list th, td{
-  border: 1px solid #ccc;
-  padding: 6px;
-}
-.table-list thead{background-color: #eee;}
-.table-list a{
-  text-decoration: none;
-  color: #333;
-}
-.table-list a:hover{text-decoration: underline;}
-.btn-add{
-  text-align: right;
-  margin-right: 20%;
-}
-.btn-add button{padding: 6px 12px;}</code></pre>
-    </div>
-    <div class="ex"><div class="lbl">💡 예제 — 상품 정보 스타일</div>
-      <span class="fname">src/App.css</span>
-      <pre><code class="language-css">/* 상품 정보 스타일 */
-.product-info{padding: 20px;}
-.product-details{
-  width: 40%;
-  margin: 20px auto;
-  text-align: left;
-  padding: 20px;
-  border: 1px solid #ddd;
-  background-color: #eee;
-  border-radius: 10px;
-}
-.product-details p{margin: 16px;}
-.btn-list{
-  text-align: left;
-  margin-left: 30%;
-}
-.btn-list button{padding: 6px 12px;}</code></pre>
-    </div>
-    <div class="ex"><div class="lbl">💡 예제 — 상품 등록 폼 스타일</div>
-      <span class="fname">src/App.css</span>
-      <pre><code class="language-css">/* 상품 등록 스타일 */
-.add-product{padding: 20px;}
-.add-form{width: 40%; margin: 20px auto; text-align: left;}
-.add-form label{display: block; margin: 6px;}
-.add-form input,
-.add-form textarea{
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 12px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-.add-form textarea{resize: none;}
-.add-form button{
-  padding: 8px 16px;
-  background-color: #28a745;
-  color: #eee;
-  border-radius: 4px;
-  border: none;
-  font-size: 15px;
-}</code></pre>
-    </div>
-    <div class="ex"><div class="lbl">💡 예제 — 로그인 폼 스타일</div>
-      <span class="fname">src/App.css</span>
-      <pre><code class="language-css">/* 로그인 스타일 */
-.sign-in{padding: 20px;}
-.signin-form{width: 30%; margin: 20px auto; text-align: left;}
-.signin-form input{
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 12px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-.signin-form button{
-  width: 100%;
-  margin-left: 3%;
-  padding: 8px 16px;
-  background-color: #007bff;
-  color: #eee;
-  border-radius: 4px;
-  border: none;
-  font-size: 15px;
-}</code></pre>
-    </div>
-  </section>
-
-  <section class="module" id="m8">
-    <h2><span class="num">8</span> styled-components 기초</h2>
+    <h2><span class="num">7</span> styled-components 기초</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li>CSS-in-JS 개념과 styled-components의 역할을 이해한다.</li>
@@ -832,8 +680,8 @@ export default ButtonSample;</code></pre>
     <div class="tip"><span class="lbl">💡 정리</span> 브라우저 개발자 도구로 보면 styled-components는 <code>sc-bpqTzb</code> 같은 자동 생성 클래스명을 각 요소에 부여합니다. 같은 <code>Button</code>이라도 전달된 props에 따라 다른 스타일이 적용됩니다.</div>
   </section>
 
-  <section class="module" id="m9">
-    <h2><span class="num">9</span> styled-components 페이지 스타일링과 확장</h2>
+  <section class="module" id="m8">
+    <h2><span class="num">8</span> styled-components 페이지 스타일링과 확장</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li><code>styled.div</code>, <code>styled.h1</code> 등으로 레이아웃 컴포넌트를 만든다.</li>
@@ -906,8 +754,8 @@ export default MainPage;</code></pre>
     <div class="tip"><span class="lbl">💡 정리</span> <code>styled(Button)</code>처럼 기존 styled 컴포넌트를 인자로 넘기면 해당 스타일을 그대로 물려받고, 새로 작성한 규칙만 덮어씁니다. <code>RoundedButton</code>은 Button의 파란 배경·hover 효과를 유지하면서 모서리만 둥글게 바뀝니다.</div>
   </section>
 
-  <section class="module" id="m10">
-    <h2><span class="num">10</span> styled-components 실전 — Blocks 모형</h2>
+  <section class="module" id="m9">
+    <h2><span class="num">9</span> styled-components 실전 — Blocks 모형</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li>props로 색상을 전달해 동적으로 스타일되는 블록을 만든다.</li>
@@ -975,7 +823,7 @@ const Block = styled.div`
       </div>
     </div>
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 10-1. 블록 추가하기</h4>
+      <h4>실습 9-1. 블록 추가하기</h4>
       <p>노란색 블록을 하나 더 추가하고, 클릭 시 "yellow"가 표시되도록 만드세요.</p>
       <details><summary>정답 보기</summary>
         <pre><code class="language-jsx">&lt;Block
@@ -984,248 +832,6 @@ const Block = styled.div`
 /&gt;</code></pre>
       </details>
     </div>
-  </section>
-
-  <section class="module" id="m11">
-    <h2><span class="num">11</span> 일반 웹페이지 GitHub Pages 배포</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div>
-      <ul>
-        <li>정적 웹페이지를 GitHub 저장소에 올리고 Pages로 배포하는 절차를 익힌다.</li>
-        <li>간단한 시계(clock) 예제를 만들어 배포 결과를 확인한다.</li>
-      </ul>
-    </div>
-    <div class="concept">
-      <h3 class="blk">📖 웹 페이지 배포 절차</h3>
-      <ol>
-        <li>test web을 깃허브 저장소에 업로드합니다.</li>
-        <li>Settings &gt; Pages 설정하기
-          <ul>
-            <li>Settings → Pages</li>
-            <li>Build and deployment — Source: <strong>Deploy from a branch</strong></li>
-            <li>Branch: <strong>main</strong> 선택 / Folder: <strong>/ (root)</strong> 선택</li>
-            <li>Save</li>
-          </ul>
-        </li>
-      </ol>
-    </div>
-    <div class="ex"><div class="lbl">💡 예제 — index.html</div>
-      <span class="fname">index.html</span>
-      <pre><code class="language-html">&lt;!DOCTYPE html&gt;
-&lt;html lang="en"&gt;
-&lt;head&gt;
-  &lt;meta charset="UTF-8"&gt;
-  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-  &lt;title&gt;Welcome~ Home&lt;/title&gt;
-  &lt;link rel="stylesheet" href="style.css"&gt;
-&lt;/head&gt;
-&lt;body&gt;
-  &lt;div class="container"&gt;
-    &lt;h1&gt;홈페이지 방문을 환영합니다!!&lt;/h1&gt;
-    &lt;div id="demo" class="clock"&gt;&lt;/div&gt;
-  &lt;/div&gt;
-
-  &lt;script src="clock.js"&gt;&lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
-    </div>
-    <div class="ex"><div class="lbl">💡 예제 — style.css</div>
-      <span class="fname">style.css</span>
-      <pre><code class="language-css">.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.clock {
-  font-size: 1.5em;
-  font-weight: bold;
-  color: #00f;
-}</code></pre>
-    </div>
-    <div class="ex"><div class="lbl">💡 예제 — clock.js (실시간 시계)</div>
-      <span class="fname">clock.js</span>
-      <pre><code class="language-javascript">setInterval(() =&gt; {
-  let date = new Date();
-  let now = date.toLocaleTimeString();
-  document.getElementById("demo").innerText = now;
-}, 1000);</code></pre>
-      <div class="out"><span class="rt">브라우저 출력</span>
-        <div style="text-align:center">
-          <h1 style="margin:6px 0">홈페이지 방문을 환영합니다!!</h1>
-          <div style="font-size:1.3em;font-weight:bold;color:#00f">오후 3:17:44</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="module" id="m12">
-    <h2><span class="num">12</span> 리엑트(Vite) 앱 GitHub Pages 배포</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div>
-      <ul>
-        <li>Vite 리엑트 앱을 GitHub Pages에 배포하는 전체 흐름을 이해한다.</li>
-        <li>gh-pages, package.json, vite.config.js 설정을 올바르게 작성한다.</li>
-      </ul>
-    </div>
-    <div class="concept">
-      <h3 class="blk">📖 사전 작업</h3>
-      <ol>
-        <li>Product_mall 앱을 미리 깃허브 저장소에 업로드합니다.</li>
-        <li>Settings &gt; Pages 설정: Source <strong>Deploy from a branch</strong>, Branch <strong>main</strong>, Folder <strong>/ (root)</strong>, Save.</li>
-      </ol>
-    </div>
-    <div class="ex"><div class="lbl">💡 1단계 — 필수 패키지 설치</div>
-      <pre><code class="language-bash">npm install
-npm install gh-pages --save-dev</code></pre>
-    </div>
-    <div class="ex"><div class="lbl">💡 2단계 — package.json 설정</div>
-      <span class="fname">package.json</span>
-      <pre><code class="language-json">{
-  "name": "todo-app",
-  "private": true,
-  "version": "0.0.1",
-  "type": "module",
-  "homepage": "https://username.github.io/repository-name/",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
-    "preview": "vite preview"
-  },
-}</code></pre>
-    </div>
-    <div class="ex"><div class="lbl">💡 3단계 — vite.config.js 설정</div>
-      <span class="fname">vite.config.js</span>
-      <pre><code class="language-javascript">import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-export default defineConfig({
-  plugins: [react()],
-  base: '/repository-name/',   // GitHub Pages 경로
-  server: {
-    port: 5173
-  }
-})</code></pre>
-    </div>
-    <div class="ex"><div class="lbl">💡 4단계 — index.html 설정 (상대 경로 사용)</div>
-      <span class="fname">index.html</span>
-      <pre><code class="language-html">&lt;!doctype html&gt;
-&lt;html lang="ko"&gt;
-  &lt;head&gt;
-    &lt;meta charset="UTF-8" /&gt;
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
-    &lt;title&gt;할 일 관리 앱&lt;/title&gt;
-  &lt;/head&gt;
-  &lt;body&gt;
-    &lt;div id="root"&gt;&lt;/div&gt;
-    &lt;!-- ✅ 상대 경로 사용 (절대 경로 X) --&gt;
-    &lt;script type="module" src="./src/main.jsx"&gt;&lt;/script&gt;
-  &lt;/body&gt;
-&lt;/html&gt;</code></pre>
-      <div class="tip"><span class="lbl">💡 주의</span> 스크립트 경로를 <code>/src/main.jsx</code>(절대 경로)가 아니라 <code>./src/main.jsx</code>(상대 경로)로 지정해야 GitHub Pages 하위 경로에서도 정상 로딩됩니다.</div>
-    </div>
-    <div class="ex"><div class="lbl">💡 5단계 — 로컬 테스트</div>
-      <span class="fname">개발 서버 / 프로덕션 빌드</span>
-      <pre><code class="language-bash"># 개발 서버 실행 (http://localhost:5173, 실시간 핫 리로드)
-npm run dev
-
-# 프로덕션 빌드 테스트 (dist/ 폴더 생성)
-npm run build
-npm run preview</code></pre>
-    </div>
-    <div class="ex"><div class="lbl">💡 6단계 — 업데이트 시 배포</div>
-      <pre><code class="language-bash"># 1. 로컬 변경사항 커밋 & 푸시 (선택)
-git add .
-git commit -m "변경사항 설명"
-git push origin main
-
-# 2. 배포
-npm run deploy</code></pre>
-      <div class="out"><span class="rt">터미널 출력</span>
-        <pre><code class="language-bash">&gt; todo-app2@0.0.1 predeploy
-&gt; npm run build
-&gt; vite build
-
-vite v4.5.14 building for production...
-✓ 34 modules transformed.
-dist/index.html                   0.41 kB
-dist/assets/index-d2ef3821.css    1.69 kB
-dist/assets/index-fa09a36a.js   144.01 kB
-✓ built in 880ms
-
-&gt; gh-pages -d dist
-Published</code></pre>
-      </div>
-    </div>
-    <div class="ex"><div class="lbl">💡 7단계 — 배포하기 & GitHub Pages 활성화</div>
-      <p>7.1 배포 명령어: <code>npm run deploy</code></p>
-      <p>7.2 GitHub Pages 활성화:</p>
-      <ol>
-        <li>GitHub 저장소 접속</li>
-        <li><strong>Settings</strong> → <strong>Pages</strong></li>
-        <li><strong>Build and deployment</strong>: Source <strong>Deploy from a branch</strong>, Branch <strong>gh-pages</strong> 선택, Folder <strong>/ (root)</strong> 선택 (gh-pages 브랜치의 루트 폴더)</li>
-        <li>Save</li>
-      </ol>
-      <div class="out"><span class="rt">배포 결과</span>
-        Your site is live at <strong>https://sudo2100.github.io/products/</strong> — Published (배포됨)
-      </div>
-    </div>
-    <div class="tip"><span class="lbl">💡 정리</span> 최종 접속 주소는 <code>https://아이디.github.io/리포지터리</code> 형식입니다. <code>vite.config.js</code>의 <code>base</code>와 리포지터리 이름이 일치해야 CSS/JS가 올바르게 로드됩니다.</div>
-  </section>
-
-  <section class="module" id="m13">
-    <h2><span class="num">13</span> SPA 404 오류 해결</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div>
-      <ul>
-        <li>SPA 라우팅에서 새로고침 시 발생하는 404 오류의 원인을 이해한다.</li>
-        <li>Vite 빌드 시 <code>index.html</code>을 <code>404.html</code>로 복사해 문제를 해결한다.</li>
-      </ul>
-    </div>
-    <div class="concept">
-      <h3 class="blk">📖 404 오류 — File Not Found</h3>
-      <p><strong>문제:</strong> 새로고침 시 <code>/product_shop/products</code> 같은 경로로 직접 접근하면, GitHub Pages가 해당 파일을 찾으려 하는데 실제 파일이 없어 404가 발생합니다.</p>
-      <p><strong>해결방법:</strong> <code>public/404.html</code>을 생성하여 <code>index.html</code>과 동일한 내용으로 설정하면, GitHub Pages가 존재하지 않는 모든 경로를 자동으로 <code>index.html</code>로 라우팅합니다.</p>
-    </div>
-    <div class="concept">
-      <h3 class="blk">📖 스크립트 경로 문제</h3>
-      <p>문제는 <code>404.html</code>의 스크립트 경로입니다. Vite 빌드 후 <code>404.html</code>은 단순 복사되므로 <code>main.jsx</code> 경로가 무효가 됩니다. 가장 간단한 해결책은 <strong>Vite 빌드 후 자동으로 <code>index.html</code>을 <code>404.html</code>로 복사</strong>하도록 설정하는 것입니다.</p>
-      <span class="fname">public/404.html (참고 — 원본 index.html)</span>
-      <pre><code class="language-html">&lt;!doctype html&gt;
-&lt;html lang="en"&gt;
-  &lt;head&gt;
-    &lt;meta charset="UTF-8" /&gt;
-    &lt;link rel="icon" type="image/svg+xml" href="/favicon.svg" /&gt;
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
-    &lt;title&gt;router&lt;/title&gt;
-  &lt;/head&gt;
-  &lt;body&gt;
-    &lt;div id="root"&gt;&lt;/div&gt;
-    &lt;script type="module" src="./src/main.jsx"&gt;&lt;/script&gt;
-  &lt;/body&gt;
-&lt;/html&gt;</code></pre>
-    </div>
-    <div class="ex"><div class="lbl">💡 예제 — vite.config.js에 copy-404 플러그인 추가</div>
-      <span class="fname">vite.config.js</span>
-      <pre><code class="language-javascript">// https://vite.dev/config/
-export default defineConfig({
-  plugins: [
-    react(),
-    {
-      name: 'copy-404',
-      writeBundle() {
-        // 빌드 후 dist/index.html을 dist/404.html로 복사
-        const distPath = path.resolve(__dirname, 'dist')
-        const indexPath = path.join(distPath, 'index.html')
-        const notFoundPath = path.join(distPath, '404.html')
-        if (fs.existsSync(indexPath)) {
-          fs.copyFileSync(indexPath, notFoundPath)
-        }
-      }
-    }
-  ],
-  base: '/product_shop/'
-})</code></pre>
-    </div>
-    <div class="tip"><span class="lbl">💡 정리</span> <code>writeBundle()</code>는 빌드 산출물이 <code>dist/</code>에 모두 기록된 뒤 실행됩니다. 이때 <code>index.html</code>을 그대로 <code>404.html</code>로 복사하면 스크립트 경로가 이미 빌드된 정상 경로이므로, 새로고침·직접 접근 시에도 앱이 올바르게 로드됩니다. (상단에 <code>import path from 'path'</code>, <code>import fs from 'fs'</code> 필요)</div>
   </section>
 
   <footer>4강. 컴포넌트 스타일링 · 학습 교안<br>모듈별 학습목표 · 개념 · 예제 · 실습문제 구성</footer>
