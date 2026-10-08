@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5강. 비동기 처리 (fetch, axios)</title>
+<style>
+/* highlight.js atom-one-dark theme (inlined) */
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*
+
+Atom One Dark by Daniel Gamage
+Original One Dark Syntax theme from https://github.com/atom/one-dark-syntax
+
+base:    #282c34
+mono-1:  #abb2bf
+mono-2:  #818896
+mono-3:  #5c6370
+hue-1:   #56b6c2
+hue-2:   #61aeee
+hue-3:   #c678dd
+hue-4:   #98c379
+hue-5:   #e06c75
+hue-5-2: #be5046
+hue-6:   #d19a66
+hue-6-2: #e6c07b
+
+*/
+.hljs {
+  color: #abb2bf;
+  background: #282c34
+}
+.hljs-comment,
+.hljs-quote {
+  color: #5c6370;
+  font-style: italic
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #c678dd
+}
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+  color: #e06c75
+}
+.hljs-literal {
+  color: #56b6c2
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #98c379
+}
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: #d19a66
+}
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #61aeee
+}
+.hljs-built_in,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: #e6c07b
+}
+.hljs-emphasis {
+  font-style: italic
+}
+.hljs-strong {
+  font-weight: bold
+}
+.hljs-link {
+  text-decoration: underline
+}
+</style>
+<style>
+  :root{--bg:#f4f6f9;--card:#fff;--ink:#1f2933;--muted:#52606d;--line:#e4e7eb;--accent:#2965f1;--accent2:#1b3a8f;--code-bg:#282c34;--goal:#eafaf1;--goal-line:#27ae60;--ex:#eef4ff;--ex-line:#5b8def;--lab:#eef7ff;--lab-line:#2965f1;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Malgun Gothic","맑은 고딕",-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.75;}
+  header.hero{background:linear-gradient(135deg,#2965f1,#1b3a8f 60%,#153e75);color:#fff;padding:52px 24px;text-align:center;}
+  header.hero .eyebrow{letter-spacing:3px;font-size:.78rem;opacity:.92;text-transform:uppercase}
+  header.hero h1{margin:12px 0 8px;font-size:1.9rem}header.hero p{margin:0;opacity:.94}
+  header.hero .tags{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  header.hero .tags span{background:rgba(255,255,255,.18);border-radius:999px;padding:5px 13px;font-size:.82rem}
+  .wrap{max-width:920px;margin:0 auto;padding:32px 20px 80px}
+  nav.toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 26px;margin-bottom:34px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  nav.toc h2{margin:0 0 12px;font-size:1.05rem;color:var(--accent2)}
+  nav.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+  nav.toc a{color:var(--ink);text-decoration:none}nav.toc a:hover{color:var(--accent);text-decoration:underline}
+  section.module{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px 30px;margin-bottom:26px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  section.module > h2{margin:0 0 6px;font-size:1.4rem;color:var(--accent2);display:flex;align-items:center;gap:12px;}
+  section.module > h2 .num{background:var(--accent);color:#fff;font-size:.95rem;font-weight:800;padding:4px 12px;border-radius:10px;min-width:38px;text-align:center;}
+  h3.blk{font-size:1.02rem;margin:22px 0 8px;font-weight:800}
+  .goal{background:var(--goal);border-left:5px solid var(--goal-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:14px 0}
+  .goal .lbl{font-weight:800;color:#1e874b}.goal ul{margin:8px 0 0}
+  .concept h3.blk{color:var(--ink);border-left:4px solid var(--accent);padding-left:10px}
+  .ex{background:var(--ex);border-left:5px solid var(--ex-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .ex .lbl{font-weight:800;color:#2f5fc7}
+  .lab{background:var(--lab);border-left:5px solid var(--lab-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .lab .lbl{font-weight:800;color:#1b4fc0}.lab h4{margin:6px 0 6px;font-size:.98rem}
+  ul{margin:8px 0}li{margin:5px 0}.muted{color:var(--muted)}
+  code{background:#eceef1;padding:2px 6px;border-radius:5px;font-size:.92em;font-family:Consolas,"D2Coding",monospace}
+  pre{background:var(--code-bg);border-radius:10px;padding:0;overflow-x:auto;margin:10px 0}
+  pre code{display:block;padding:16px 18px;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;line-height:1.6;background:var(--code-bg);color:#abb2bf;border-radius:10px;white-space:pre}
+  pre code.hljs{background:var(--code-bg);padding:16px 18px}
+  .fname{display:inline-block;background:#1b3a8f;color:#fff;font-family:Consolas,"D2Coding",monospace;font-size:.8rem;font-weight:700;padding:4px 12px;border-radius:8px 8px 0 0;margin:10px 0 -8px}
+  .fname + pre{border-top-left-radius:0}
+  .out{background:#fff;color:var(--ink);border:1px solid var(--line);border-left:4px solid #27ae60;border-radius:8px;padding:12px 16px;margin:8px 0 0}
+  .out .rt{font-size:.72rem;letter-spacing:1px;color:#27ae60;font-weight:800;text-transform:uppercase;display:block;margin-bottom:6px}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:.93rem}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:#eef2fb;color:var(--accent2)}td.c,th.c{text-align:center}
+  td code,th code{background:#eef1f5}
+  details{margin-top:10px;background:#fff;border:1px solid #cfe0ff;border-radius:8px;padding:8px 14px}
+  details summary{cursor:pointer;font-weight:700;color:#1b4fc0}details pre{margin-top:10px}
+  footer{text-align:center;color:var(--muted);font-size:.85rem;padding:30px 20px}
+  .pill{display:inline-block;background:#eceef1;border-radius:6px;padding:2px 9px;margin:2px;font-size:.85rem}
+  .flow{background:#f7f9fc;border:1px dashed #b9c6de;border-radius:10px;padding:12px 16px;margin:12px 0;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;white-space:pre-wrap;color:#37475f}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}nav.toc ol{columns:1}}
+  .tip{background:#fff8e6;border-left:5px solid #f2b705;border-radius:0 10px 10px 0;padding:12px 18px;margin:14px 0}
+  .tip .lbl{font-weight:800;color:#b57f00}
+  .demo{border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:8px 0 0;background:#fafbfc}
+  .demo button{margin:2px 4px 2px 0;padding:4px 12px;border:1px solid #b9c6de;border-radius:6px;background:#fff;cursor:default}
+  .demo input{padding:4px 8px;border:1px solid #b9c6de;border-radius:6px;margin:2px 0}
+
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="eyebrow">React 심화 · Chapter 05 · 학습 교안</div>
+  <h1>비동기 처리 (fetch, axios)</h1>
+  <p>자바스크립트의 비동기 처리 개념부터 리엑트에서 fetch와 axios로 REST API 데이터를 받아와 화면에 렌더링하고, 로딩·에러 처리와 데이터 추가(POST)까지 실습으로 익힙니다.</p>
+  <div class="tags"><span>🏷️ 비동기</span><span>🏷️ 콜백/Promise/async·await</span><span>🏷️ fetch</span><span>🏷️ axios</span><span>🏷️ useEffect</span><span>🏷️ REST API</span><span>🏷️ JSON</span></div>
+</header>
+<div class="wrap">
+  <nav class="toc">
+    <h2>📚 학습 목차</h2>
+    <ol>
+      <li><a href="#m1">비동기 처리란 무엇인가</a></li>
+      <li><a href="#m2">동기 처리 — async01.js</a></li>
+      <li><a href="#m3">콜백을 사용한 비동기 처리 — async02.js</a></li>
+      <li><a href="#m4">async / await — async03.js</a></li>
+      <li><a href="#m5">리엑트에서 비동기 처리와 useEffect</a></li>
+      <li><a href="#m6">fetch vs axios · JSONPlaceholder</a></li>
+      <li><a href="#m7">REST API 이해하기</a></li>
+      <li><a href="#m8">JSON 데이터 다루기</a></li>
+      <li><a href="#m9">fetch로 할 일 목록 전체 가져오기</a></li>
+      <li><a href="#m10">fetch로 할 일 1건 가져오기</a></li>
+      <li><a href="#m11">axios 소개와 메서드</a></li>
+      <li><a href="#m12">axios로 할 일 목록 가져오기</a></li>
+      <li><a href="#m13">axios로 할 일 1건 가져오기</a></li>
+      <li><a href="#m14">axios로 할 일 추가하기 (POST)</a></li>
+    </ol>
+  </nav>
+
+  <section class="module" id="m1">
+    <h2><span class="num">1</span> 비동기 처리란 무엇인가</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>자바스크립트의 싱글 스레드 특성과 비동기 처리의 필요성을 이해한다.</li>
+      <li>콜백, Promise, async/await 세 가지 비동기 처리 방식의 차이를 구분한다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 동기 vs 비동기</h3>
+      <p>자바스크립트는 <strong>싱글 스레드</strong> 방식으로, 처리해야 할 기능을 한 번에 하나씩 순차적으로 처리합니다. 반면 <strong>비동기 처리</strong>는 프로그램에서 처리해야 할 기능들을 무조건 순차적으로 처리하는 것이 아니라, <strong>원하는 순서에 맞게</strong> 처리하는 방식입니다.</p>
+    </div>
+    <div class="concept"><h3 class="blk">📖 비동기 처리의 세 가지 방식</h3>
+      <table>
+        <thead><tr><th>방식</th><th>버전</th><th>기능</th></tr></thead>
+        <tbody>
+          <tr><td>콜백 함수</td><td>기존부터 사용</td><td>함수 안에 또 다른 함수를 매개변수로 넘겨서 실행 순서를 제어함</td></tr>
+          <tr><td>프로미스(Promise)</td><td>ECMAScript 2015</td><td>Promise 객체와 콜백 함수를 사용해서 실행 순서를 제어함</td></tr>
+          <tr><td>async / await</td><td>ECMAScript 2017</td><td>async와 await를 사용해서 실행 순서를 제어함</td></tr>
+        </tbody>
+      </table>
+      <div class="tip"><span class="lbl">💡 정리</span> 콜백 → Promise → async/await 순으로 발전해 왔으며, 뒤로 갈수록 코드가 더 읽기 쉽고 깔끔해집니다.</div>
+    </div>
+  </section>
+
+  <section class="module" id="m2">
+    <h2><span class="num">2</span> 동기 처리 — async01.js</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>싱글 스레드에서 코드가 순차적으로 실행되는 흐름을 이해한다.</li>
+      <li><code>setTimeout</code>이 비동기로 동작하여 실행 순서가 바뀌는 것을 확인한다.</li>
+    </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — 동기 흐름 속의 setTimeout</div>
+      <span class="fname">async01.js</span>
+<pre><code class="language-javascript">function displayA() {
+  console.log('A');
+}
+
+function displayB() {
+  // console.log('B');
+  // 2초 후에 'B'를 출력하는 비동기 처리
+  setTimeout(() =&gt; {
+    console.log('B');
+  }, 2000);
+}
+
+function displayC() {
+  console.log('C');
+}
+
+displayA();
+displayB();
+displayC();</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <pre><code class="language-text">A
+C
+B</code></pre>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> 싱글 스레드이므로 <code>displayA() → displayB() → displayC()</code> 순서로 호출되지만, <code>displayB()</code>는 2초 후에 'B'를 출력하는 비동기 처리이므로 <code>displayC()</code>가 먼저 실행되어 'C'가 출력됩니다. 결과적으로 <strong>'A' → 'C' → 'B'</strong> 순서로 출력됩니다.</div>
+    </div>
+  </section>
+
+  <section class="module" id="m3">
+    <h2><span class="num">3</span> 콜백을 사용한 비동기 처리 — async02.js</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>콜백 함수를 매개변수로 넘겨 실행 순서를 제어하는 방법을 익힌다.</li>
+    </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — 콜백으로 순서 제어</div>
+      <span class="fname">async02.js</span>
+<pre><code class="language-javascript">function displayA() {
+  console.log('A');
+}
+
+function displayB(callBack) {
+  setTimeout(() =&gt; {
+    console.log('B');
+    callBack();
+  }, 2000);
+}
+
+function displayC() {
+  console.log('C');
+}
+
+displayA();
+displayB(displayC);</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <pre><code class="language-text">A
+B
+C</code></pre>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> 비동기 처리 — 프로그램에서 처리해야 할 기능들을 순차적으로 처리하는 것이 아니라, 동시에 처리하는 방식입니다. 원하는 순서에 맞게 처리하기 위해 <strong>콜백 함수</strong>를 사용하여 <code>displayB</code>가 끝난 뒤 <code>displayC</code>를 호출합니다. 결과는 <strong>'A' → 'B' → 'C'</strong> 순서로 출력됩니다.</div>
+    </div>
+  </section>
+
+  <section class="module" id="m4">
+    <h2><span class="num">4</span> async / await — async03.js</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>Promise를 반환하는 함수를 만들고 <code>await</code>로 완료를 기다리는 방법을 익힌다.</li>
+      <li>async/await로 비동기 코드를 동기 코드처럼 깔끔하게 작성한다.</li>
+    </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — Promise를 반환하는 함수</div>
+      <span class="fname">async03.js</span>
+<pre><code class="language-javascript">async function displayA() {
+  console.log('A');
+}
+
+async function displayB() {
+  // Promise 객체를 반환하여 비동기 작업 처리
+  return new Promise((resolve) =&gt; {
+    setTimeout(() =&gt; {
+      console.log('B');
+      resolve();
+    }, 2000);
+  });
+}
+
+async function displayC() {
+  console.log('C');
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — await로 완료 기다리기</div>
+      <span class="fname">async03.js</span>
+<pre><code class="language-javascript">async function displayC() { // async 함수로 변경
+    console.log("C");
+}
+
+async function runSequence() { // async 함수로 변경
+    displayA();
+    await displayB();  // displayB가 완료될 때까지 기다림
+    await displayC();  // displayC가 완료될 때까지 기다림
+}
+
+runSequence(); // A -&gt; B -&gt; C 순서로 출력됨</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> 비동기 처리 — async/await 방식은 <code>async/await</code>를 사용하여 더 깔끔하게 비동기 작업을 처리하고, Promise를 명시적으로 사용하지 않아도 됩니다. 결과는 <strong>'A' → 'B' → 'C'</strong> 순서로 출력됩니다.</div>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 4-1. 순서 보장하기</h4>
+      <p>아래 함수 <code>step1</code>, <code>step2</code>, <code>step3</code>이 있을 때, "1 → 2 → 3" 순서로 콘솔에 출력되도록 <code>async/await</code>를 사용하는 <code>run</code> 함수를 완성하세요. (<code>step2</code>는 1초 뒤에 출력되는 비동기 함수입니다.)</p>
+      <details><summary>정답 보기</summary>
+<pre><code class="language-javascript">function step1() { console.log(1); }
+function step2() {
+  return new Promise((resolve) =&gt; {
+    setTimeout(() =&gt; { console.log(2); resolve(); }, 1000);
+  });
+}
+function step3() { console.log(3); }
+
+async function run() {
+  step1();
+  await step2(); // step2가 끝날 때까지 기다림
+  step3();
+}
+
+run(); // 1 -&gt; 2 -&gt; 3</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m5">
+    <h2><span class="num">5</span> 리엑트에서 비동기 처리와 useEffect</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>리엑트에서 비동기 처리가 필요한 상황을 이해한다.</li>
+      <li>데이터 패칭에 <code>useEffect</code>를 사용하는 이유와 무한 호출 방지 방법을 익힌다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 리엑트에서 비동기 처리</h3>
+      <p>작업이 끝날 때까지 기다리지 않고 다음 코드를 먼저 실행하는 방식입니다. 예를 들면 다음과 같습니다.</p>
+      <ul>
+        <li>서버에서 데이터 가져오기 (API 호출)</li>
+        <li>파일 업로드</li>
+        <li>로그인 요청</li>
+      </ul>
+      <h3 class="blk">📖 기본 동작 흐름</h3>
+      <div class="flow">
+컴포넌트 렌더링
+  ↓
+useEffect 실행
+  ↓
+API 요청 (fetch / axios)
+  ↓
+데이터 받아오기
+  ↓
+useState로 저장
+  ↓
+화면 다시 렌더링
+      </div>
+    </div>
+    <div class="concept"><h3 class="blk">📖 useEffect()를 사용하는 이유</h3>
+      <p>상태와 비동기의 관계를 다음 코드로 살펴봅니다.</p>
+<pre><code class="language-jsx">const [data, setData] = useState([]);
+
+useEffect(() =&gt; {
+  // API 호출
+}, []);</code></pre>
+      <ul>
+        <li>컴포넌트가 처음 렌더링될 때 실행됨</li>
+        <li>의존성 배열 <code>[]</code>로 무한 호출 방지 — "화면 뜨자마자 데이터 가져오기" 역할</li>
+      </ul>
+      <p>서버에서 받은 데이터를 저장하면 다음과 같이 동작합니다.</p>
+      <ul>
+        <li><code>setData</code> 실행</li>
+        <li>컴포넌트 자동 재렌더링</li>
+        <li>화면 업데이트</li>
+      </ul>
+      <div class="tip"><span class="lbl">💡 정리</span> 데이터 패칭은 렌더링의 부수 효과(side effect)이므로 반드시 <code>useEffect</code> 안에서 실행하고, 의존성 배열을 <code>[]</code>로 두어 최초 1회만 호출되게 합니다.</div>
+    </div>
+  </section>
+
+  <section class="module" id="m6">
+    <h2><span class="num">6</span> fetch vs axios · JSONPlaceholder</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>fetch와 axios의 차이를 표로 비교한다.</li>
+      <li>테스트용 무료 REST API인 JSONPlaceholder의 용도를 이해한다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 fetch() 와 axios() 차이</h3>
+      <table>
+        <thead><tr><th>항목</th><th>fetch</th><th>axios</th></tr></thead>
+        <tbody>
+          <tr><td>기본 제공 여부</td><td>브라우저 내장 API</td><td>외부 라이브러리 (설치 필요)</td></tr>
+          <tr><td>설치</td><td>❌ 필요 없음</td><td>✅ <code>npm install axios</code></td></tr>
+          <tr><td>데이터 변환</td><td><code>response.json()</code> 직접 호출</td><td>자동 JSON 변환</td></tr>
+          <tr><td>응답 데이터 접근</td><td><code>res.json()</code></td><td><code>res.data</code></td></tr>
+          <tr><td>에러 처리</td><td>HTTP 에러 자동 처리 ❌</td><td>HTTP 에러 자동 throw ✅</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="concept"><h3 class="blk">📖 JSONPlaceholder</h3>
+      <p><strong>JSONPlaceholder</strong>는 가짜 데이터가 필요할 때 언제든지 사용할 수 있는 무료 온라인 REST API입니다. (Free fake and reliable API for testing and prototyping. Powered by JSON Server + LowDB.)</p>
+      <div class="ex"><div class="lbl">💡 예제 — 할 일 1건 가져오기</div>
+        <span class="fname">브라우저 콘솔</span>
+<pre><code class="language-javascript">fetch('https://jsonplaceholder.typicode.com/todos/1')
+  .then(response =&gt; response.json())
+  .then(json =&gt; console.log(json))</code></pre>
+        <div class="out"><span class="rt">브라우저 출력</span>
+<pre><code class="language-json">{
+  "userId": 1,
+  "id": 1,
+  "title": "delectus aut autem",
+  "completed": false
+}</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="module" id="m7">
+    <h2><span class="num">7</span> REST API 이해하기</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>REST API의 개념과 리소스/HTTP 메서드의 관계를 이해한다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 REST API란?</h3>
+      <p><strong>REST API</strong>(Representational State Transfer API)는 웹에서 서버와 클라이언트가 데이터를 주고받기 위한 표준적인 방식입니다. 웹사이트나 모바일 앱에서 회원 정보, 게시글, 상품 목록 등을 조회하거나 저장할 때 REST API를 사용합니다.</p>
+      <p>핵심 개념은 "<strong>리소스(Resource)를 URL로 표현하고, 그 리소스에 대한 행위는 HTTP 메서드로 구분한다</strong>"는 것입니다. REST API는 웹에서 사용하는 HTTP를 기반으로 동작합니다.</p>
+      <h3 class="blk">📖 주요 HTTP 메서드</h3>
+      <table>
+        <thead><tr><th>메서드</th><th>기능</th></tr></thead>
+        <tbody>
+          <tr><td>GET</td><td>데이터 조회</td></tr>
+          <tr><td>POST</td><td>데이터 생성</td></tr>
+          <tr><td>PUT</td><td>데이터 전체 수정</td></tr>
+          <tr><td>PATCH</td><td>데이터 일부 수정</td></tr>
+          <tr><td>DELETE</td><td>데이터 삭제</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="module" id="m8">
+    <h2><span class="num">8</span> JSON 데이터 다루기</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>JSON의 기본 구조(키/값)와 배열·객체 표현을 이해한다.</li>
+      <li>JSON이 어디에 사용되는지 파악한다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 JSON이란?</h3>
+      <p><strong>JSON</strong>(JavaScript Object Notation)은 데이터를 문자열 형태로 표현하는 규칙(포맷)입니다. JSON은 <strong>키(key)와 값(value)</strong>으로 이루어져 있습니다.</p>
+<pre><code class="language-json">{
+  "name": "이순신",
+  "age": 45,
+  "isStudent": false
+}</code></pre>
+      <ul>
+        <li><code>"name"</code> → key (항상 문자열)</li>
+        <li><code>"이순신"</code> → value</li>
+      </ul>
+    </div>
+    <div class="concept"><h3 class="blk">📖 배열과 객체</h3>
+      <span class="fname">배열</span>
+<pre><code class="language-json">{
+  "fruits": ["사과", "바나나", "포도"]
+}</code></pre>
+      <span class="fname">객체</span>
+<pre><code class="language-json">{
+  "product": {
+    "name": "마우스",
+    "price": 30000
+  }
+}</code></pre>
+      <h3 class="blk">📖 JSON 사용처</h3>
+      <ul>
+        <li>서버 ↔ 클라이언트 데이터 통신</li>
+        <li>API 응답 데이터 형식</li>
+        <li>설정 파일 (config)</li>
+        <li>데이터 저장 (localStorage 등)</li>
+      </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 할 일 목록 JSON 응답</div>
+      <span class="fname">https://jsonplaceholder.typicode.com/todos</span>
+<pre><code class="language-json">[
+  {
+    "userId": 1,
+    "id": 1,
+    "title": "delectus aut autem",
+    "completed": false
+  },
+  {
+    "userId": 1,
+    "id": 2,
+    "title": "quis ut nam facilis et officia qui",
+    "completed": false
+  },
+  {
+    "userId": 1,
+    "id": 3,
+    "title": "fugiat veniam minus",
+    "completed": false
+  },
+  {
+    "userId": 1,
+    "id": 4,
+    "title": "et porro tempora",
+    "completed": true
+  }
+]</code></pre>
+    </div>
+  </section>
+
+  <section class="module" id="m9">
+    <h2><span class="num">9</span> fetch로 할 일 목록 전체 가져오기</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li><code>fetch</code>와 <code>useEffect</code>로 목록 데이터를 받아와 상태에 저장하고 렌더링한다.</li>
+      <li>라우터로 목록/상세 페이지를 구성한다.</li>
+    </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — 라우터 설정</div>
+      <span class="fname">App.jsx</span>
+<pre><code class="language-jsx">import FetchTodos from './fetch_ex/FetchTodos'
+import FetchTodoById from './fetch_ex/FetchTodoById'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+
+function App() {
+
+  return (
+    &lt;&gt;
+      &lt;BrowserRouter&gt;
+        &lt;Routes&gt;
+          &lt;Route path="/" element={&lt;FetchTodos /&gt;} /&gt;
+          &lt;Route path="/:id" element={&lt;FetchTodoById /&gt;} /&gt;
+        &lt;/Routes&gt;
+      &lt;/BrowserRouter&gt;
+    &lt;/&gt;
+  )
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — fetch로 목록 가져오기</div>
+      <span class="fname">fetch_ex/FetchTodos.jsx</span>
+<pre><code class="language-jsx">// JSONPlaceholder에서 사용자 데이터를 가져오는 예시
+const FetchTodos = () =&gt; {
+  const [data, setData] = useState([]);
+
+  // 컴포넌트가 마운트될 때 한 번만 실행
+  useEffect(() =&gt; {
+    fetch("https://jsonplaceholder.typicode.com/todos")
+      .then((response) =&gt; response.json()) // JSON 응답을 JavaScript 객체로 변환
+      .then((result) =&gt; {
+        setData(result); // 변환된 데이터를 상태에 저장
+        console.log(result);
+      })
+      .catch((error) =&gt; console.error(error)); // 오류 처리
+  }, []);
+
+  return (
+    &lt;div className="fetch-todos"&gt;
+      &lt;h2&gt;할 일(To-do) 데이터&lt;/h2&gt;
+      &lt;ul&gt;
+        {data.map((todo) =&gt; (
+          &lt;li key={todo.id}&gt;
+            &lt;Link to={`/${todo.id}`}&gt;{todo.title}&lt;/Link&gt;
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default FetchTodos;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <h4 style="text-align:center;margin:.4em 0">할 일(To-do) 데이터</h4>
+        <ul style="text-align:center;list-style:none;padding:0">
+          <li><a href="#m10">delectus aut autem</a></li>
+          <li><a href="#m10">quis ut nam facilis et officia qui</a></li>
+          <li><a href="#m10">fugiat veniam minus</a></li>
+          <li><a href="#m10">et porro tempora</a></li>
+          <li>… (총 200건)</li>
+        </ul>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>data.map</code>으로 각 항목을 <code>&lt;Link&gt;</code>로 렌더링해 클릭 시 상세 페이지(<code>/:id</code>)로 이동합니다. <code>key</code>에는 <code>todo.id</code>를 사용합니다. 콘솔에는 <code>(200) [{…}, {…}, …]</code>처럼 200건의 배열이 출력됩니다.</div>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 9-1. 게시글 목록 가져오기</h4>
+      <p><code>https://jsonplaceholder.typicode.com/posts</code>에서 게시글 목록을 <code>fetch</code>로 가져와 각 게시글의 <code>title</code>을 <code>&lt;li&gt;</code>로 출력하는 <code>FetchPosts</code> 컴포넌트를 작성하세요.</p>
+      <details><summary>정답 보기</summary>
+<pre><code class="language-jsx">import { useState, useEffect } from "react";
+
+const FetchPosts = () =&gt; {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() =&gt; {
+    fetch("https://jsonplaceholder.typicode.com/posts")
+      .then((res) =&gt; res.json())
+      .then((result) =&gt; setPosts(result))
+      .catch((error) =&gt; console.error(error));
+  }, []);
+
+  return (
+    &lt;ul&gt;
+      {posts.map((post) =&gt; (
+        &lt;li key={post.id}&gt;{post.title}&lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+};
+
+export default FetchPosts;</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m10">
+    <h2><span class="num">10</span> fetch로 할 일 1건 가져오기</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li><code>useParams</code>로 URL의 id를 읽어 특정 데이터를 조회한다.</li>
+      <li>의존성 배열에 id를 넣어 id가 바뀔 때마다 다시 요청한다.</li>
+    </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — id로 1건 가져오기</div>
+      <span class="fname">fetch_ex/FetchTodoById.jsx</span>
+<pre><code class="language-jsx">import { useParams } from "react-router-dom";
+
+const FetchTodoById = () =&gt; {
+  const { id } = useParams(); // URL에서 id 파라미터를 가져옴
+  const [data, setData] = useState(null);
+
+  useEffect(() =&gt; {
+    fetch(`https://jsonplaceholder.typicode.com/todos/${id}`)
+      .then((response) =&gt; response.json()
+      ) // JSON 응답을 JavaScript 객체로 변환
+      .then((result) =&gt; {
+        setData(result); // 변환된 데이터를 상태에 저장
+        console.log(result);
+      })
+      .catch((error) =&gt; console.error(error)); // 오류 처리
+  }, [id]); // id가 변경될 때마다 데이터를 다시 가져옴</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상세 화면 렌더링</div>
+      <span class="fname">fetch_ex/FetchTodoById.jsx</span>
+<pre><code class="language-jsx">  return (
+    &lt;div className="fetch-todo-by-id"&gt;
+      &lt;h2&gt;할 일(To-do) 데이터&lt;/h2&gt;
+      {data &amp;&amp; (
+        &lt;div&gt;
+          &lt;p&gt;
+            &lt;strong&gt;제목:&lt;/strong&gt; {data.title}
+          &lt;/p&gt;
+          &lt;p&gt;
+            &lt;strong&gt;완료 여부:&lt;/strong&gt;
+            {data.completed ? "● 완료" : "○ 미완료"}
+          &lt;/p&gt;
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+};</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <h4 style="text-align:center">할 일(To-do) 데이터</h4>
+        <p><strong>제목:</strong> delectus aut autem</p>
+        <p><strong>완료 여부:</strong> ○ 미완료</p>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> 데이터가 도착하기 전 <code>data</code>는 <code>null</code>이므로 <code>{data &amp;&amp; (...)}</code>로 데이터가 있을 때만 렌더링해 에러를 방지합니다. 의존성 배열에 <code>[id]</code>를 넣어 URL의 id가 바뀔 때마다 다시 요청합니다.</div>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 10-1. 로딩 표시 추가하기</h4>
+      <p>위 <code>FetchTodoById</code>에서 데이터가 도착하기 전까지 "불러오는 중..."을 보여주도록 수정하세요.</p>
+      <details><summary>정답 보기</summary>
+<pre><code class="language-jsx">return (
+  &lt;div className="fetch-todo-by-id"&gt;
+    &lt;h2&gt;할 일(To-do) 데이터&lt;/h2&gt;
+    {data ? (
+      &lt;div&gt;
+        &lt;p&gt;&lt;strong&gt;제목:&lt;/strong&gt; {data.title}&lt;/p&gt;
+        &lt;p&gt;
+          &lt;strong&gt;완료 여부:&lt;/strong&gt;
+          {data.completed ? "● 완료" : "○ 미완료"}
+        &lt;/p&gt;
+      &lt;/div&gt;
+    ) : (
+      &lt;p&gt;불러오는 중...&lt;/p&gt;
+    )}
+  &lt;/div&gt;
+);</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m11">
+    <h2><span class="num">11</span> axios 소개와 메서드</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>axios를 설치하고 사용하는 이유를 이해한다.</li>
+      <li>HTTP 메서드별 axios 함수를 익힌다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 axios 라이브러리 설치</h3>
+<pre><code class="language-bash">npm install axios</code></pre>
+      <p><strong>axios란?</strong> HTTP 요청을 쉽게 보내기 위한 라이브러리입니다.</p>
+      <ul>
+        <li>서버(API)와 통신할 때 사용</li>
+        <li>GET, POST, PUT, DELETE 요청 처리</li>
+        <li>fetch의 불편한 점(JSON 변환을 직접 해야 함, 에러 처리 불편)을 보완</li>
+      </ul>
+      <span class="fname">package.json</span>
+<pre><code class="language-json">"dependencies": {
+  "axios": "^1.14.0",
+  "react": "^19.2.4",
+  "react-dom": "^19.2.4"
+},</code></pre>
+    </div>
+    <div class="concept"><h3 class="blk">📖 axios 메서드</h3>
+      <table>
+        <thead><tr><th>메서드</th><th>용도</th><th>axios 함수</th></tr></thead>
+        <tbody>
+          <tr><td>GET</td><td>데이터 조회</td><td><code>axios.get()</code></td></tr>
+          <tr><td>POST</td><td>데이터 생성</td><td><code>axios.post()</code></td></tr>
+          <tr><td>PUT</td><td>전체 수정</td><td><code>axios.put()</code></td></tr>
+          <tr><td>PATCH</td><td>일부 수정</td><td><code>axios.patch()</code></td></tr>
+          <tr><td>DELETE</td><td>데이터 삭제</td><td><code>axios.delete()</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="module" id="m12">
+    <h2><span class="num">12</span> axios로 할 일 목록 가져오기</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li><code>axios.get</code>으로 목록을 가져오고 <code>response.data</code>로 데이터에 접근한다.</li>
+      <li>fetch 방식과의 차이(JSON 변환 자동)를 비교한다.</li>
+    </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — axios 라우터 설정</div>
+      <span class="fname">App.jsx</span>
+<pre><code class="language-jsx">function App() {
+
+  return (
+    &lt;&gt;
+      &lt;BrowserRouter&gt;
+        &lt;Routes&gt;
+          {/* Fetch Todo */}
+          &lt;Route path="/" element={&lt;FetchTodos /&gt;} /&gt;
+          &lt;Route path="/:id" element={&lt;FetchTodoById /&gt;} /&gt;
+
+          {/* Axios Todo */}
+          &lt;Route path="/axios" element={&lt;AxiosTodos /&gt;} /&gt;
+          &lt;Route path="/axios/:id" element={&lt;AxiosTodoById /&gt;} /&gt;
+          &lt;Route path="/axios-post" element={&lt;AxiosPost /&gt;} /&gt;
+        &lt;/Routes&gt;
+      &lt;/BrowserRouter&gt;
+    &lt;/&gt;
+  )
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 공통 스타일</div>
+      <span class="fname">App.css</span>
+<pre><code class="language-css">.app{
+  margin-top: 20px;
+}
+.fetch-todos ul li,
+.axios-todos ul li{margin: 10px;}
+
+.fetch-todo-by-id p,
+.axios-todo-by-id p{line-height: 2;}
+
+.axios-new-todo button{
+  padding: 6px 12px;
+  margin: 5px;
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — axios로 목록 가져오기</div>
+      <span class="fname">axios_ex/AxiosTodos.jsx</span>
+<pre><code class="language-jsx">const AxiosTodos = () =&gt; {
+    const [data, setData] = useState([]);
+
+    useEffect(() =&gt; {
+        // JSONPlaceholder API에서 할 일 데이터를 가져옵니다.
+        axios.get("https://jsonplaceholder.typicode.com/todos")
+            .then((response) =&gt; {
+                setData(response.data); // 가져온 데이터를 상태에 저장
+                console.log(response.data);
+            })
+            .catch((error) =&gt; console.error(error)); // 오류 처리
+    }, []);
+
+    return (
+        &lt;div&gt;
+            &lt;h2&gt;할 일(To-do) 데이터&lt;/h2&gt;
+            &lt;ul&gt;
+              {data.map((todo) =&gt; (
+                &lt;li key={todo.id}&gt;
+                  &lt;Link to={`/axios/${todo.id}`}&gt;{todo.title}&lt;/Link&gt;
+                &lt;/li&gt;
+              ))}
+            &lt;/ul&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> axios는 응답 데이터를 <code>response.data</code>로 바로 접근할 수 있어 <code>response.json()</code> 호출이 필요 없습니다. 목록의 링크는 <code>/axios/${todo.id}</code>로 연결됩니다.</div>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 12-1. fetch를 axios로 바꾸기</h4>
+      <p>아래 fetch 코드를 axios로 바꿔 <code>users</code>를 가져오세요.</p>
+<pre><code class="language-jsx">fetch("https://jsonplaceholder.typicode.com/users")
+  .then((res) =&gt; res.json())
+  .then((result) =&gt; setUsers(result));</code></pre>
+      <details><summary>정답 보기</summary>
+<pre><code class="language-jsx">axios.get("https://jsonplaceholder.typicode.com/users")
+  .then((response) =&gt; setUsers(response.data))
+  .catch((error) =&gt; console.error(error));</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m13">
+    <h2><span class="num">13</span> axios로 할 일 1건 가져오기</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li><code>useParams</code>와 <code>axios.get</code>으로 특정 id의 데이터를 조회한다.</li>
+    </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — id로 1건 가져오기</div>
+      <span class="fname">axios_ex/AxiosTodoById.jsx</span>
+<pre><code class="language-jsx">const AxiosTodoById = () =&gt; {
+  const {id} = useParams(); // URL에서 ID를 가져옵니다.
+  const [data, setData] = useState(null);
+
+  useEffect(() =&gt; {
+    // JSONPlaceholder API에서 특정 ID의 할 일 데이터를 가져옵니다.
+    axios.get(`https://jsonplaceholder.typicode.com/todos/${id}`)
+      .then((response) =&gt; {
+        setData(response.data); // 가져온 데이터를 상태에 저장
+        console.log(response.data);
+      })
+      .catch((error) =&gt; console.error(error));
+  }, [id]); // id가 변경될 때마다 데이터를 다시 가져옴</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상세 화면 렌더링</div>
+      <span class="fname">axios_ex/AxiosTodoById.jsx</span>
+<pre><code class="language-jsx">  return (
+    &lt;div className="axios-todo-by-id"&gt;
+      &lt;h2&gt;할 일(To-do) 데이터&lt;/h2&gt;
+      {data &amp;&amp; (
+        &lt;div&gt;
+          &lt;p&gt;
+            &lt;strong&gt;제목: &lt;/strong&gt; {data.title}
+          &lt;/p&gt;
+          &lt;p&gt;
+            &lt;strong&gt;완료 여부: &lt;/strong&gt;
+            {data.completed ? "● 완료" : "○ 미완료"}
+          &lt;/p&gt;
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+};</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <h4 style="text-align:center">할 일(To-do) 데이터</h4>
+        <p><strong>제목:</strong> delectus aut autem</p>
+        <p><strong>완료 여부:</strong> ○ 미완료</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="module" id="m14">
+    <h2><span class="num">14</span> axios로 할 일 추가하기 (POST)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>제어 컴포넌트(입력 상태 관리)와 폼 제출을 결합한다.</li>
+      <li><code>axios.post</code>로 새 데이터를 서버에 생성 요청한다.</li>
+    </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — 입력 상태와 POST 요청</div>
+      <span class="fname">axios_ex/AxiosNewTodo.jsx</span>
+<pre><code class="language-jsx">import axios from "axios";
+import { useState } from "react";
+
+const AxiosPost = () =&gt; {
+  const [title, setTitle] = useState(""); // 할 일 입력 상태 관리
+
+  // 입력값 변경 시 상태 업데이트
+  const handleInputChange = (e) =&gt; {
+    setTitle(e.target.value); // 입력 필드의 값을 상태에 저장
+  }
+
+  // 폼 제출 시 POST 요청 보내기
+  const handleSubmit = (e) =&gt; {
+    e.preventDefault(); // 폼 제출 시 페이지 새로고침 방지
+
+    // JSONPlaceholder API에 POST 요청 보내기
+    axios.post("https://jsonplaceholder.typicode.com/todos", {
+      title: title,
+      completed: false
+    })</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 응답 처리와 폼 렌더링</div>
+      <span class="fname">axios_ex/AxiosNewTodo.jsx</span>
+<pre><code class="language-jsx">    .then((response) =&gt; {
+      console.log("추가된 데이터:", response.data);
+      alert("추가 완료!");
+      setTitle(""); // 입력 필드 초기화
+    })
+    .catch((error) =&gt; console.log(error)) // 에러 처리
+  }
+
+  return(
+    &lt;div className="axios-new-todo"&gt;
+      &lt;h2&gt;할 일 추가&lt;/h2&gt;
+      &lt;form onSubmit={handleSubmit}&gt;
+        &lt;input
+          type="text"
+          placeholder="할 일 입력"
+          value={title} // 입력 필드의 값을 상태에 바인딩
+          onChange={handleInputChange}
+        /&gt;
+        &lt;button type="submit"&gt;추가&lt;/button&gt;
+      &lt;/form&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <h4 style="text-align:center">할 일 추가</h4>
+        <div class="demo">
+          <input type="text" value="땀나게 달리기" readonly>
+          <button>추가</button>
+        </div>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> 입력값을 <code>title</code> 상태로 관리하는 <strong>제어 컴포넌트</strong> 패턴입니다. <code>handleSubmit</code>에서 <code>e.preventDefault()</code>로 새로고침을 막고, <code>axios.post</code>의 두 번째 인자로 보낼 데이터 객체를 전달합니다. JSONPlaceholder는 실제로 저장하지 않고 가짜 응답(생성된 id 포함)만 돌려줍니다.</div>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 14-1. 빈 값 제출 막기</h4>
+      <p>입력값이 비어 있으면 POST 요청을 보내지 않고 "할 일을 입력하세요"를 alert로 띄우도록 <code>handleSubmit</code>을 수정하세요.</p>
+      <details><summary>정답 보기</summary>
+<pre><code class="language-jsx">const handleSubmit = (e) =&gt; {
+  e.preventDefault();
+
+  if (title.trim() === "") {
+    alert("할 일을 입력하세요");
+    return; // 요청을 보내지 않고 종료
+  }
+
+  axios.post("https://jsonplaceholder.typicode.com/todos", {
+    title: title,
+    completed: false
+  })
+    .then((response) =&gt; {
+      alert("추가 완료!");
+      setTitle("");
+    })
+    .catch((error) =&gt; console.log(error));
+};</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <footer>5강. 비동기 처리 (fetch, axios) · 학습 교안<br>모듈별 학습목표 · 개념 · 예제 · 실습문제 구성</footer>
+</div>
+
+<script>
+(()=>{var wn=Object.create;var Ce=Object.defineProperty;var On=Object.getOwnPropertyDescriptor;var Rn=Object.getOwnPropertyNames;var xn=Object.getPrototypeOf,Mn=Object.prototype.hasOwnProperty;var vn=(e,n)=>()=>{try{return n||e((n={exports:{}}).exports,n),n.exports}catch(t){throw n=0,t}};var kn=(e,n,t,s)=>{if(n&&typeof n=="object"||typeof n=="function")for(let g of Rn(n))!Mn.call(e,g)&&g!==t&&Ce(e,g,{get:()=>n[g],enumerable:!(s=On(n,g))||s.enumerable});return e};var In=(e,n,t)=>(t=e!=null?wn(xn(e)):{},kn(n||!e||!e.__esModule?Ce(t,"default",{value:e,enumerable:!0}):t,e));var Ve=vn((Lt,Je)=>{function $e(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(n=>{let t=e[n],s=typeof t;(s==="object"||s==="function")&&!Object.isFrozen(t)&&$e(t)}),e}var de=class{constructor(n){n.data===void 0&&(n.data={}),this.data=n.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function He(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function K(e,...n){let t=Object.create(null);for(let s in e)t[s]=e[s];return n.forEach(function(s){for(let g in s)t[g]=s[g]}),t}var Cn="</span>",Le=e=>!!e.scope,Ln=(e,{prefix:n})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let t=e.split(".");return[`${n}${t.shift()}`,...t.map((s,g)=>`${s}${"_".repeat(g+1)}`)].join(" ")}return`${n}${e}`},_e=class{constructor(n,t){this.buffer="",this.classPrefix=t.classPrefix,n.walk(this)}addText(n){this.buffer+=He(n)}openNode(n){if(!Le(n))return;let t=Ln(n.scope,{prefix:this.classPrefix});this.span(t)}closeNode(n){Le(n)&&(this.buffer+=Cn)}value(){return this.buffer}span(n){this.buffer+=`<span class="${n}">`}},De=(e={})=>{let n={children:[]};return Object.assign(n,e),n},Ne=class e{constructor(){this.rootNode=De(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(n){this.top.children.push(n)}openNode(n){let t=De({scope:n});this.add(t),this.stack.push(t)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(n){return this.constructor._walk(n,this.rootNode)}static _walk(n,t){return typeof t=="string"?n.addText(t):t.children&&(n.openNode(t),t.children.forEach(s=>this._walk(n,s)),n.closeNode(t)),n}static _collapse(n){typeof n!="string"&&n.children&&(n.children.every(t=>typeof t=="string")?n.children=[n.children.join("")]:n.children.forEach(t=>{e._collapse(t)}))}},Se=class extends Ne{constructor(n){super(),this.options=n}addText(n){n!==""&&this.add(n)}startScope(n){this.openNode(n)}endScope(){this.closeNode()}__addSublanguage(n,t){let s=n.root;t&&(s.scope=`language:${t}`),this.add(s)}toHTML(){return new _e(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function re(e){return e?typeof e=="string"?e:e.source:null}function Ge(e){return j("(?=",e,")")}function Dn(e){return j("(?:",e,")*")}function Bn(e){return j("(?:",e,")?")}function j(...e){return e.map(t=>re(t)).join("")}function Un(e){let n=e[e.length-1];return typeof n=="object"&&n.constructor===Object?(e.splice(e.length-1,1),n):{}}function ye(...e){return"("+(Un(e).capture?"":"?:")+e.map(s=>re(s)).join("|")+")"}function Fe(e){return new RegExp(e.toString()+"|").exec("").length-1}function Pn(e,n){let t=e&&e.exec(n);return t&&t.index===0}var zn=/\[(?:[^\\\]]|\\.)*\]|\(\??|\\([1-9][0-9]*)|\\./;function Te(e,{joinWith:n}){let t=0;return e.map(s=>{t+=1;let g=t,E=re(s),a="";for(;E.length>0;){let i=zn.exec(E);if(!i){a+=E;break}a+=E.substring(0,i.index),E=E.substring(i.index+i[0].length),i[0][0]==="\\"&&i[1]?a+="\\"+String(Number(i[1])+g):(a+=i[0],i[0]==="("&&t++)}return a}).map(s=>`(${s})`).join(n)}var $n=/\b\B/,Ke="[a-zA-Z]\\w*",we="[a-zA-Z_]\\w*",Ze="\\b\\d+(\\.\\d+)?",We="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Xe="\\b(0b[01]+)",Hn="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",Gn=(e={})=>{let n=/^#![ ]*\//;return e.binary&&(e.begin=j(n,/.*\b/,e.binary,/\b.*/)),K({scope:"meta",begin:n,end:/$/,relevance:0,"on:begin":(t,s)=>{t.index!==0&&s.ignoreMatch()}},e)},ae={begin:"\\\\[\\s\\S]",relevance:0},Fn={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[ae]},Kn={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[ae]},Zn={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},fe=function(e,n,t={}){let s=K({scope:"comment",begin:e,end:n,contains:[]},t);s.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let g=ye("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return s.contains.push({begin:j(/[ ]+/,"(",g,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),s},Wn=fe("//","$"),Xn=fe("/\\*","\\*/"),Yn=fe("#","$"),jn={scope:"number",begin:Ze,relevance:0},qn={scope:"number",begin:We,relevance:0},Qn={scope:"number",begin:Xe,relevance:0},Jn={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[ae,{begin:/\[/,end:/\]/,relevance:0,contains:[ae]}]},Vn={scope:"title",begin:Ke,relevance:0},et={scope:"title",begin:we,relevance:0},nt={begin:"\\.\\s*"+we,relevance:0},tt=function(e){return Object.assign(e,{"on:begin":(n,t)=>{t.data._beginMatch=n[1]},"on:end":(n,t)=>{t.data._beginMatch!==n[1]&&t.ignoreMatch()}})},ue=Object.freeze({__proto__:null,APOS_STRING_MODE:Fn,BACKSLASH_ESCAPE:ae,BINARY_NUMBER_MODE:Qn,BINARY_NUMBER_RE:Xe,COMMENT:fe,C_BLOCK_COMMENT_MODE:Xn,C_LINE_COMMENT_MODE:Wn,C_NUMBER_MODE:qn,C_NUMBER_RE:We,END_SAME_AS_BEGIN:tt,HASH_COMMENT_MODE:Yn,IDENT_RE:Ke,MATCH_NOTHING_RE:$n,METHOD_GUARD:nt,NUMBER_MODE:jn,NUMBER_RE:Ze,PHRASAL_WORDS_MODE:Zn,QUOTE_STRING_MODE:Kn,REGEXP_MODE:Jn,RE_STARTERS_RE:Hn,SHEBANG:Gn,TITLE_MODE:Vn,UNDERSCORE_IDENT_RE:we,UNDERSCORE_TITLE_MODE:et});function it(e,n){e.input[e.index-1]==="."&&n.ignoreMatch()}function st(e,n){e.className!==void 0&&(e.scope=e.className,delete e.className)}function rt(e,n){n&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=it,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function at(e,n){Array.isArray(e.illegal)&&(e.illegal=ye(...e.illegal))}function ot(e,n){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function ct(e,n){e.relevance===void 0&&(e.relevance=1)}var lt=(e,n)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let t=Object.assign({},e);Object.keys(e).forEach(s=>{delete e[s]}),e.keywords=t.keywords,e.begin=j(t.beforeMatch,Ge(t.begin)),e.starts={relevance:0,contains:[Object.assign(t,{endsParent:!0})]},e.relevance=0,delete t.beforeMatch},ut=["of","and","for","in","not","or","if","then","parent","list","value"],dt="keyword";function Ye(e,n,t=dt){let s=Object.create(null);return typeof e=="string"?g(t,e.split(" ")):Array.isArray(e)?g(t,e):Object.keys(e).forEach(function(E){Object.assign(s,Ye(e[E],n,E))}),s;function g(E,a){n&&(a=a.map(i=>i.toLowerCase())),a.forEach(function(i){let l=i.split("|");s[l[0]]=[E,gt(l[0],l[1])]})}}function gt(e,n){return n?Number(n):ft(e)?0:1}function ft(e){return ut.includes(e.toLowerCase())}var Be={},Y=e=>{console.error(e)},Ue=(e,...n)=>{console.log(`WARN: ${e}`,...n)},J=(e,n)=>{Be[`${e}/${n}`]||(console.log(`Deprecated as of ${e}. ${n}`),Be[`${e}/${n}`]=!0)},ge=new Error;function je(e,n,{key:t}){let s=0,g=e[t],E={},a={};for(let i=1;i<=n.length;i++)a[i+s]=g[i],E[i+s]=!0,s+=Fe(n[i-1]);e[t]=a,e[t]._emit=E,e[t]._multi=!0}function bt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw Y("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),ge;if(typeof e.beginScope!="object"||e.beginScope===null)throw Y("beginScope must be object"),ge;je(e,e.begin,{key:"beginScope"}),e.begin=Te(e.begin,{joinWith:""})}}function pt(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw Y("skip, excludeEnd, returnEnd not compatible with endScope: {}"),ge;if(typeof e.endScope!="object"||e.endScope===null)throw Y("endScope must be object"),ge;je(e,e.end,{key:"endScope"}),e.end=Te(e.end,{joinWith:""})}}function ht(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function Et(e){ht(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),bt(e),pt(e)}function mt(e){function n(a,i){return new RegExp(re(a),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(i?"g":""))}class t{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(i,l){l.position=this.position++,this.matchIndexes[this.matchAt]=l,this.regexes.push([l,i]),this.matchAt+=Fe(i)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let i=this.regexes.map(l=>l[1]);this.matcherRe=n(Te(i,{joinWith:"|"}),!0),this.lastIndex=0}exec(i){this.matcherRe.lastIndex=this.lastIndex;let l=this.matcherRe.exec(i);if(!l)return null;let f=l.findIndex((w,S)=>S>0&&w!==void 0),m=this.matchIndexes[f];return l.splice(0,f),Object.assign(l,m)}}class s{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(i){if(this.multiRegexes[i])return this.multiRegexes[i];let l=new t;return this.rules.slice(i).forEach(([f,m])=>l.addRule(f,m)),l.compile(),this.multiRegexes[i]=l,l}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(i,l){this.rules.push([i,l]),l.type==="begin"&&this.count++}exec(i){let l=this.getMatcher(this.regexIndex);l.lastIndex=this.lastIndex;let f=l.exec(i);if(this.resumingScanAtSamePosition()&&!(f&&f.index===this.lastIndex)){let m=this.getMatcher(0);m.lastIndex=this.lastIndex+1,f=m.exec(i)}return f&&(this.regexIndex+=f.position+1,this.regexIndex===this.count&&this.considerAll()),f}}function g(a){let i=new s;return a.contains.forEach(l=>i.addRule(l.begin,{rule:l,type:"begin"})),a.terminatorEnd&&i.addRule(a.terminatorEnd,{type:"end"}),a.illegal&&i.addRule(a.illegal,{type:"illegal"}),i}function E(a,i){let l=a;if(a.isCompiled)return l;[st,ot,Et,lt].forEach(m=>m(a,i)),e.compilerExtensions.forEach(m=>m(a,i)),a.__beforeBegin=null,[rt,at,ct].forEach(m=>m(a,i)),a.isCompiled=!0;let f=null;return typeof a.keywords=="object"&&a.keywords.$pattern&&(a.keywords=Object.assign({},a.keywords),f=a.keywords.$pattern,delete a.keywords.$pattern),f=f||/\w+/,a.keywords&&(a.keywords=Ye(a.keywords,e.case_insensitive)),l.keywordPatternRe=n(f,!0),i&&(a.begin||(a.begin=/\B|\b/),l.beginRe=n(l.begin),!a.end&&!a.endsWithParent&&(a.end=/\B|\b/),a.end&&(l.endRe=n(l.end)),l.terminatorEnd=re(l.end)||"",a.endsWithParent&&i.terminatorEnd&&(l.terminatorEnd+=(a.end?"|":"")+i.terminatorEnd)),a.illegal&&(l.illegalRe=n(a.illegal)),a.contains||(a.contains=[]),a.contains=[].concat(...a.contains.map(function(m){return _t(m==="self"?a:m)})),a.contains.forEach(function(m){E(m,l)}),a.starts&&E(a.starts,i),l.matcher=g(l),l}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=K(e.classNameAliases||{}),E(e)}function qe(e){return e?e.endsWithParent||qe(e.starts):!1}function _t(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(n){return K(e,{variants:null},n)})),e.cachedVariants?e.cachedVariants:qe(e)?K(e,{starts:e.starts?K(e.starts):null}):Object.isFrozen(e)?K(e):e}var Nt="11.9.0",Ae=class extends Error{constructor(n,t){super(n),this.name="HTMLInjectionError",this.html=t}},me=He,Pe=K,ze=Symbol("nomatch"),St=7,Qe=function(e){let n=Object.create(null),t=Object.create(null),s=[],g=!0,E="Could not find the language '{}', did you forget to load/include a language module?",a={disableAutodetect:!0,name:"Plain text",contains:[]},i={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:Se};function l(r){return i.noHighlightRe.test(r)}function f(r){let o=r.className+" ";o+=r.parentNode?r.parentNode.className:"";let d=i.languageDetectRe.exec(o);if(d){let h=D(d[1]);return h||(Ue(E.replace("{}",d[1])),Ue("Falling back to no-highlight mode for this block.",r)),h?d[1]:"no-highlight"}return o.split(/\s+/).find(h=>l(h)||D(h))}function m(r,o,d){let h="",_="";typeof o=="object"?(h=r,d=o.ignoreIllegals,_=o.language):(J("10.7.0","highlight(lang, code, ...args) has been deprecated."),J("10.7.0",`Please use highlight(code, options) instead.
+https://github.com/highlightjs/highlight.js/issues/2277`),_=r,h=o),d===void 0&&(d=!0);let T={code:h,language:_};F("before:highlight",T);let v=T.result?T.result:w(T.language,T.code,d);return v.code=T.code,F("after:highlight",v),v}function w(r,o,d,h){let _=Object.create(null);function T(c,u){return c.keywords[u]}function v(){if(!b.keywords){O.addText(A);return}let c=0;b.keywordPatternRe.lastIndex=0;let u=b.keywordPatternRe.exec(A),p="";for(;u;){p+=A.substring(c,u.index);let N=$.case_insensitive?u[0].toLowerCase():u[0],R=T(b,N);if(R){let[G,yn]=R;if(O.addText(p),p="",_[N]=(_[N]||0)+1,_[N]<=St&&(le+=yn),G.startsWith("_"))p+=u[0];else{let Tn=$.classNameAliases[G]||G;z(u[0],Tn)}}else p+=u[0];c=b.keywordPatternRe.lastIndex,u=b.keywordPatternRe.exec(A)}p+=A.substring(c),O.addText(p)}function oe(){if(A==="")return;let c=null;if(typeof b.subLanguage=="string"){if(!n[b.subLanguage]){O.addText(A);return}c=w(b.subLanguage,A,!0,Ie[b.subLanguage]),Ie[b.subLanguage]=c._top}else c=y(A,b.subLanguage.length?b.subLanguage:null);b.relevance>0&&(le+=c.relevance),O.__addSublanguage(c._emitter,c.language)}function I(){b.subLanguage!=null?oe():v(),A=""}function z(c,u){c!==""&&(O.startScope(u),O.addText(c),O.endScope())}function xe(c,u){let p=1,N=u.length-1;for(;p<=N;){if(!c._emit[p]){p++;continue}let R=$.classNameAliases[c[p]]||c[p],G=u[p];R?z(G,R):(A=G,v(),A=""),p++}}function Me(c,u){return c.scope&&typeof c.scope=="string"&&O.openNode($.classNameAliases[c.scope]||c.scope),c.beginScope&&(c.beginScope._wrap?(z(A,$.classNameAliases[c.beginScope._wrap]||c.beginScope._wrap),A=""):c.beginScope._multi&&(xe(c.beginScope,u),A="")),b=Object.create(c,{parent:{value:b}}),b}function ve(c,u,p){let N=Pn(c.endRe,p);if(N){if(c["on:end"]){let R=new de(c);c["on:end"](u,R),R.isMatchIgnored&&(N=!1)}if(N){for(;c.endsParent&&c.parent;)c=c.parent;return c}}if(c.endsWithParent)return ve(c.parent,u,p)}function mn(c){return b.matcher.regexIndex===0?(A+=c[0],1):(Ee=!0,0)}function _n(c){let u=c[0],p=c.rule,N=new de(p),R=[p.__beforeBegin,p["on:begin"]];for(let G of R)if(G&&(G(c,N),N.isMatchIgnored))return mn(u);return p.skip?A+=u:(p.excludeBegin&&(A+=u),I(),!p.returnBegin&&!p.excludeBegin&&(A=u)),Me(p,c),p.returnBegin?0:u.length}function Nn(c){let u=c[0],p=o.substring(c.index),N=ve(b,c,p);if(!N)return ze;let R=b;b.endScope&&b.endScope._wrap?(I(),z(u,b.endScope._wrap)):b.endScope&&b.endScope._multi?(I(),xe(b.endScope,c)):R.skip?A+=u:(R.returnEnd||R.excludeEnd||(A+=u),I(),R.excludeEnd&&(A=u));do b.scope&&O.closeNode(),!b.skip&&!b.subLanguage&&(le+=b.relevance),b=b.parent;while(b!==N.parent);return N.starts&&Me(N.starts,c),R.returnEnd?0:u.length}function Sn(){let c=[];for(let u=b;u!==$;u=u.parent)u.scope&&c.unshift(u.scope);c.forEach(u=>O.openNode(u))}let ce={};function ke(c,u){let p=u&&u[0];if(A+=c,p==null)return I(),0;if(ce.type==="begin"&&u.type==="end"&&ce.index===u.index&&p===""){if(A+=o.slice(u.index,u.index+1),!g){let N=new Error(`0 width match regex (${r})`);throw N.languageName=r,N.badRule=ce.rule,N}return 1}if(ce=u,u.type==="begin")return _n(u);if(u.type==="illegal"&&!d){let N=new Error('Illegal lexeme "'+p+'" for mode "'+(b.scope||"<unnamed>")+'"');throw N.mode=b,N}else if(u.type==="end"){let N=Nn(u);if(N!==ze)return N}if(u.type==="illegal"&&p==="")return 1;if(he>1e5&&he>u.index*3)throw new Error("potential infinite loop, way more iterations than matches");return A+=p,p.length}let $=D(r);if(!$)throw Y(E.replace("{}",r)),new Error('Unknown language: "'+r+'"');let An=mt($),pe="",b=h||An,Ie={},O=new i.__emitter(i);Sn();let A="",le=0,X=0,he=0,Ee=!1;try{if($.__emitTokens)$.__emitTokens(o,O);else{for(b.matcher.considerAll();;){he++,Ee?Ee=!1:b.matcher.considerAll(),b.matcher.lastIndex=X;let c=b.matcher.exec(o);if(!c)break;let u=o.substring(X,c.index),p=ke(u,c);X=c.index+p}ke(o.substring(X))}return O.finalize(),pe=O.toHTML(),{language:r,value:pe,relevance:le,illegal:!1,_emitter:O,_top:b}}catch(c){if(c.message&&c.message.includes("Illegal"))return{language:r,value:me(o),illegal:!0,relevance:0,_illegalBy:{message:c.message,index:X,context:o.slice(X-100,X+100),mode:c.mode,resultSoFar:pe},_emitter:O};if(g)return{language:r,value:me(o),illegal:!1,relevance:0,errorRaised:c,_emitter:O,_top:b};throw c}}function S(r){let o={value:me(r),illegal:!1,relevance:0,_top:a,_emitter:new i.__emitter(i)};return o._emitter.addText(r),o}function y(r,o){o=o||i.languages||Object.keys(n);let d=S(r),h=o.filter(D).filter(Q).map(I=>w(I,r,!1));h.unshift(d);let _=h.sort((I,z)=>{if(I.relevance!==z.relevance)return z.relevance-I.relevance;if(I.language&&z.language){if(D(I.language).supersetOf===z.language)return 1;if(D(z.language).supersetOf===I.language)return-1}return 0}),[T,v]=_,oe=T;return oe.secondBest=v,oe}function C(r,o,d){let h=o&&t[o]||d;r.classList.add("hljs"),r.classList.add(`language-${h}`)}function x(r){let o=null,d=f(r);if(l(d))return;if(F("before:highlightElement",{el:r,language:d}),r.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",r);return}if(r.children.length>0&&(i.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("https://github.com/highlightjs/highlight.js/wiki/security"),console.warn("The element with unescaped HTML:"),console.warn(r)),i.throwUnescapedHTML))throw new Ae("One of your code blocks includes unescaped HTML.",r.innerHTML);o=r;let h=o.textContent,_=d?m(h,{language:d,ignoreIllegals:!0}):y(h);r.innerHTML=_.value,r.dataset.highlighted="yes",C(r,d,_.language),r.result={language:_.language,re:_.relevance,relevance:_.relevance},_.secondBest&&(r.secondBest={language:_.secondBest.language,relevance:_.secondBest.relevance}),F("after:highlightElement",{el:r,result:_,text:h})}function M(r){i=Pe(i,r)}let ee=()=>{L(),J("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function B(){L(),J("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let P=!1;function L(){if(document.readyState==="loading"){P=!0;return}document.querySelectorAll(i.cssSelector).forEach(x)}function H(){P&&L()}typeof window<"u"&&window.addEventListener&&window.addEventListener("DOMContentLoaded",H,!1);function k(r,o){let d=null;try{d=o(e)}catch(h){if(Y("Language definition for '{}' could not be registered.".replace("{}",r)),g)Y(h);else throw h;d=a}d.name||(d.name=r),n[r]=d,d.rawDefinition=o.bind(null,e),d.aliases&&q(d.aliases,{languageName:r})}function ne(r){delete n[r];for(let o of Object.keys(t))t[o]===r&&delete t[o]}function Z(){return Object.keys(n)}function D(r){return r=(r||"").toLowerCase(),n[r]||n[t[r]]}function q(r,{languageName:o}){typeof r=="string"&&(r=[r]),r.forEach(d=>{t[d.toLowerCase()]=o})}function Q(r){let o=D(r);return o&&!o.disableAutodetect}function te(r){r["before:highlightBlock"]&&!r["before:highlightElement"]&&(r["before:highlightElement"]=o=>{r["before:highlightBlock"](Object.assign({block:o.el},o))}),r["after:highlightBlock"]&&!r["after:highlightElement"]&&(r["after:highlightElement"]=o=>{r["after:highlightBlock"](Object.assign({block:o.el},o))})}function ie(r){te(r),s.push(r)}function se(r){let o=s.indexOf(r);o!==-1&&s.splice(o,1)}function F(r,o){let d=r;s.forEach(function(h){h[d]&&h[d](o)})}function W(r){return J("10.7.0","highlightBlock will be removed entirely in v12.0"),J("10.7.0","Please use highlightElement now."),x(r)}Object.assign(e,{highlight:m,highlightAuto:y,highlightAll:L,highlightElement:x,highlightBlock:W,configure:M,initHighlighting:ee,initHighlightingOnLoad:B,registerLanguage:k,unregisterLanguage:ne,listLanguages:Z,getLanguage:D,registerAliases:q,autoDetection:Q,inherit:Pe,addPlugin:ie,removePlugin:se}),e.debugMode=function(){g=!1},e.safeMode=function(){g=!0},e.versionString=Nt,e.regex={concat:j,lookahead:Ge,either:ye,optional:Bn,anyNumberOfTimes:Dn};for(let r in ue)typeof ue[r]=="object"&&$e(ue[r]);return Object.assign(e,ue),e},V=Qe({});V.newInstance=()=>Qe({});Je.exports=V;V.HighlightJS=V;V.default=V});var en=In(Ve(),1);var U=en.default;var nn="[A-Za-z$_][0-9A-Za-z$_]*",At=["as","in","of","if","for","while","finally","var","new","function","do","return","void","else","break","catch","instanceof","with","throw","case","default","try","switch","continue","typeof","delete","let","yield","const","class","debugger","async","await","static","import","from","export","extends"],yt=["true","false","null","undefined","NaN","Infinity"],tn=["Object","Function","Boolean","Symbol","Math","Date","Number","BigInt","String","RegExp","Array","Float32Array","Float64Array","Int8Array","Uint8Array","Uint8ClampedArray","Int16Array","Int32Array","Uint16Array","Uint32Array","BigInt64Array","BigUint64Array","Set","Map","WeakSet","WeakMap","ArrayBuffer","SharedArrayBuffer","Atomics","DataView","JSON","Promise","Generator","GeneratorFunction","AsyncFunction","Reflect","Proxy","Intl","WebAssembly"],sn=["Error","EvalError","InternalError","RangeError","ReferenceError","SyntaxError","TypeError","URIError"],rn=["setInterval","setTimeout","clearInterval","clearTimeout","require","exports","eval","isFinite","isNaN","parseFloat","parseInt","decodeURI","decodeURIComponent","encodeURI","encodeURIComponent","escape","unescape"],Tt=["arguments","this","super","console","window","document","localStorage","sessionStorage","module","global"],wt=[].concat(rn,tn,sn);function Oe(e){let n=e.regex,t=(o,{after:d})=>{let h="</"+o[0].slice(1);return o.input.indexOf(h,d)!==-1},s=nn,g={begin:"<>",end:"</>"},E=/<[A-Za-z0-9\\._:-]+\s*\/>/,a={begin:/<[A-Za-z0-9\\._:-]+/,end:/\/[A-Za-z0-9\\._:-]+>|\/>/,isTrulyOpeningTag:(o,d)=>{let h=o[0].length+o.index,_=o.input[h];if(_==="<"||_===","){d.ignoreMatch();return}_===">"&&(t(o,{after:h})||d.ignoreMatch());let T,v=o.input.substring(h);if(T=v.match(/^\s*=/)){d.ignoreMatch();return}if((T=v.match(/^\s+extends\s+/))&&T.index===0){d.ignoreMatch();return}}},i={$pattern:nn,keyword:At,literal:yt,built_in:wt,"variable.language":Tt},l="[0-9](_?[0-9])*",f=`\\.(${l})`,m="0|[1-9](_?[0-9])*|0[0-7]*[89][0-9]*",w={className:"number",variants:[{begin:`(\\b(${m})((${f})|\\.)?|(${f}))[eE][+-]?(${l})\\b`},{begin:`\\b(${m})\\b((${f})\\b|\\.)?|(${f})\\b`},{begin:"\\b(0|[1-9](_?[0-9])*)n\\b"},{begin:"\\b0[xX][0-9a-fA-F](_?[0-9a-fA-F])*n?\\b"},{begin:"\\b0[bB][0-1](_?[0-1])*n?\\b"},{begin:"\\b0[oO][0-7](_?[0-7])*n?\\b"},{begin:"\\b0[0-7]+n?\\b"}],relevance:0},S={className:"subst",begin:"\\$\\{",end:"\\}",keywords:i,contains:[]},y={begin:"html`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"xml"}},C={begin:"css`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"css"}},x={begin:"gql`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"graphql"}},M={className:"string",begin:"`",end:"`",contains:[e.BACKSLASH_ESCAPE,S]},B={className:"comment",variants:[e.COMMENT(/\/\*\*(?!\/)/,"\\*/",{relevance:0,contains:[{begin:"(?=@[A-Za-z]+)",relevance:0,contains:[{className:"doctag",begin:"@[A-Za-z]+"},{className:"type",begin:"\\{",end:"\\}",excludeEnd:!0,excludeBegin:!0,relevance:0},{className:"variable",begin:s+"(?=\\s*(-)|$)",endsParent:!0,relevance:0},{begin:/(?=[^\n])\s/,relevance:0}]}]}),e.C_BLOCK_COMMENT_MODE,e.C_LINE_COMMENT_MODE]},P=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,{match:/\$\d+/},w];S.contains=P.concat({begin:/\{/,end:/\}/,keywords:i,contains:["self"].concat(P)});let L=[].concat(B,S.contains),H=L.concat([{begin:/\(/,end:/\)/,keywords:i,contains:["self"].concat(L)}]),k={className:"params",begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H},ne={variants:[{match:[/class/,/\s+/,s,/\s+/,/extends/,/\s+/,n.concat(s,"(",n.concat(/\./,s),")*")],scope:{1:"keyword",3:"title.class",5:"keyword",7:"title.class.inherited"}},{match:[/class/,/\s+/,s],scope:{1:"keyword",3:"title.class"}}]},Z={relevance:0,match:n.either(/\bJSON/,/\b[A-Z][a-z]+([A-Z][a-z]*|\d)*/,/\b[A-Z]{2,}([A-Z][a-z]+|\d)+([A-Z][a-z]*)*/,/\b[A-Z]{2,}[a-z]+([A-Z][a-z]+|\d)*([A-Z][a-z]*)*/),className:"title.class",keywords:{_:[...tn,...sn]}},D={label:"use_strict",className:"meta",relevance:10,begin:/^\s*['"]use (strict|asm)['"]/},q={variants:[{match:[/function/,/\s+/,s,/(?=\s*\()/]},{match:[/function/,/\s*(?=\()/]}],className:{1:"keyword",3:"title.function"},label:"func.def",contains:[k],illegal:/%/},Q={relevance:0,match:/\b[A-Z][A-Z_0-9]+\b/,className:"variable.constant"};function te(o){return n.concat("(?!",o.join("|"),")")}let ie={match:n.concat(/\b/,te([...rn,"super","import"]),s,n.lookahead(/\(/)),className:"title.function",relevance:0},se={begin:n.concat(/\./,n.lookahead(n.concat(s,/(?![0-9A-Za-z$_(])/))),end:s,excludeBegin:!0,keywords:"prototype",className:"property",relevance:0},F={match:[/get|set/,/\s+/,s,/(?=\()/],className:{1:"keyword",3:"title.function"},contains:[{begin:/\(\)/},k]},W="(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|"+e.UNDERSCORE_IDENT_RE+")\\s*=>",r={match:[/const|var|let/,/\s+/,s,/\s*/,/=\s*/,/(async\s*)?/,n.lookahead(W)],keywords:"async",className:{1:"keyword",3:"title.function"},contains:[k]};return{name:"JavaScript",aliases:["js","jsx","mjs","cjs"],keywords:i,exports:{PARAMS_CONTAINS:H,CLASS_REFERENCE:Z},illegal:/#(?![$_A-z])/,contains:[e.SHEBANG({label:"shebang",binary:"node",relevance:5}),D,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,B,{match:/\$\d+/},w,Z,{className:"attr",begin:s+n.lookahead(":"),relevance:0},r,{begin:"("+e.RE_STARTERS_RE+"|\\b(case|return|throw)\\b)\\s*",keywords:"return throw case",relevance:0,contains:[B,e.REGEXP_MODE,{className:"function",begin:W,returnBegin:!0,end:"\\s*=>",contains:[{className:"params",variants:[{begin:e.UNDERSCORE_IDENT_RE,relevance:0},{className:null,begin:/\(\s*\)/,skip:!0},{begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H}]}]},{begin:/,/,relevance:0},{match:/\s+/,relevance:0},{variants:[{begin:g.begin,end:g.end},{match:E},{begin:a.begin,"on:begin":a.isTrulyOpeningTag,end:a.end}],subLanguage:"xml",contains:[{begin:a.begin,end:a.end,skip:!0,contains:["self"]}]}]},q,{beginKeywords:"while if switch catch for"},{begin:"\\b(?!function)"+e.UNDERSCORE_IDENT_RE+"\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)\\s*\\{",returnBegin:!0,label:"func.def",contains:[k,e.inherit(e.TITLE_MODE,{begin:s,className:"title.function"})]},{match:/\.\.\./,relevance:0},se,{match:"\\$"+s,relevance:0},{match:[/\bconstructor(?=\s*\()/],className:{1:"title.function"},contains:[k]},ie,Q,ne,F,{match:/\$[(.]/}]}}var be="[A-Za-z$_][0-9A-Za-z$_]*",an=["as","in","of","if","for","while","finally","var","new","function","do","return","void","else","break","catch","instanceof","with","throw","case","default","try","switch","continue","typeof","delete","let","yield","const","class","debugger","async","await","static","import","from","export","extends"],on=["true","false","null","undefined","NaN","Infinity"],cn=["Object","Function","Boolean","Symbol","Math","Date","Number","BigInt","String","RegExp","Array","Float32Array","Float64Array","Int8Array","Uint8Array","Uint8ClampedArray","Int16Array","Int32Array","Uint16Array","Uint32Array","BigInt64Array","BigUint64Array","Set","Map","WeakSet","WeakMap","ArrayBuffer","SharedArrayBuffer","Atomics","DataView","JSON","Promise","Generator","GeneratorFunction","AsyncFunction","Reflect","Proxy","Intl","WebAssembly"],ln=["Error","EvalError","InternalError","RangeError","ReferenceError","SyntaxError","TypeError","URIError"],un=["setInterval","setTimeout","clearInterval","clearTimeout","require","exports","eval","isFinite","isNaN","parseFloat","parseInt","decodeURI","decodeURIComponent","encodeURI","encodeURIComponent","escape","unescape"],dn=["arguments","this","super","console","window","document","localStorage","sessionStorage","module","global"],gn=[].concat(un,cn,ln);function Ot(e){let n=e.regex,t=(o,{after:d})=>{let h="</"+o[0].slice(1);return o.input.indexOf(h,d)!==-1},s=be,g={begin:"<>",end:"</>"},E=/<[A-Za-z0-9\\._:-]+\s*\/>/,a={begin:/<[A-Za-z0-9\\._:-]+/,end:/\/[A-Za-z0-9\\._:-]+>|\/>/,isTrulyOpeningTag:(o,d)=>{let h=o[0].length+o.index,_=o.input[h];if(_==="<"||_===","){d.ignoreMatch();return}_===">"&&(t(o,{after:h})||d.ignoreMatch());let T,v=o.input.substring(h);if(T=v.match(/^\s*=/)){d.ignoreMatch();return}if((T=v.match(/^\s+extends\s+/))&&T.index===0){d.ignoreMatch();return}}},i={$pattern:be,keyword:an,literal:on,built_in:gn,"variable.language":dn},l="[0-9](_?[0-9])*",f=`\\.(${l})`,m="0|[1-9](_?[0-9])*|0[0-7]*[89][0-9]*",w={className:"number",variants:[{begin:`(\\b(${m})((${f})|\\.)?|(${f}))[eE][+-]?(${l})\\b`},{begin:`\\b(${m})\\b((${f})\\b|\\.)?|(${f})\\b`},{begin:"\\b(0|[1-9](_?[0-9])*)n\\b"},{begin:"\\b0[xX][0-9a-fA-F](_?[0-9a-fA-F])*n?\\b"},{begin:"\\b0[bB][0-1](_?[0-1])*n?\\b"},{begin:"\\b0[oO][0-7](_?[0-7])*n?\\b"},{begin:"\\b0[0-7]+n?\\b"}],relevance:0},S={className:"subst",begin:"\\$\\{",end:"\\}",keywords:i,contains:[]},y={begin:"html`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"xml"}},C={begin:"css`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"css"}},x={begin:"gql`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"graphql"}},M={className:"string",begin:"`",end:"`",contains:[e.BACKSLASH_ESCAPE,S]},B={className:"comment",variants:[e.COMMENT(/\/\*\*(?!\/)/,"\\*/",{relevance:0,contains:[{begin:"(?=@[A-Za-z]+)",relevance:0,contains:[{className:"doctag",begin:"@[A-Za-z]+"},{className:"type",begin:"\\{",end:"\\}",excludeEnd:!0,excludeBegin:!0,relevance:0},{className:"variable",begin:s+"(?=\\s*(-)|$)",endsParent:!0,relevance:0},{begin:/(?=[^\n])\s/,relevance:0}]}]}),e.C_BLOCK_COMMENT_MODE,e.C_LINE_COMMENT_MODE]},P=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,{match:/\$\d+/},w];S.contains=P.concat({begin:/\{/,end:/\}/,keywords:i,contains:["self"].concat(P)});let L=[].concat(B,S.contains),H=L.concat([{begin:/\(/,end:/\)/,keywords:i,contains:["self"].concat(L)}]),k={className:"params",begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H},ne={variants:[{match:[/class/,/\s+/,s,/\s+/,/extends/,/\s+/,n.concat(s,"(",n.concat(/\./,s),")*")],scope:{1:"keyword",3:"title.class",5:"keyword",7:"title.class.inherited"}},{match:[/class/,/\s+/,s],scope:{1:"keyword",3:"title.class"}}]},Z={relevance:0,match:n.either(/\bJSON/,/\b[A-Z][a-z]+([A-Z][a-z]*|\d)*/,/\b[A-Z]{2,}([A-Z][a-z]+|\d)+([A-Z][a-z]*)*/,/\b[A-Z]{2,}[a-z]+([A-Z][a-z]+|\d)*([A-Z][a-z]*)*/),className:"title.class",keywords:{_:[...cn,...ln]}},D={label:"use_strict",className:"meta",relevance:10,begin:/^\s*['"]use (strict|asm)['"]/},q={variants:[{match:[/function/,/\s+/,s,/(?=\s*\()/]},{match:[/function/,/\s*(?=\()/]}],className:{1:"keyword",3:"title.function"},label:"func.def",contains:[k],illegal:/%/},Q={relevance:0,match:/\b[A-Z][A-Z_0-9]+\b/,className:"variable.constant"};function te(o){return n.concat("(?!",o.join("|"),")")}let ie={match:n.concat(/\b/,te([...un,"super","import"]),s,n.lookahead(/\(/)),className:"title.function",relevance:0},se={begin:n.concat(/\./,n.lookahead(n.concat(s,/(?![0-9A-Za-z$_(])/))),end:s,excludeBegin:!0,keywords:"prototype",className:"property",relevance:0},F={match:[/get|set/,/\s+/,s,/(?=\()/],className:{1:"keyword",3:"title.function"},contains:[{begin:/\(\)/},k]},W="(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|"+e.UNDERSCORE_IDENT_RE+")\\s*=>",r={match:[/const|var|let/,/\s+/,s,/\s*/,/=\s*/,/(async\s*)?/,n.lookahead(W)],keywords:"async",className:{1:"keyword",3:"title.function"},contains:[k]};return{name:"JavaScript",aliases:["js","jsx","mjs","cjs"],keywords:i,exports:{PARAMS_CONTAINS:H,CLASS_REFERENCE:Z},illegal:/#(?![$_A-z])/,contains:[e.SHEBANG({label:"shebang",binary:"node",relevance:5}),D,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,B,{match:/\$\d+/},w,Z,{className:"attr",begin:s+n.lookahead(":"),relevance:0},r,{begin:"("+e.RE_STARTERS_RE+"|\\b(case|return|throw)\\b)\\s*",keywords:"return throw case",relevance:0,contains:[B,e.REGEXP_MODE,{className:"function",begin:W,returnBegin:!0,end:"\\s*=>",contains:[{className:"params",variants:[{begin:e.UNDERSCORE_IDENT_RE,relevance:0},{className:null,begin:/\(\s*\)/,skip:!0},{begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H}]}]},{begin:/,/,relevance:0},{match:/\s+/,relevance:0},{variants:[{begin:g.begin,end:g.end},{match:E},{begin:a.begin,"on:begin":a.isTrulyOpeningTag,end:a.end}],subLanguage:"xml",contains:[{begin:a.begin,end:a.end,skip:!0,contains:["self"]}]}]},q,{beginKeywords:"while if switch catch for"},{begin:"\\b(?!function)"+e.UNDERSCORE_IDENT_RE+"\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)\\s*\\{",returnBegin:!0,label:"func.def",contains:[k,e.inherit(e.TITLE_MODE,{begin:s,className:"title.function"})]},{match:/\.\.\./,relevance:0},se,{match:"\\$"+s,relevance:0},{match:[/\bconstructor(?=\s*\()/],className:{1:"title.function"},contains:[k]},ie,Q,ne,F,{match:/\$[(.]/}]}}function Re(e){let n=Ot(e),t=be,s=["any","void","number","boolean","string","object","never","symbol","bigint","unknown"],g={beginKeywords:"namespace",end:/\{/,excludeEnd:!0,contains:[n.exports.CLASS_REFERENCE]},E={beginKeywords:"interface",end:/\{/,excludeEnd:!0,keywords:{keyword:"interface extends",built_in:s},contains:[n.exports.CLASS_REFERENCE]},a={className:"meta",relevance:10,begin:/^\s*['"]use strict['"]/},i=["type","namespace","interface","public","private","protected","implements","declare","abstract","readonly","enum","override"],l={$pattern:be,keyword:an.concat(i),literal:on,built_in:gn.concat(s),"variable.language":dn},f={className:"meta",begin:"@"+t},m=(S,y,C)=>{let x=S.contains.findIndex(M=>M.label===y);if(x===-1)throw new Error("can not find mode to replace");S.contains.splice(x,1,C)};Object.assign(n.keywords,l),n.exports.PARAMS_CONTAINS.push(f),n.contains=n.contains.concat([f,g,E]),m(n,"shebang",e.SHEBANG()),m(n,"use_strict",a);let w=n.contains.find(S=>S.label==="func.def");return w.relevance=0,Object.assign(n,{name:"TypeScript",aliases:["ts","tsx","mts","cts"]}),n}function fn(e){let n=e.regex,t=n.concat(/[\p{L}_]/u,n.optional(/[\p{L}0-9_.-]*:/u),/[\p{L}0-9_.-]*/u),s=/[\p{L}0-9._:-]+/u,g={className:"symbol",begin:/&[a-z]+;|&#[0-9]+;|&#x[a-f0-9]+;/},E={begin:/\s/,contains:[{className:"keyword",begin:/#?[a-z_][a-z1-9_-]+/,illegal:/\n/}]},a=e.inherit(E,{begin:/\(/,end:/\)/}),i=e.inherit(e.APOS_STRING_MODE,{className:"string"}),l=e.inherit(e.QUOTE_STRING_MODE,{className:"string"}),f={endsWithParent:!0,illegal:/</,relevance:0,contains:[{className:"attr",begin:s,relevance:0},{begin:/=\s*/,relevance:0,contains:[{className:"string",endsParent:!0,variants:[{begin:/"/,end:/"/,contains:[g]},{begin:/'/,end:/'/,contains:[g]},{begin:/[^\s"'=<>`]+/}]}]}]};return{name:"HTML, XML",aliases:["html","xhtml","rss","atom","xjb","xsd","xsl","plist","wsf","svg"],case_insensitive:!0,unicodeRegex:!0,contains:[{className:"meta",begin:/<![a-z]/,end:/>/,relevance:10,contains:[E,l,i,a,{begin:/\[/,end:/\]/,contains:[{className:"meta",begin:/<![a-z]/,end:/>/,contains:[E,a,l,i]}]}]},e.COMMENT(/<!--/,/-->/,{relevance:10}),{begin:/<!\[CDATA\[/,end:/\]\]>/,relevance:10},g,{className:"meta",end:/\?>/,variants:[{begin:/<\?xml/,relevance:10,contains:[l]},{begin:/<\?[a-z][a-z0-9]+/}]},{className:"tag",begin:/<style(?=\s|>)/,end:/>/,keywords:{name:"style"},contains:[f],starts:{end:/<\/style>/,returnEnd:!0,subLanguage:["css","xml"]}},{className:"tag",begin:/<script(?=\s|>)/,end:/>/,keywords:{name:"script"},contains:[f],starts:{end:/<\/script>/,returnEnd:!0,subLanguage:["javascript","handlebars","xml"]}},{className:"tag",begin:/<>|<\/>/},{className:"tag",begin:n.concat(/</,n.lookahead(n.concat(t,n.either(/\/>/,/>/,/\s/)))),end:/\/?>/,contains:[{className:"name",begin:t,relevance:0,starts:f}]},{className:"tag",begin:n.concat(/<\//,n.lookahead(n.concat(t,/>/))),contains:[{className:"name",begin:t,relevance:0},{begin:/>/,relevance:0,endsParent:!0}]}]}}var Rt=e=>({IMPORTANT:{scope:"meta",begin:"!important"},BLOCK_COMMENT:e.C_BLOCK_COMMENT_MODE,HEXCOLOR:{scope:"number",begin:/#(([0-9a-fA-F]{3,4})|(([0-9a-fA-F]{2}){3,4}))\b/},FUNCTION_DISPATCH:{className:"built_in",begin:/[\w-]+(?=\()/},ATTRIBUTE_SELECTOR_MODE:{scope:"selector-attr",begin:/\[/,end:/\]/,illegal:"$",contains:[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE]},CSS_NUMBER_MODE:{scope:"number",begin:e.NUMBER_RE+"(%|em|ex|ch|rem|vw|vh|vmin|vmax|cm|mm|in|pt|pc|px|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?",relevance:0},CSS_VARIABLE:{className:"attr",begin:/--[A-Za-z_][A-Za-z0-9_-]*/}}),xt=["a","abbr","address","article","aside","audio","b","blockquote","body","button","canvas","caption","cite","code","dd","del","details","dfn","div","dl","dt","em","fieldset","figcaption","figure","footer","form","h1","h2","h3","h4","h5","h6","header","hgroup","html","i","iframe","img","input","ins","kbd","label","legend","li","main","mark","menu","nav","object","ol","p","q","quote","samp","section","span","strong","summary","sup","table","tbody","td","textarea","tfoot","th","thead","time","tr","ul","var","video"],Mt=["any-hover","any-pointer","aspect-ratio","color","color-gamut","color-index","device-aspect-ratio","device-height","device-width","display-mode","forced-colors","grid","height","hover","inverted-colors","monochrome","orientation","overflow-block","overflow-inline","pointer","prefers-color-scheme","prefers-contrast","prefers-reduced-motion","prefers-reduced-transparency","resolution","scan","scripting","update","width","min-width","max-width","min-height","max-height"],vt=["active","any-link","blank","checked","current","default","defined","dir","disabled","drop","empty","enabled","first","first-child","first-of-type","fullscreen","future","focus","focus-visible","focus-within","has","host","host-context","hover","indeterminate","in-range","invalid","is","lang","last-child","last-of-type","left","link","local-link","not","nth-child","nth-col","nth-last-child","nth-last-col","nth-last-of-type","nth-of-type","only-child","only-of-type","optional","out-of-range","past","placeholder-shown","read-only","read-write","required","right","root","scope","target","target-within","user-invalid","valid","visited","where"],kt=["after","backdrop","before","cue","cue-region","first-letter","first-line","grammar-error","marker","part","placeholder","selection","slotted","spelling-error"],It=["align-content","align-items","align-self","all","animation","animation-delay","animation-direction","animation-duration","animation-fill-mode","animation-iteration-count","animation-name","animation-play-state","animation-timing-function","backface-visibility","background","background-attachment","background-blend-mode","background-clip","background-color","background-image","background-origin","background-position","background-repeat","background-size","block-size","border","border-block","border-block-color","border-block-end","border-block-end-color","border-block-end-style","border-block-end-width","border-block-start","border-block-start-color","border-block-start-style","border-block-start-width","border-block-style","border-block-width","border-bottom","border-bottom-color","border-bottom-left-radius","border-bottom-right-radius","border-bottom-style","border-bottom-width","border-collapse","border-color","border-image","border-image-outset","border-image-repeat","border-image-slice","border-image-source","border-image-width","border-inline","border-inline-color","border-inline-end","border-inline-end-color","border-inline-end-style","border-inline-end-width","border-inline-start","border-inline-start-color","border-inline-start-style","border-inline-start-width","border-inline-style","border-inline-width","border-left","border-left-color","border-left-style","border-left-width","border-radius","border-right","border-right-color","border-right-style","border-right-width","border-spacing","border-style","border-top","border-top-color","border-top-left-radius","border-top-right-radius","border-top-style","border-top-width","border-width","bottom","box-decoration-break","box-shadow","box-sizing","break-after","break-before","break-inside","caption-side","caret-color","clear","clip","clip-path","clip-rule","color","column-count","column-fill","column-gap","column-rule","column-rule-color","column-rule-style","column-rule-width","column-span","column-width","columns","contain","content","content-visibility","counter-increment","counter-reset","cue","cue-after","cue-before","cursor","direction","display","empty-cells","filter","flex","flex-basis","flex-direction","flex-flow","flex-grow","flex-shrink","flex-wrap","float","flow","font","font-display","font-family","font-feature-settings","font-kerning","font-language-override","font-size","font-size-adjust","font-smoothing","font-stretch","font-style","font-synthesis","font-variant","font-variant-caps","font-variant-east-asian","font-variant-ligatures","font-variant-numeric","font-variant-position","font-variation-settings","font-weight","gap","glyph-orientation-vertical","grid","grid-area","grid-auto-columns","grid-auto-flow","grid-auto-rows","grid-column","grid-column-end","grid-column-start","grid-gap","grid-row","grid-row-end","grid-row-start","grid-template","grid-template-areas","grid-template-columns","grid-template-rows","hanging-punctuation","height","hyphens","icon","image-orientation","image-rendering","image-resolution","ime-mode","inline-size","isolation","justify-content","left","letter-spacing","line-break","line-height","list-style","list-style-image","list-style-position","list-style-type","margin","margin-block","margin-block-end","margin-block-start","margin-bottom","margin-inline","margin-inline-end","margin-inline-start","margin-left","margin-right","margin-top","marks","mask","mask-border","mask-border-mode","mask-border-outset","mask-border-repeat","mask-border-slice","mask-border-source","mask-border-width","mask-clip","mask-composite","mask-image","mask-mode","mask-origin","mask-position","mask-repeat","mask-size","mask-type","max-block-size","max-height","max-inline-size","max-width","min-block-size","min-height","min-inline-size","min-width","mix-blend-mode","nav-down","nav-index","nav-left","nav-right","nav-up","none","normal","object-fit","object-position","opacity","order","orphans","outline","outline-color","outline-offset","outline-style","outline-width","overflow","overflow-wrap","overflow-x","overflow-y","padding","padding-block","padding-block-end","padding-block-start","padding-bottom","padding-inline","padding-inline-end","padding-inline-start","padding-left","padding-right","padding-top","page-break-after","page-break-before","page-break-inside","pause","pause-after","pause-before","perspective","perspective-origin","pointer-events","position","quotes","resize","rest","rest-after","rest-before","right","row-gap","scroll-margin","scroll-margin-block","scroll-margin-block-end","scroll-margin-block-start","scroll-margin-bottom","scroll-margin-inline","scroll-margin-inline-end","scroll-margin-inline-start","scroll-margin-left","scroll-margin-right","scroll-margin-top","scroll-padding","scroll-padding-block","scroll-padding-block-end","scroll-padding-block-start","scroll-padding-bottom","scroll-padding-inline","scroll-padding-inline-end","scroll-padding-inline-start","scroll-padding-left","scroll-padding-right","scroll-padding-top","scroll-snap-align","scroll-snap-stop","scroll-snap-type","scrollbar-color","scrollbar-gutter","scrollbar-width","shape-image-threshold","shape-margin","shape-outside","speak","speak-as","src","tab-size","table-layout","text-align","text-align-all","text-align-last","text-combine-upright","text-decoration","text-decoration-color","text-decoration-line","text-decoration-style","text-emphasis","text-emphasis-color","text-emphasis-position","text-emphasis-style","text-indent","text-justify","text-orientation","text-overflow","text-rendering","text-shadow","text-transform","text-underline-position","top","transform","transform-box","transform-origin","transform-style","transition","transition-delay","transition-duration","transition-property","transition-timing-function","unicode-bidi","vertical-align","visibility","voice-balance","voice-duration","voice-family","voice-pitch","voice-range","voice-rate","voice-stress","voice-volume","white-space","widows","width","will-change","word-break","word-spacing","word-wrap","writing-mode","z-index"].reverse();function bn(e){let n=e.regex,t=Rt(e),s={begin:/-(webkit|moz|ms|o)-(?=[a-z])/},g="and or not only",E=/@-?\w[\w]*(-\w+)*/,a="[a-zA-Z-][a-zA-Z0-9_-]*",i=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE];return{name:"CSS",case_insensitive:!0,illegal:/[=|'\$]/,keywords:{keyframePosition:"from to"},classNameAliases:{keyframePosition:"selector-tag"},contains:[t.BLOCK_COMMENT,s,t.CSS_NUMBER_MODE,{className:"selector-id",begin:/#[A-Za-z0-9_-]+/,relevance:0},{className:"selector-class",begin:"\\."+a,relevance:0},t.ATTRIBUTE_SELECTOR_MODE,{className:"selector-pseudo",variants:[{begin:":("+vt.join("|")+")"},{begin:":(:)?("+kt.join("|")+")"}]},t.CSS_VARIABLE,{className:"attribute",begin:"\\b("+It.join("|")+")\\b"},{begin:/:/,end:/[;}{]/,contains:[t.BLOCK_COMMENT,t.HEXCOLOR,t.IMPORTANT,t.CSS_NUMBER_MODE,...i,{begin:/(url|data-uri)\(/,end:/\)/,relevance:0,keywords:{built_in:"url data-uri"},contains:[...i,{className:"string",begin:/[^)]/,endsWithParent:!0,excludeEnd:!0}]},t.FUNCTION_DISPATCH]},{begin:n.lookahead(/@/),end:"[{;]",relevance:0,illegal:/:/,contains:[{className:"keyword",begin:E},{begin:/\s/,endsWithParent:!0,excludeEnd:!0,relevance:0,keywords:{$pattern:/[a-z-]+/,keyword:g,attribute:Mt.join(" ")},contains:[{begin:/[a-z-]+(?=:)/,className:"attribute"},...i,t.CSS_NUMBER_MODE]}]},{className:"selector-tag",begin:"\\b("+xt.join("|")+")\\b"}]}}function pn(e){let n={className:"attr",begin:/"(\\.|[^\\"\r\n])*"(?=\s*:)/,relevance:1.01},t={match:/[{}[\],:]/,className:"punctuation",relevance:0},s=["true","false","null"],g={scope:"literal",beginKeywords:s.join(" ")};return{name:"JSON",keywords:{literal:s},contains:[n,t,e.QUOTE_STRING_MODE,g,e.C_NUMBER_MODE,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE],illegal:"\\S"}}function hn(e){let n=e.regex,t={},s={begin:/\$\{/,end:/\}/,contains:["self",{begin:/:-/,contains:[t]}]};Object.assign(t,{className:"variable",variants:[{begin:n.concat(/\$[\w\d#@][\w\d_]*/,"(?![\\w\\d])(?![$])")},s]});let g={className:"subst",begin:/\$\(/,end:/\)/,contains:[e.BACKSLASH_ESCAPE]},E={begin:/<<-?\s*(?=\w+)/,starts:{contains:[e.END_SAME_AS_BEGIN({begin:/(\w+)/,end:/(\w+)/,className:"string"})]}},a={className:"string",begin:/"/,end:/"/,contains:[e.BACKSLASH_ESCAPE,t,g]};g.contains.push(a);let i={match:/\\"/},l={className:"string",begin:/'/,end:/'/},f={match:/\\'/},m={begin:/\$?\(\(/,end:/\)\)/,contains:[{begin:/\d+#[0-9a-f]+/,className:"number"},e.NUMBER_MODE,t]},w=["fish","bash","zsh","sh","csh","ksh","tcsh","dash","scsh"],S=e.SHEBANG({binary:`(${w.join("|")})`,relevance:10}),y={className:"function",begin:/\w[\w\d_]*\s*\(\s*\)\s*\{/,returnBegin:!0,contains:[e.inherit(e.TITLE_MODE,{begin:/\w[\w\d_]*/})],relevance:0},C=["if","then","else","elif","fi","for","while","until","in","do","done","case","esac","function","select"],x=["true","false"],M={match:/(\/[a-z._-]+)+/},ee=["break","cd","continue","eval","exec","exit","export","getopts","hash","pwd","readonly","return","shift","test","times","trap","umask","unset"],B=["alias","bind","builtin","caller","command","declare","echo","enable","help","let","local","logout","mapfile","printf","read","readarray","source","type","typeset","ulimit","unalias"],P=["autoload","bg","bindkey","bye","cap","chdir","clone","comparguments","compcall","compctl","compdescribe","compfiles","compgroups","compquote","comptags","comptry","compvalues","dirs","disable","disown","echotc","echoti","emulate","fc","fg","float","functions","getcap","getln","history","integer","jobs","kill","limit","log","noglob","popd","print","pushd","pushln","rehash","sched","setcap","setopt","stat","suspend","ttyctl","unfunction","unhash","unlimit","unsetopt","vared","wait","whence","where","which","zcompile","zformat","zftp","zle","zmodload","zparseopts","zprof","zpty","zregexparse","zsocket","zstyle","ztcp"],L=["chcon","chgrp","chown","chmod","cp","dd","df","dir","dircolors","ln","ls","mkdir","mkfifo","mknod","mktemp","mv","realpath","rm","rmdir","shred","sync","touch","truncate","vdir","b2sum","base32","base64","cat","cksum","comm","csplit","cut","expand","fmt","fold","head","join","md5sum","nl","numfmt","od","paste","ptx","pr","sha1sum","sha224sum","sha256sum","sha384sum","sha512sum","shuf","sort","split","sum","tac","tail","tr","tsort","unexpand","uniq","wc","arch","basename","chroot","date","dirname","du","echo","env","expr","factor","groups","hostid","id","link","logname","nice","nohup","nproc","pathchk","pinky","printenv","printf","pwd","readlink","runcon","seq","sleep","stat","stdbuf","stty","tee","test","timeout","tty","uname","unlink","uptime","users","who","whoami","yes"];return{name:"Bash",aliases:["sh"],keywords:{$pattern:/\b[a-z][a-z0-9._-]+\b/,keyword:C,literal:x,built_in:[...ee,...B,"set","shopt",...P,...L]},contains:[S,e.SHEBANG(),y,m,e.HASH_COMMENT_MODE,E,M,a,i,l,f,t]}}function En(e){let n=e.regex,t={begin:/<\/?[A-Za-z_]/,end:">",subLanguage:"xml",relevance:0},s={begin:"^[-\\*]{3,}",end:"$"},g={className:"code",variants:[{begin:"(`{3,})[^`](.|\\n)*?\\1`*[ ]*"},{begin:"(~{3,})[^~](.|\\n)*?\\1~*[ ]*"},{begin:"```",end:"```+[ ]*$"},{begin:"~~~",end:"~~~+[ ]*$"},{begin:"`.+?`"},{begin:"(?=^( {4}|\\t))",contains:[{begin:"^( {4}|\\t)",end:"(\\n)$"}],relevance:0}]},E={className:"bullet",begin:"^[ 	]*([*+-]|(\\d+\\.))(?=\\s+)",end:"\\s+",excludeEnd:!0},a={begin:/^\[[^\n]+\]:/,returnBegin:!0,contains:[{className:"symbol",begin:/\[/,end:/\]/,excludeBegin:!0,excludeEnd:!0},{className:"link",begin:/:\s*/,end:/$/,excludeBegin:!0}]},i=/[A-Za-z][A-Za-z0-9+.-]*/,l={variants:[{begin:/\[.+?\]\[.*?\]/,relevance:0},{begin:/\[.+?\]\(((data|javascript|mailto):|(?:http|ftp)s?:\/\/).*?\)/,relevance:2},{begin:n.concat(/\[.+?\]\(/,i,/:\/\/.*?\)/),relevance:2},{begin:/\[.+?\]\([./?&#].*?\)/,relevance:1},{begin:/\[.*?\]\(.*?\)/,relevance:0}],returnBegin:!0,contains:[{match:/\[(?=\])/},{className:"string",relevance:0,begin:"\\[",end:"\\]",excludeBegin:!0,returnEnd:!0},{className:"link",relevance:0,begin:"\\]\\(",end:"\\)",excludeBegin:!0,excludeEnd:!0},{className:"symbol",relevance:0,begin:"\\]\\[",end:"\\]",excludeBegin:!0,excludeEnd:!0}]},f={className:"strong",contains:[],variants:[{begin:/_{2}(?!\s)/,end:/_{2}/},{begin:/\*{2}(?!\s)/,end:/\*{2}/}]},m={className:"emphasis",contains:[],variants:[{begin:/\*(?![*\s])/,end:/\*/},{begin:/_(?![_\s])/,end:/_/,relevance:0}]},w=e.inherit(f,{contains:[]}),S=e.inherit(m,{contains:[]});f.contains.push(S),m.contains.push(w);let y=[t,l];return[f,m,w,S].forEach(M=>{M.contains=M.contains.concat(y)}),y=y.concat(f,m),{name:"Markdown",aliases:["md","mkdown","mkd"],contains:[{className:"section",variants:[{begin:"^#{1,6}",end:"$",contains:y},{begin:"(?=^.+?\\n[=-]{2,}$)",contains:[{begin:"^[=-]*$"},{begin:"^",end:"\\n",contains:y}]}]},t,E,f,m,{className:"quote",begin:"^>\\s+",contains:y,end:"$"},g,s,l,a]}}U.registerLanguage("javascript",Oe);U.registerLanguage("typescript",Re);U.registerLanguage("tsx",Re);U.registerLanguage("jsx",Oe);U.registerLanguage("xml",fn);U.registerLanguage("css",bn);U.registerLanguage("json",pn);U.registerLanguage("bash",hn);U.registerLanguage("markdown",En);window.hljs=U;})();
+
+</script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>
