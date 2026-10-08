@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10강. 웹서버 만들기 (Express)</title>
+<style>
+/* highlight.js atom-one-dark theme (inlined) */
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*
+
+Atom One Dark by Daniel Gamage
+Original One Dark Syntax theme from https://github.com/atom/one-dark-syntax
+
+base:    #282c34
+mono-1:  #abb2bf
+mono-2:  #818896
+mono-3:  #5c6370
+hue-1:   #56b6c2
+hue-2:   #61aeee
+hue-3:   #c678dd
+hue-4:   #98c379
+hue-5:   #e06c75
+hue-5-2: #be5046
+hue-6:   #d19a66
+hue-6-2: #e6c07b
+
+*/
+.hljs {
+  color: #abb2bf;
+  background: #282c34
+}
+.hljs-comment,
+.hljs-quote {
+  color: #5c6370;
+  font-style: italic
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #c678dd
+}
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+  color: #e06c75
+}
+.hljs-literal {
+  color: #56b6c2
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #98c379
+}
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: #d19a66
+}
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #61aeee
+}
+.hljs-built_in,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: #e6c07b
+}
+.hljs-emphasis {
+  font-style: italic
+}
+.hljs-strong {
+  font-weight: bold
+}
+.hljs-link {
+  text-decoration: underline
+}
+</style>
+<style>
+  :root{--bg:#f4f6f9;--card:#fff;--ink:#1f2933;--muted:#52606d;--line:#e4e7eb;--accent:#2965f1;--accent2:#1b3a8f;--code-bg:#282c34;--goal:#eafaf1;--goal-line:#27ae60;--ex:#eef4ff;--ex-line:#5b8def;--lab:#eef7ff;--lab-line:#2965f1;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Malgun Gothic","맑은 고딕",-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.75;}
+  header.hero{background:linear-gradient(135deg,#2965f1,#1b3a8f 60%,#153e75);color:#fff;padding:52px 24px;text-align:center;}
+  header.hero .eyebrow{letter-spacing:3px;font-size:.78rem;opacity:.92;text-transform:uppercase}
+  header.hero h1{margin:12px 0 8px;font-size:1.9rem}header.hero p{margin:0;opacity:.94}
+  header.hero .tags{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  header.hero .tags span{background:rgba(255,255,255,.18);border-radius:999px;padding:5px 13px;font-size:.82rem}
+  .wrap{max-width:920px;margin:0 auto;padding:32px 20px 80px}
+  nav.toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 26px;margin-bottom:34px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  nav.toc h2{margin:0 0 12px;font-size:1.05rem;color:var(--accent2)}
+  nav.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+  nav.toc a{color:var(--ink);text-decoration:none}nav.toc a:hover{color:var(--accent);text-decoration:underline}
+  section.module{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px 30px;margin-bottom:26px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  section.module > h2{margin:0 0 6px;font-size:1.4rem;color:var(--accent2);display:flex;align-items:center;gap:12px;}
+  section.module > h2 .num{background:var(--accent);color:#fff;font-size:.95rem;font-weight:800;padding:4px 12px;border-radius:10px;min-width:38px;text-align:center;}
+  h3.blk{font-size:1.02rem;margin:22px 0 8px;font-weight:800}
+  .goal{background:var(--goal);border-left:5px solid var(--goal-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:14px 0}
+  .goal .lbl{font-weight:800;color:#1e874b}.goal ul{margin:8px 0 0}
+  .concept h3.blk{color:var(--ink);border-left:4px solid var(--accent);padding-left:10px}
+  .ex{background:var(--ex);border-left:5px solid var(--ex-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .ex .lbl{font-weight:800;color:#2f5fc7}
+  .lab{background:var(--lab);border-left:5px solid var(--lab-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .lab .lbl{font-weight:800;color:#1b4fc0}.lab h4{margin:6px 0 6px;font-size:.98rem}
+  ul{margin:8px 0}li{margin:5px 0}.muted{color:var(--muted)}
+  code{background:#eceef1;padding:2px 6px;border-radius:5px;font-size:.92em;font-family:Consolas,"D2Coding",monospace}
+  pre{background:var(--code-bg);border-radius:10px;padding:0;overflow-x:auto;margin:10px 0}
+  pre code{display:block;padding:16px 18px;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;line-height:1.6;background:var(--code-bg);color:#abb2bf;border-radius:10px;white-space:pre}
+  pre code.hljs{background:var(--code-bg);padding:16px 18px}
+  .fname{display:inline-block;background:#1b3a8f;color:#fff;font-family:Consolas,"D2Coding",monospace;font-size:.8rem;font-weight:700;padding:4px 12px;border-radius:8px 8px 0 0;margin:10px 0 -8px}
+  .fname + pre{border-top-left-radius:0}
+  .out{background:#fff;color:var(--ink);border:1px solid var(--line);border-left:4px solid #27ae60;border-radius:8px;padding:12px 16px;margin:8px 0 0}
+  .out .rt{font-size:.72rem;letter-spacing:1px;color:#27ae60;font-weight:800;text-transform:uppercase;display:block;margin-bottom:6px}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:.93rem}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:#eef2fb;color:var(--accent2)}td.c,th.c{text-align:center}
+  td code,th code{background:#eef1f5}
+  details{margin-top:10px;background:#fff;border:1px solid #cfe0ff;border-radius:8px;padding:8px 14px}
+  details summary{cursor:pointer;font-weight:700;color:#1b4fc0}details pre{margin-top:10px}
+  footer{text-align:center;color:var(--muted);font-size:.85rem;padding:30px 20px}
+  .pill{display:inline-block;background:#eceef1;border-radius:6px;padding:2px 9px;margin:2px;font-size:.85rem}
+  .flow{background:#f7f9fc;border:1px dashed #b9c6de;border-radius:10px;padding:12px 16px;margin:12px 0;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;white-space:pre-wrap;color:#37475f}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}nav.toc ol{columns:1}}
+  .tip{background:#fff8e6;border-left:5px solid #f2b705;border-radius:0 10px 10px 0;padding:12px 18px;margin:14px 0}
+  .tip .lbl{font-weight:800;color:#b57f00}
+  .demo{border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:8px 0 0;background:#fafbfc}
+  .demo button{margin:2px 4px 2px 0;padding:4px 12px;border:1px solid #b9c6de;border-radius:6px;background:#fff;cursor:default}
+  .demo input{padding:4px 8px;border:1px solid #b9c6de;border-radius:6px;margin:2px 0}
+
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="eyebrow">React 심화 · Chapter 10 · 학습 교안</div>
+  <h1>웹서버 만들기 (Express)</h1>
+  <p>Node.js 기반의 Express 프레임워크로 REST API 서버를 만들고, MySQL 데이터베이스와 연동해 상품 CRUD API를 구현합니다. Postman으로 API를 테스트하고 MVC 패턴까지 학습합니다.</p>
+  <div class="tags">
+    <span>🏷️ Express</span>
+    <span>🏷️ REST API</span>
+    <span>🏷️ 미들웨어</span>
+    <span>🏷️ Postman</span>
+    <span>🏷️ MySQL</span>
+    <span>🏷️ CRUD</span>
+    <span>🏷️ MVC 패턴</span>
+  </div>
+</header>
+<div class="wrap">
+  <nav class="toc">
+    <h2>📚 학습 목차</h2>
+    <ol>
+      <li><a href="#m1">Express 프레임워크 소개</a></li>
+      <li><a href="#m2">api-server 프로젝트 시작 (package.json · index.js)</a></li>
+      <li><a href="#m3">서버 실행과 nodemon 자동 재실행</a></li>
+      <li><a href="#m4">REST API 만들기 — 상품 목록 · 등록</a></li>
+      <li><a href="#m5">Postman으로 API 테스트하기</a></li>
+      <li><a href="#m6">SQL 기초 — DDL · DML · DCL</a></li>
+      <li><a href="#m7">MySQL · Workbench 설치와 데이터 타입</a></li>
+      <li><a href="#m8">DB · 테이블 만들기 (SQL 실습)</a></li>
+      <li><a href="#m9">RDBMS와 제약 조건 — ER 다이어그램 · employee</a></li>
+      <li><a href="#m10">API 서버 — MySQL 데이터베이스 연결</a></li>
+      <li><a href="#m11">상품 CRUD API (DB 연동)</a></li>
+      <li><a href="#m12">MVC 패턴으로 서버 구조화하기</a></li>
+    </ol>
+  </nav>
+
+  <section class="module" id="m1">
+    <h2><span class="num">1</span> Express 프레임워크 소개</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>Express 프레임워크가 무엇인지, 어디에 쓰이는지 이해한다.</li>
+      <li>Express로 만드는 가장 기본적인 서버 코드의 형태를 파악한다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 Express 프레임워크란?</h3>
+      <p>Express는 <strong>Node.js 기반에서 동작하는 웹 서버 프레임워크</strong>로, 서버 개발을 쉽고 빠르게 할 수 있도록 도와주는 가볍고 유연한 백엔드 도구입니다.</p>
+      <p>주로 다음과 같은 곳에서 사용합니다.</p>
+      <ul>
+        <li><strong>REST API 서버</strong> — 데이터를 주고받는 API 제공</li>
+        <li><strong>프론트엔드(React 등) 백엔드</strong> — SPA에 데이터를 공급하는 서버</li>
+        <li><strong>간단한 웹 서버</strong> — 정적/동적 페이지 응답</li>
+        <li><strong>풀스택 프로젝트</strong> — 프론트와 백엔드를 함께 구성</li>
+      </ul>
+      <div class="tip"><span class="lbl">💡 정리</span> Express 공식 문서(expressjs.com)의 슬로건은 "Fast, unopinionated, minimalist web framework for Node.js"입니다. 설치는 <code>npm install express --save</code> 로 합니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — Express 공식 예제(가장 기본 형태)</div>
+      <span class="fname">index.js</span>
+<pre><code class="language-javascript">const express = require('express')
+const app = express()
+const port = 3000
+
+app.get('/', (req, res) =&gt; {
+  res.send('Hello World!')
+})
+
+app.listen(port, () =&gt; {
+  console.log(`Example app listening on port ${port}`)
+})</code></pre>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 1-1. Express의 정의 설명하기</h4>
+      <p>Express가 어떤 도구인지, 어떤 환경(런타임) 위에서 동작하는지 한 문장으로 설명해 보세요.</p>
+      <details><summary>정답 보기</summary>
+        <p>Express는 <strong>Node.js</strong> 기반에서 동작하는 웹 서버 프레임워크로, 서버 개발을 쉽고 빠르게 할 수 있도록 도와주는 가볍고 유연한 백엔드 도구이다. REST API 서버, React 등 프론트엔드의 백엔드, 간단한 웹 서버, 풀스택 프로젝트 등에 사용된다.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m2">
+    <h2><span class="num">2</span> api-server 프로젝트 시작 (package.json · index.js)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>Node.js 프로젝트를 초기화하고 Express를 설치할 수 있다.</li>
+      <li><code>package.json</code>의 <code>"type": "module"</code> 설정으로 ES6 import 구문을 사용할 수 있다.</li>
+      <li>가장 기본적인 Express 서버(index.js)를 작성할 수 있다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 프로젝트 개요 & 준비 절차</h3>
+      <table>
+        <tr><th>항목</th><th>내용</th></tr>
+        <tr><td>프로젝트 이름</td><td>api-server</td></tr>
+        <tr><td>깃허브 리포지터리</td><td>api-server</td></tr>
+        <tr><td>주요 문서</td><td>README.md</td></tr>
+        <tr><td>개발 환경</td><td>node.js + express framework</td></tr>
+      </table>
+      <div class="flow">
+1. Node.js 설치
+2. package.json 생성  →  npm init -y
+3. Express 설치       →  npm install express
+4. index.js 작성 (PORT: 8000)
+5. 서버 실행          →  node index.js
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> 기본 CommonJS에서는 <code>require</code>를 쓰지만, <code>package.json</code>에 <code>"type": "module"</code>을 넣으면 <code>import express from 'express'</code> 같은 ES6 import 구문을 사용할 수 있습니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 프로젝트 설정 파일 (npm init -y로 생성 후 수정)</div>
+      <span class="fname">package.json</span>
+<pre><code class="language-json">{
+  "name": "api-server",
+  "version": "1.0.0",
+  "description": "- Language: Javascript\r - Express: Node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" &amp;&amp; exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 가장 기본적인 Express 서버</div>
+      <span class="fname">index.js</span>
+<pre><code class="language-javascript">import express from 'express';
+
+// Express 객체 생성
+const app = express();
+
+// 라우트 설정
+app.get('/', (req, res) =&gt; {
+  // 클라이언트에게 응답 보내기
+  res.send('&lt;h2&gt;Hello, World!&lt;/h2&gt;');
+});
+
+// 서버 실행
+const PORT = 8000;
+app.listen(PORT, () =&gt; {
+  console.log(`서버 실행중... http://localhost:${PORT}`);
+});</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p>브라우저에서 <code>http://localhost:8000</code> 접속 시:</p>
+        <h2 style="margin:4px 0;">Hello, World!</h2>
+      </div>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 2-1. import 구문 오류 해결</h4>
+      <p><code>import express from 'express'</code>를 사용해 서버를 실행했더니 ES6 문법 관련 오류가 발생했습니다. 무엇을 수정해야 할까요?</p>
+      <details><summary>정답 보기</summary>
+        <p><code>package.json</code>에 <code>"type": "module"</code> 을 추가하면 ES6의 import/export 구문을 사용할 수 있습니다.</p>
+<pre><code class="language-json">{
+  "type": "module"
+}</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m3">
+    <h2><span class="num">3</span> 서버 실행과 nodemon 자동 재실행</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li><code>node index.js</code>로 서버를 실행하고 접속을 확인할 수 있다.</li>
+      <li>nodemon을 설치해 코드 변경 시 서버가 자동 재실행되도록 설정할 수 있다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 서버 실행하기</h3>
+      <p>터미널에서 <code>node index.js</code> 명령으로 서버를 실행하면 콘솔에 실행 메시지가 출력됩니다.</p>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 서버 실행 (터미널)</div>
+      <span class="fname">터미널</span>
+<pre><code class="language-bash">PS D:\웹(js기반)\api-server\api-express&gt; node index.js
+서버 실행중... http://localhost:8000</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p><code>localhost:8000</code> 접속:</p>
+        <h2 style="margin:4px 0;">Hello, World!</h2>
+      </div>
+    </div>
+    <div class="concept"><h3 class="blk">📖 서버 자동 실행 — nodemon</h3>
+      <p><code>node index.js</code>는 코드를 고칠 때마다 서버를 껐다 켜야 합니다. <strong>nodemon</strong>을 설치하면 파일이 바뀔 때마다 서버가 자동으로 재실행됩니다.</p>
+      <div class="flow">
+1. 설치         →  npm i nodemon
+2. 실행         →  nodemon index
+      </div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — nodemon 설치 및 실행</div>
+      <span class="fname">터미널</span>
+<pre><code class="language-bash">npm i nodemon
+nodemon index</code></pre>
+      <span class="fname">package.json (scripts · dependencies 추가)</span>
+<pre><code class="language-json">"scripts": {
+  "test": "echo \"Error: no test specified\" &amp;&amp; exit 1",
+  "start": "nodemon index.js"
+},
+"keywords": [],
+"author": "",
+"license": "ISC",
+"type": "module",
+"dependencies": {
+  "express": "^5.2.1",
+  "nodemon": "^3.1.14"
+}</code></pre>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 3-1. start 스크립트 만들기</h4>
+      <p>매번 <code>nodemon index.js</code>를 입력하는 대신 <code>npm start</code>로 서버를 실행하고 싶습니다. <code>package.json</code>의 scripts에 어떤 항목을 추가해야 할까요?</p>
+      <details><summary>정답 보기</summary>
+<pre><code class="language-json">"scripts": {
+  "start": "nodemon index.js"
+}</code></pre>
+        <p>이후 터미널에서 <code>npm start</code> 명령으로 서버를 실행할 수 있습니다.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m4">
+    <h2><span class="num">4</span> REST API 만들기 — 상품 목록 · 등록</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>REST API와 HTTP 메서드(GET · POST · PUT · DELETE)의 역할을 이해한다.</li>
+      <li><code>app.get</code>으로 상품 목록을 JSON으로 응답하는 API를 만들 수 있다.</li>
+      <li><code>express.json()</code> 미들웨어로 요청 본문(req.body)을 파싱할 수 있다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 RESTful API와 HTTP 메서드</h3>
+      <table>
+        <tr><th>메서드</th><th>의미</th><th>Express 코드</th></tr>
+        <tr><td>GET</td><td>조회</td><td>app.get(url) → res.json(data)</td></tr>
+        <tr><td>POST</td><td>생성</td><td>app.post(url) → req.body(data)</td></tr>
+        <tr><td>PUT</td><td>수정</td><td>app.put(url)</td></tr>
+        <tr><td>DELETE</td><td>삭제</td><td>app.delete(url)</td></tr>
+      </table>
+      <div class="tip"><span class="lbl">💡 정리</span> POST 요청처럼 요청 본문(body)에 담긴 JSON 데이터를 <code>req.body</code>로 읽으려면 <code>app.use(express.json())</code> 미들웨어를 반드시 등록해야 합니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품 목록 API (GET)</div>
+      <span class="fname">index.js</span>
+<pre><code class="language-javascript">// 상품 목록 API
+app.get('/products', (req, res) =&gt; {
+  const products = [
+    { id: 1, name: '무선마우스', price: 30000 },
+    { id: 2, name: '유선키보드', price: 20000 },
+    { id: 3, name: '웹캠', price: 40000 },
+  ];
+  res.json(products); // JSON 형태로 응답 보내기
+});</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p><code>http://localhost:8000/products</code> (pretty print 적용):</p>
+<pre><code class="language-json">[
+  { "id": 1, "name": "무선마우스", "price": 30000 },
+  { "id": 2, "name": "유선키보드", "price": 20000 },
+  { "id": 3, "name": "웹캠", "price": 40000 }
+]</code></pre>
+      </div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품 등록 API (POST) + JSON 미들웨어</div>
+      <span class="fname">index.js</span>
+<pre><code class="language-javascript">// JSON 요청 본문 파싱 미들웨어
+app.use(express.json());
+
+// 상품 등록 API
+app.post('/products', (req, res) =&gt; {
+  // postman 테스트 도구 사용해서 body에 json 형태로 데이터 전달
+  console.log(req.body); //{ id: 4, name: '모니터', price: 120000 }
+  res.send('상품이 등록되었습니다.');
+});</code></pre>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 4-1. req.body가 undefined인 이유</h4>
+      <p>POST 요청으로 JSON 데이터를 보냈는데 <code>console.log(req.body)</code>가 <code>undefined</code>로 출력됩니다. 원인과 해결 방법을 설명하세요.</p>
+      <details><summary>정답 보기</summary>
+        <p>JSON 요청 본문을 파싱하는 미들웨어가 등록되지 않았기 때문입니다. 라우트보다 위에 다음 코드를 추가해야 합니다.</p>
+<pre><code class="language-javascript">app.use(express.json());</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m5">
+    <h2><span class="num">5</span> Postman으로 API 테스트하기 + 전체 코드</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>Postman을 설치하고 Workspace · Collection을 구성할 수 있다.</li>
+      <li>POST 요청의 Body에 JSON을 담아 API를 테스트할 수 있다.</li>
+      <li>미들웨어 · 로깅 · GET · POST를 포함한 전체 서버 코드를 이해한다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 Postman — REST API 테스트 도구</h3>
+      <p>브라우저는 주소창으로 GET 요청만 편하게 보낼 수 있습니다. POST/PUT/DELETE처럼 본문이 필요한 요청을 테스트하려면 <strong>Postman</strong> 같은 테스트 도구가 필요합니다.</p>
+      <div class="flow">
+Postman 설치
+→ My Workspace &gt; COLLECTION &gt; 추가
+→ 요청(Method + URL) 생성
+→ Body &gt; raw &gt; JSON 선택 후 데이터 입력
+→ Send
+      </div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — POST 요청 보내기 (Postman)</div>
+      <span class="fname">Postman → POST http://localhost:8000/products → Body(raw, JSON)</span>
+<pre><code class="language-json">{
+  "id": 4,
+  "name": "모니터",
+  "price": 120000
+}</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p>응답 (200 OK):</p>
+        <p style="margin:4px 0;">상품이 등록되었습니다.</p>
+      </div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 전체 코드 (미들웨어 · 로깅 · GET · POST)</div>
+      <span class="fname">index.js</span>
+<pre><code class="language-javascript">import express from 'express';
+
+const app = express();
+const PORT = 8000;
+
+// 요청 본문(JSON/form-data)을 파싱하기 위한 미들웨어
+app.use(express.json());
+
+// 모든 요청 로깅 - 요청 URL을 콘솔에 출력
+app.use((req, res, next) =&gt; {
+  console.log(`${req.url}`);
+  next();
+});
+
+// 웹 브라우저 요청
+// 루트 경로에 대한 GET 요청 처리 - http://localhost:8000/
+app.get('/', (req, res) =&gt; {
+  res.send('Hello Express!'); // 클라이언트에게 응답(문자열 전송)
+});
+
+// restful API - 상품 목록, 상품 등록
+// http 메서드 - get, post, put, delete
+// get 요청 - http://localhost:8000/products
+app.get('/products', (req, res) =&gt; {
+  const products = [
+    { id: 1, name: '노트북', price: 1000000 },
+    { id: 2, name: '모니터', price: 300000 },
+  ];
+  res.json(products); // 클라이언트에게 JSON 형식으로 응답
+});
+
+// post 요청 - http://localhost:8000/products
+// postman 도구로 테스트 가능
+app.post('/products', (req, res) =&gt; {
+  console.log('요청 본문:', req.body);
+  res.send('상품 등록 완료');
+});
+
+//서버 실행
+app.listen(PORT, () =&gt; {
+  console.log(`서버 실행중.. 포트: ${PORT}`);
+});</code></pre>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 5-1. 요청 로깅 미들웨어 작성</h4>
+      <p>모든 요청에 대해 요청 URL을 콘솔에 출력하는 미들웨어를 작성하세요. (다음 처리로 넘기는 것도 잊지 마세요.)</p>
+      <details><summary>정답 보기</summary>
+<pre><code class="language-javascript">app.use((req, res, next) =&gt; {
+  console.log(`${req.url}`);
+  next(); // 다음 미들웨어/라우트로 제어를 넘김
+});</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m6">
+    <h2><span class="num">6</span> SQL 기초 — DDL · DML · DCL</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>SQL의 개념과 DDL · DML · DCL 세 가지 분류를 구분할 수 있다.</li>
+      <li>테이블 생성/삭제/변경, 데이터 삽입/조회/수정/삭제 문법을 익힌다.</li>
+      <li>트랜잭션(commit/rollback)과 권한(grant/revoke) 명령을 이해한다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 SQL(Structured Query Language)이란?</h3>
+      <p>'에스큐엘' 또는 '시퀄'이라 부르며, 사용자와 데이터베이스 시스템 간에 의사 소통을 하기 위한 언어입니다. 사용자가 SQL로 데이터의 검색·조작·정의 등을 요구하면, DB 시스템이 필요한 데이터를 가져와 결과를 알려줍니다.</p>
+      <table>
+        <tr><th>구분</th><th>개념</th></tr>
+        <tr><td>DDL (Data Definition Language) — 데이터 정의어</td><td>테이블을 포함한 여러 객체를 생성·수정·삭제하는 명령어</td></tr>
+        <tr><td>DML (Data Manipulation Language) — 데이터 조작어</td><td>데이터를 저장·검색·수정·삭제하는 명령어</td></tr>
+        <tr><td>DCL (Data Control Language) — 데이터 제어어</td><td>데이터 사용 권한과 관련된 명령어</td></tr>
+      </table>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — DDL (데이터 정의어)</div>
+      <span class="fname">SQL</span>
+<pre><code class="language-sql">-- 테이블 생성(만들기)
+create table 테이블이름(
+  name char(10),
+  age int
+);
+
+-- 테이블 삭제
+drop table 테이블이름;
+truncate table 테이블이름;  -- 모든 데이터 삭제(테이블은 유지)
+
+-- 테이블 변경
+alter table 테이블이름 add 칼럼추가;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — DML (데이터 조작어)</div>
+      <span class="fname">SQL</span>
+<pre><code class="language-sql">-- 자료 삽입(insert)
+insert into 테이블이름(칼럼명) values (값1, 값2);
+
+-- 자료 조회(select)
+select 칼럼명 from 테이블이름;
+
+-- 자료 수정(update)
+update 테이블이름 set 칼럼명 = '변경내용' where 칼럼명;
+
+-- 자료 삭제(delete)
+delete from 테이블이름;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — DCL (데이터 제어어)</div>
+      <span class="fname">SQL</span>
+<pre><code class="language-sql">-- 커밋과 롤백 (트랜잭션 = 작은 업무 단위)
+commit;    -- 트랜잭션 완료
+rollback;  -- 변경사항을 취소하고 원래대로 복구
+
+-- 권한 부여와 해제
+grant ...;   -- DB 권한을 부여
+revoke ...;  -- DB 권한을 해제</code></pre>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 6-1. 명령어 분류하기</h4>
+      <p>다음 명령어를 DDL / DML / DCL로 분류하세요: <code>create table</code>, <code>insert into</code>, <code>grant</code>, <code>select</code>, <code>drop table</code>, <code>rollback</code></p>
+      <details><summary>정답 보기</summary>
+        <ul>
+          <li><strong>DDL</strong>: create table, drop table</li>
+          <li><strong>DML</strong>: insert into, select</li>
+          <li><strong>DCL</strong>: grant, rollback</li>
+        </ul>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m7">
+    <h2><span class="num">7</span> MySQL · Workbench 설치와 데이터 타입</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>MySQL DBMS와 Workbench를 설치하고 root 계정으로 접속할 수 있다.</li>
+      <li>MySQL의 주요 데이터 타입을 이해하고 용도에 맞게 선택할 수 있다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 MySQL DBMS 설치</h3>
+      <p>웹 애플리케이션에서 데이터베이스와의 연동은 필수적인 작업입니다. 이런 상호작용을 위해서는 <strong>데이터베이스 관리 시스템(DBMS)</strong>이 설치되어야 합니다.</p>
+      <div class="flow">
+① 'mysql download' 검색 → MySQL Community Downloads
+② 8.4.8 LTS 버전 선택 → 설치
+③ 설치 정보 입력
+   - 사용자 : root
+   - 비밀번호 : pw1234
+   - 포트 : 3306
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> <strong>MySQL Workbench(워크벤치)</strong>는 MySQL 데이터베이스를 시각적으로 관리하고 설계할 수 있도록 돕는 통합 개발 환경(IDE)입니다. 설치 후 root 계정으로 접속합니다.</div>
+    </div>
+    <div class="concept"><h3 class="blk">📖 MySQL 데이터 타입(Data Type)</h3>
+      <table>
+        <tr><th>데이터 타입</th><th>설명</th></tr>
+        <tr><td>CHAR</td><td>고정길이 문자, 최대 255byte, 디폴트값은 1byte</td></tr>
+        <tr><td>VARCHAR</td><td>가변길이 문자, 최대 65536byte, 디폴트값은 1byte</td></tr>
+        <tr><td>INT</td><td>가변 숫자, 십진수 기준 최대 220byte</td></tr>
+        <tr><td>TEXT</td><td>가변길이 문자, 최대 65536byte, 디폴트값은 1byte</td></tr>
+        <tr><td>DATE</td><td>날짜 — 연, 월, 일</td></tr>
+        <tr><td>TIMESTAMP</td><td>날짜 — 연, 월, 일, 시, 분, 초, 밀리초</td></tr>
+      </table>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 7-1. 데이터 타입 선택</h4>
+      <p>다음 컬럼에 적절한 데이터 타입을 골라 보세요: (1) 최대 20자 상품 이름, (2) 가격(정수), (3) 등록 일시(연·월·일·시·분·초).</p>
+      <details><summary>정답 보기</summary>
+        <ul>
+          <li>(1) 상품 이름 → <code>VARCHAR(20)</code></li>
+          <li>(2) 가격 → <code>INT</code></li>
+          <li>(3) 등록 일시 → <code>TIMESTAMP</code></li>
+        </ul>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m8">
+    <h2><span class="num">8</span> DB · 테이블 만들기 (SQL 실습)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>Workbench에서 root 계정으로 데이터베이스를 생성하고 사용할 수 있다.</li>
+      <li>테이블을 생성하고 데이터를 삽입·조회할 수 있다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 DB 만들기 (root 계정)</h3>
+      <p>Workbench에서 root 계정으로 접속한 뒤, 데이터베이스를 만들고 <code>use</code> 문으로 사용할 DB를 선택합니다. SQL 실행은 번개(⚡) 아이콘 또는 단축키로 합니다.</p>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — DB 생성과 사용, 테이블 생성</div>
+      <span class="fname">Workbench SQL Editor</span>
+<pre><code class="language-sql">-- root 계정에서 db 생성
+create database mydb;
+
+-- db 사용
+use mydb;
+
+-- 테이블 생성
+create table test(
+  msg varchar(30)
+);</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 자료 삽입 · 조회</div>
+      <span class="fname">Workbench SQL Editor</span>
+<pre><code class="language-sql">-- 테이블 생성
+create table test(
+  msg varchar(30)
+);
+
+-- 자료 삽입
+insert into test(msg) values ('Good Luck!');
+
+-- 자료 검색
+select msg from test;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p>Result Grid:</p>
+        <table>
+          <tr><th>msg</th></tr>
+          <tr><td>Good Luck!</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="tip"><span class="lbl">💡 정리</span> 작성한 SQL은 <code>dbworks &gt; root</code> 폴더를 만들어 <code>.sql</code> 파일로 저장해 두면 재사용하기 편합니다.</div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 8-1. memo 테이블 만들고 데이터 넣기</h4>
+      <p><code>mydb</code>에 <code>content</code>(문자 50자) 컬럼을 가진 <code>memo</code> 테이블을 만들고, '첫 메모'라는 값을 삽입한 뒤 전체 조회하는 SQL을 작성하세요.</p>
+      <details><summary>정답 보기</summary>
+<pre><code class="language-sql">use mydb;
+
+create table memo(
+  content varchar(50)
+);
+
+insert into memo(content) values ('첫 메모');
+
+select * from memo;</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m9">
+    <h2><span class="num">9</span> RDBMS와 제약 조건 — ER 다이어그램 · employee</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>ER 다이어그램으로 개체와 관계를 표현하는 방법을 이해한다.</li>
+      <li>NOT NULL · PRIMARY KEY 제약 조건의 의미와 필요성을 설명할 수 있다.</li>
+      <li>제약 조건 위반 시 발생하는 오류(1062, 1364)를 이해한다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 ER 다이어그램 — 부서와 사원의 개체 관계도</h3>
+      <div class="flow">
+   [부서] ── &lt;소속&gt; ── [사원]
+     │                  │
+  부서번호 부서이름 위치   사원번호 사원이름 나이
+      </div>
+      <p>사각형은 <strong>개체(엔티티)</strong>, 마름모는 <strong>관계</strong>, 타원은 <strong>속성(칼럼)</strong>을 나타냅니다.</p>
+    </div>
+    <div class="concept"><h3 class="blk">📖 제약 조건(Constraints)</h3>
+      <p>테이블들은 각 속성(칼럼)에 대한 무결성을 유지하기 위한 다양한 제약 조건이 적용되어 있습니다. 제약 조건에는 NOT NULL, 기본키, 외래키, CHECK 등이 있습니다.</p>
+      <table>
+        <tr><th>제약 조건</th><th>설명</th></tr>
+        <tr><td>NOT NULL</td><td>칼럼을 정의할 때 명시하면 반드시 데이터를 입력해야 한다. <br><code>칼럼명 데이터타입 NOT NULL</code></td></tr>
+        <tr><td>PRIMARY KEY (기본키)</td><td>UNIQUE와 NOT NULL 속성을 동시에 가진 제약 조건. 테이블당 1개의 기본키만 생성 가능. <br><code>칼럼명 데이터타입 PRIMARY KEY</code> 또는 <code>PRIMARY KEY(칼럼명, ...)</code></td></tr>
+      </table>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 제약 조건 없는 employee 테이블 (문제 상황)</div>
+      <span class="fname">Workbench SQL Editor</span>
+<pre><code class="language-sql">-- 사원 테이블 생성
+create table employee(
+  id varchar(5),
+  name varchar(20),
+  salary int
+);
+
+-- 사원 추가
+insert into employee(id, name, salary) values ('e1001', '김대리', 3500000);
+insert into employee(id, name, salary) values ('e1002', '장그래', 2500000);
+insert into employee(id, name) values ('e1002', '한강');
+
+/* 오류
+  1. 기본키(primary key)가 없어서 고유하지 않음
+  2. 필수 입력 제한이 없음(not null)
+*/
+
+-- 사원 전체 검색
+select id, name, salary from employee;
+
+-- 사원 1명 검색
+select * from employee where id = 'e1002';
+
+-- 테이블 삭제
+drop table employee;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 제약 조건 적용 (PRIMARY KEY · NOT NULL)</div>
+      <span class="fname">Workbench SQL Editor</span>
+<pre><code class="language-sql">-- 사원 테이블 생성
+create table employee(
+  id varchar(5) primary key,
+  name varchar(20) not null,
+  salary int
+);
+
+-- 사원 추가
+insert into employee(id, name, salary) values ('e1001', '김대리', 3500000);
+insert into employee(id, name, salary) values ('e1002', '장그래', 2500000);
+-- insert into employee(id, name) values ('e1002', '한강');
+-- Error Code: 1062. Duplicate entry 'e1002' for key 'employee.PRIMARY'
+
+insert into employee(id, name) values ('e1003', '한강');
+-- insert into employee(id, salary) values ('e1004', 5000000);
+-- Error Code: 1364. Field 'name' doesn't have a default value
+
+-- 사원 검색
+select * from employee;
+
+-- 아이디가 'e1001'인 사원의 이름과 급여 검색
+select name, salary from employee where id = 'e1001';
+
+-- 급여가 300만원 미만인 사원의 모든 정보 검색
+select * from employee where salary &lt; 3000000;
+
+-- 급여가 없는 사원의 정보 검색
+select * from employee where salary is null;</code></pre>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 9-1. 오류 코드 해석하기</h4>
+      <p>기본키가 <code>id</code>인 employee 테이블에서 <code>Error Code: 1062. Duplicate entry 'e1002'</code>와 <code>Error Code: 1364. Field 'name' doesn't have a default value</code>가 각각 왜 발생하는지 설명하세요.</p>
+      <details><summary>정답 보기</summary>
+        <ul>
+          <li><strong>1062</strong>: 이미 존재하는 기본키 값('e1002')을 또 삽입하려 해서 발생합니다. PRIMARY KEY는 UNIQUE 속성을 가지므로 값이 중복될 수 없습니다.</li>
+          <li><strong>1364</strong>: <code>name</code> 컬럼이 NOT NULL인데 값을 넣지 않아 발생합니다. 기본값도 없으므로 반드시 값을 입력해야 합니다.</li>
+        </ul>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m10">
+    <h2><span class="num">10</span> API 서버 — MySQL 데이터베이스 연결</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>전용 계정(jsuser)과 데이터베이스(jsdb), product 테이블을 만들 수 있다.</li>
+      <li><code>mysql2</code> 라이브러리로 Express 서버와 MySQL을 연결할 수 있다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 프로젝트 개요</h3>
+      <table>
+        <tr><th>항목</th><th>내용</th></tr>
+        <tr><td>프로젝트 이름</td><td>api-server-db</td></tr>
+        <tr><td>깃허브 리포지터리</td><td>api-server-db</td></tr>
+        <tr><td>개발 환경</td><td>node.js + express framework</td></tr>
+        <tr><td>데이터베이스</td><td>MySQL + Workbench(워크벤치)</td></tr>
+      </table>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — DB 준비: 계정 · DB · 권한 · product 테이블</div>
+      <span class="fname">Workbench (root 계정)</span>
+<pre><code class="language-sql">-- jsuser 계정 및 비밀번호 생성
+create user jsuser@localhost identified by 'pwjs';
+-- jsdb 생성
+create database jsdb;
+-- 권한 부여
+grant all privileges on jsdb.* to jsuser@localhost;
+
+-- product 테이블 생성
+create table product(
+  id int auto_increment primary key,
+  product_name varchar(20) not null,
+  price int not null,
+  created_at timestamp default current_timestamp
+);
+
+-- 상품 추가
+insert into product(product_name, price) values('노트북', 12000000);
+
+-- 상품 검색
+select * from product;</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>id</code>는 <code>auto_increment</code>로 자동 증가하고, <code>created_at</code>은 <code>default current_timestamp</code>로 삽입 시각이 자동 기록됩니다. 그래서 상품 등록 시 id와 날짜는 직접 넣지 않아도 됩니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — mysql2 라이브러리 설치 & 연결 설정</div>
+      <span class="fname">터미널</span>
+<pre><code class="language-bash">npm install mysql2</code></pre>
+      <span class="fname">package.json (dependencies)</span>
+<pre><code class="language-json">{
+  "name": "api-server(db)",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" &amp;&amp; exit 1",
+    "start": "nodemon index.js"
+  },
+  "type": "module",
+  "dependencies": {
+    "express": "^5.2.1",
+    "mysql2": "^3.20.0",
+    "nodemon": "^3.1.14"
+  }
+}</code></pre>
+      <span class="fname">index.js</span>
+<pre><code class="language-javascript">import express from 'express';
+import mysql from 'mysql2';
+
+const app = express();
+const PORT = 8000;
+
+// MySQL 연결 설정
+const db = mysql.createConnection({
+  host: 'localhost',
+  user: 'jsuser',
+  password: 'pwjs',
+  database: 'jsdb'
+});
+
+// MySQL 연결 확인
+db.connect((err) =&gt; {
+  if (err) {
+    console.error('Error connecting to MySQL:', err);
+    return;
+  }
+  console.log('MySQL에 연결되었습니다.');
+});
+
+// 라우트 설정
+app.get('/', (req, res) =&gt; {
+  res.send('Hello, World!');
+});
+
+app.listen(PORT, () =&gt; {
+  console.log(`Server is running on port ${PORT}`);
+});</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p>서버 실행 (터미널):</p>
+<pre><code class="language-bash">nodemon index
+[nodemon] starting `node index.js`
+Server is running on port 8000
+MySQL에 연결되었습니다.</code></pre>
+      </div>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 10-1. 연결 오류 처리</h4>
+      <p>MySQL 연결에 실패했을 때 콘솔에 오류를 출력하고 즉시 함수를 종료하도록 <code>db.connect</code> 콜백을 작성하세요.</p>
+      <details><summary>정답 보기</summary>
+<pre><code class="language-javascript">db.connect((err) =&gt; {
+  if (err) {
+    console.error('데이터베이스 연결 실패:', err);
+    return;
+  }
+  console.log('데이터베이스에 연결되었습니다.');
+});</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m11">
+    <h2><span class="num">11</span> 상품 CRUD API (DB 연동)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li><code>db.query</code>와 SQL로 상품 목록 조회·상세 조회·등록·수정·삭제 API를 구현한다.</li>
+      <li>플레이스홀더(<code>?</code>)와 <code>req.params</code> · <code>req.body</code>를 활용할 수 있다.</li>
+      <li>상태 코드(200 · 201 · 500)로 응답을 구분할 수 있다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 CRUD와 HTTP 메서드 매핑</h3>
+      <table>
+        <tr><th>기능</th><th>메서드 · 경로</th><th>SQL</th></tr>
+        <tr><td>목록 조회</td><td>GET /products</td><td>SELECT * FROM product</td></tr>
+        <tr><td>상세 조회</td><td>GET /products/:id</td><td>SELECT * FROM product WHERE id = ?</td></tr>
+        <tr><td>등록</td><td>POST /products</td><td>INSERT INTO product ...</td></tr>
+        <tr><td>수정</td><td>PUT /products/:id</td><td>UPDATE product SET ...</td></tr>
+        <tr><td>삭제</td><td>DELETE /products/:id</td><td>DELETE FROM product WHERE id = ?</td></tr>
+      </table>
+      <div class="tip"><span class="lbl">💡 정리</span> SQL에 값을 넣을 때는 <code>?</code> 플레이스홀더와 배열을 함께 넘겨 SQL 인젝션을 방지합니다. URL 경로의 값은 <code>req.params</code>, 요청 본문의 값은 <code>req.body</code>로 읽습니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품 목록 조회 (GET /products)</div>
+      <span class="fname">index.js</span>
+<pre><code class="language-javascript">//상품 목록 조회 라우트 설정
+app.get('/products', (req, res) =&gt; {
+  const sql = 'SELECT * FROM product';
+  db.query(sql, (err, results) =&gt; {
+    if (err) {
+      // 에러 발생 시 500 상태 코드와 에러 메시지 반환
+      console.error('상품 조회 에러:', err);
+      res.status(500).send('상품 조회 중 오류가 발생했습니다.');
+      return; // 즉시 종료
+    }
+    res.json(results); // 성공 시 상품 목록을 JSON 형식으로 반환
+  });
+});</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p>Postman GET /products (200 OK):</p>
+<pre><code class="language-json">[
+  {
+    "id": 1,
+    "product_name": "무선마우스",
+    "price": 30000,
+    "created_at": "2026-04-06T04:11:07.000Z"
+  },
+  {
+    "id": 2,
+    "product_name": "유선키보드",
+    "price": 20000,
+    "created_at": "2026-04-06T05:00:49.000Z"
+  }
+]</code></pre>
+      </div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품 등록 (POST /products)</div>
+      <span class="fname">index.js</span>
+<pre><code class="language-javascript">// JSON 요청 본문을 파싱하기 위한 미들웨어 설정
+app.use(express.json());
+
+// 상품 등록 페이지 요청 라우트 설정
+app.post('/products', (req, res) =&gt; {
+  const { productName, price } = req.body; // 요청 본문에서 상품 이름과 가격 추출
+  const sql = 'INSERT INTO product (product_name, price) VALUES (?, ?)';
+  db.query(sql, [productName, price], (err, results) =&gt; {
+    if (err) {
+      // 에러 발생 시 500 상태 코드와 에러 메시지 반환
+      console.error('상품 등록 에러:', err);
+      res.status(500).send('상품 등록 중 오류가 발생했습니다.');
+      return; // 즉시 종료
+    }
+    res.status(201).send('상품이 성공적으로 등록되었습니다.');
+  });
+});</code></pre>
+      <div class="demo">요청 Body(JSON): <code>{ "productName": "웹캠", "price": 40000 }</code></div>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p>응답 (201): 상품이 성공적으로 등록되었습니다. <br>(상품을 등록하면 id와 날짜는 자동 생성됨)</p>
+      </div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품 상세보기 (GET /products/:id)</div>
+      <span class="fname">index.js</span>
+<pre><code class="language-javascript">// 상품 상세 조회 라우트 설정
+app.get('/products/:id', (req, res) =&gt; {
+  const productId = req.params.id; // URL 경로에서 상품 ID 추출
+  const sql = 'SELECT * FROM product WHERE id = ?';
+  db.query(sql, [productId], (err, results) =&gt; {
+    if (err) {
+      console.error('상품 조회 에러:', err);
+      res.status(500).send('상품 조회 중 오류가 발생했습니다.');
+      return;
+    }
+    res.json(results[0]); // 첫 번째 결과만 반환
+  });
+});</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p>Postman GET /products/2 (200 OK) — id가 2번인 제품 상세 보기:</p>
+<pre><code class="language-json">{
+  "id": 2,
+  "product_name": "유선키보드",
+  "price": 20000,
+  "created_at": "2026-04-07T00:57:37.000Z"
+}</code></pre>
+      </div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품 삭제 (DELETE /products/:id)</div>
+      <span class="fname">index.js</span>
+<pre><code class="language-javascript">// 상품 삭제 라우트 설정
+app.delete('/products/:id', (req, res) =&gt; {
+  const productId = req.params.id; // URL 경로에서 상품 ID 추출
+  const sql = 'DELETE FROM product WHERE id = ?';
+  db.query(sql, [productId], (err, results) =&gt; {
+    if (err) {
+      console.error('상품 삭제 에러:', err);
+      res.status(500).send('상품 삭제 중 오류가 발생했습니다.');
+      return;
+    }
+    res.send('상품이 성공적으로 삭제되었습니다.');
+  });
+});</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p>Postman DELETE /products/3 — id가 3번인 제품 삭제:</p>
+        <p style="margin:4px 0;">상품이 성공적으로 삭제되었습니다.</p>
+      </div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품 수정 (PUT /products/:id)</div>
+      <span class="fname">index.js</span>
+<pre><code class="language-javascript">// 상품 수정 라우트 설정
+app.put('/products/:id', (req, res) =&gt; {
+  const productId = req.params.id;
+  const { productName, price } = req.body;
+  const sql = 'UPDATE product SET product_name = ?, price = ? WHERE id = ?';
+  db.query(sql, [productName, price, productId], (err, results) =&gt; {
+    if (err) {
+      console.error('상품 수정 에러:', err);
+      res.status(500).send('상품 수정 중 오류가 발생했습니다.');
+      return;
+    }
+    res.send('상품이 성공적으로 수정되었습니다.');
+  });
+});</code></pre>
+      <div class="demo">PUT /products/2 · Body(JSON): <code>{ "productName": "무선 키보드", "price": 40000 }</code></div>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p>id 2번인 제품 '유선 키보드'를 '무선 키보드'로, 가격은 40000원으로 변경:</p>
+        <p style="margin:4px 0;">상품이 성공적으로 수정되었습니다.</p>
+      </div>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 11-1. 상세 조회 API 작성</h4>
+      <p>URL 경로로 전달된 상품 id에 해당하는 상품 한 건을 조회해 JSON으로 반환하는 <code>GET /products/:id</code> API를 작성하세요. 결과는 첫 번째 행만 반환합니다.</p>
+      <details><summary>정답 보기</summary>
+<pre><code class="language-javascript">app.get('/products/:id', (req, res) =&gt; {
+  const productId = req.params.id;
+  const sql = 'SELECT * FROM product WHERE id = ?';
+  db.query(sql, [productId], (err, results) =&gt; {
+    if (err) {
+      console.error('상품 조회 에러:', err);
+      res.status(500).send('상품 조회 중 오류가 발생했습니다.');
+      return;
+    }
+    res.json(results[0]);
+  });
+});</code></pre>
+      </details>
+      <h4>실습 11-2. 상품 등록 API 작성</h4>
+      <p>요청 본문에서 <code>productName</code>, <code>price</code>를 꺼내 product 테이블에 INSERT하고, 성공 시 201 상태로 응답하는 API를 작성하세요. (플레이스홀더 <code>?</code> 사용)</p>
+      <details><summary>정답 보기</summary>
+<pre><code class="language-javascript">app.post('/products', (req, res) =&gt; {
+  const { productName, price } = req.body;
+  const sql = 'INSERT INTO product (product_name, price) VALUES (?, ?)';
+  db.query(sql, [productName, price], (err, results) =&gt; {
+    if (err) {
+      console.error('상품 등록 에러:', err);
+      res.status(500).send('상품 등록 중 오류가 발생했습니다.');
+      return;
+    }
+    res.status(201).send('상품이 성공적으로 등록되었습니다.');
+  });
+});</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m12">
+    <h2><span class="num">12</span> MVC 패턴으로 서버 구조화하기</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>MVC 패턴의 세 가지 역할(Model · View · Controller)을 이해한다.</li>
+      <li>Express 프로젝트에서 파일별 역할을 분리하는 방법을 파악한다.</li>
+      <li>MVC 계층별 코드 작성 순서를 이해한다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 1. MVC 패턴이란?</h3>
+      <p>MVC 패턴은 애플리케이션을 다음 3가지 역할로 나누어 관리하는 구조입니다.</p>
+      <ul>
+        <li><strong>Model</strong>: 데이터 처리, 데이터베이스 연결, 비즈니스 로직 담당</li>
+        <li><strong>View</strong>: 사용자에게 보여주는 화면 또는 응답 결과 담당</li>
+        <li><strong>Controller</strong>: 클라이언트 요청을 받아서 처리 흐름을 연결하는 담당</li>
+      </ul>
+    </div>
+    <div class="concept"><h3 class="blk">📖 2. Express MVC 프로젝트에서의 역할 분리</h3>
+      <p>프로젝트 이름은 <code>react-server</code>이며(개발 환경: node.js + express + MySQL/Workbench), 각 파일의 역할은 다음과 같습니다.</p>
+      <table>
+        <tr><th>파일</th><th>역할</th></tr>
+        <tr><td>index.js</td><td>서버를 실행하고 라우트를 연결하는 진입점</td></tr>
+        <tr><td>route/productRoute.js</td><td>URL 경로와 컨트롤러를 연결</td></tr>
+        <tr><td>controller/productController.js</td><td>요청을 받아서 서비스 계층으로 전달</td></tr>
+        <tr><td>service/productService.js</td><td>비즈니스 로직 처리</td></tr>
+        <tr><td>repository/productRepository.js</td><td>데이터베이스 접근 및 쿼리 처리</td></tr>
+        <tr><td>config/database.js</td><td>데이터베이스 연결 설정</td></tr>
+      </table>
+      <div class="tip"><span class="lbl">💡 정리</span> MVC 코드 작성 순서는 보통 <strong>config → repository → service → controller → route → index</strong> 순으로, 데이터 접근 계층부터 진입점 방향으로 쌓아 올립니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 폴더 구조(역할 분리)</div>
+      <span class="fname">react-server/</span>
+<pre><code class="language-bash">react-server/
+├── index.js                        # 진입점: 서버 실행 · 라우트 연결
+├── config/
+│   └── database.js                 # DB 연결 설정
+├── route/
+│   └── productRoute.js             # URL ↔ 컨트롤러 연결
+├── controller/
+│   └── productController.js        # 요청 수신 → 서비스 전달
+├── service/
+│   └── productService.js           # 비즈니스 로직
+└── repository/
+    └── productRepository.js        # DB 접근 · 쿼리</code></pre>
+    </div>
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 12-1. 계층 역할 연결하기</h4>
+      <p>다음 파일이 담당하는 MVC 역할을 연결하세요: <code>productRepository.js</code>, <code>productController.js</code>, <code>productRoute.js</code>.</p>
+      <details><summary>정답 보기</summary>
+        <ul>
+          <li><code>productRepository.js</code> → 데이터베이스 접근 및 쿼리 처리 (Model 계열)</li>
+          <li><code>productController.js</code> → 요청을 받아서 서비스 계층으로 전달 (Controller)</li>
+          <li><code>productRoute.js</code> → URL 경로와 컨트롤러를 연결 (라우팅)</li>
+        </ul>
+      </details>
+    </div>
+  </section>
+
+  <footer>10강. 웹서버 만들기 (Express) · 학습 교안<br>모듈별 학습목표 · 개념 · 예제 · 실습문제 구성</footer>
+</div>
+
+<script>
+(()=>{var Tn=Object.create;var Ce=Object.defineProperty;var vn=Object.getOwnPropertyDescriptor;var xn=Object.getOwnPropertyNames;var Rn=Object.getPrototypeOf,Mn=Object.prototype.hasOwnProperty;var kn=(e,n)=>()=>{try{return n||e((n={exports:{}}).exports,n),n.exports}catch(t){throw n=0,t}};var In=(e,n,t,i)=>{if(n&&typeof n=="object"||typeof n=="function")for(let g of xn(n))!Mn.call(e,g)&&g!==t&&Ce(e,g,{get:()=>n[g],enumerable:!(i=vn(n,g))||i.enumerable});return e};var Cn=(e,n,t)=>(t=e!=null?Tn(Rn(e)):{},In(n||!e||!e.__esModule?Ce(t,"default",{value:e,enumerable:!0}):t,e));var Je=kn((Dt,Ve)=>{function $e(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(n=>{let t=e[n],i=typeof t;(i==="object"||i==="function")&&!Object.isFrozen(t)&&$e(t)}),e}var ge=class{constructor(n){n.data===void 0&&(n.data={}),this.data=n.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function He(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function Z(e,...n){let t=Object.create(null);for(let i in e)t[i]=e[i];return n.forEach(function(i){for(let g in i)t[g]=i[g]}),t}var Ln="</span>",Le=e=>!!e.scope,Dn=(e,{prefix:n})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let t=e.split(".");return[`${n}${t.shift()}`,...t.map((i,g)=>`${i}${"_".repeat(g+1)}`)].join(" ")}return`${n}${e}`},Ee=class{constructor(n,t){this.buffer="",this.classPrefix=t.classPrefix,n.walk(this)}addText(n){this.buffer+=He(n)}openNode(n){if(!Le(n))return;let t=Dn(n.scope,{prefix:this.classPrefix});this.span(t)}closeNode(n){Le(n)&&(this.buffer+=Ln)}value(){return this.buffer}span(n){this.buffer+=`<span class="${n}">`}},De=(e={})=>{let n={children:[]};return Object.assign(n,e),n},Ne=class e{constructor(){this.rootNode=De(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(n){this.top.children.push(n)}openNode(n){let t=De({scope:n});this.add(t),this.stack.push(t)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(n){return this.constructor._walk(n,this.rootNode)}static _walk(n,t){return typeof t=="string"?n.addText(t):t.children&&(n.openNode(t),t.children.forEach(i=>this._walk(n,i)),n.closeNode(t)),n}static _collapse(n){typeof n!="string"&&n.children&&(n.children.every(t=>typeof t=="string")?n.children=[n.children.join("")]:n.children.forEach(t=>{e._collapse(t)}))}},ye=class extends Ne{constructor(n){super(),this.options=n}addText(n){n!==""&&this.add(n)}startScope(n){this.openNode(n)}endScope(){this.closeNode()}__addSublanguage(n,t){let i=n.root;t&&(i.scope=`language:${t}`),this.add(i)}toHTML(){return new Ee(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function ae(e){return e?typeof e=="string"?e:e.source:null}function Ge(e){return Q("(?=",e,")")}function Bn(e){return Q("(?:",e,")*")}function Un(e){return Q("(?:",e,")?")}function Q(...e){return e.map(t=>ae(t)).join("")}function Pn(e){let n=e[e.length-1];return typeof n=="object"&&n.constructor===Object?(e.splice(e.length-1,1),n):{}}function we(...e){return"("+(Pn(e).capture?"":"?:")+e.map(i=>ae(i)).join("|")+")"}function Fe(e){return new RegExp(e.toString()+"|").exec("").length-1}function zn(e,n){let t=e&&e.exec(n);return t&&t.index===0}var $n=/\[(?:[^\\\]]|\\.)*\]|\(\??|\\([1-9][0-9]*)|\\./;function Ae(e,{joinWith:n}){let t=0;return e.map(i=>{t+=1;let g=t,p=ae(i),s="";for(;p.length>0;){let r=$n.exec(p);if(!r){s+=p;break}s+=p.substring(0,r.index),p=p.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?s+="\\"+String(Number(r[1])+g):(s+=r[0],r[0]==="("&&t++)}return s}).map(i=>`(${i})`).join(n)}var Hn=/\b\B/,Ke="[a-zA-Z]\\w*",Oe="[a-zA-Z_]\\w*",Ze="\\b\\d+(\\.\\d+)?",We="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",je="\\b(0b[01]+)",Gn="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",Fn=(e={})=>{let n=/^#![ ]*\//;return e.binary&&(e.begin=Q(n,/.*\b/,e.binary,/\b.*/)),Z({scope:"meta",begin:n,end:/$/,relevance:0,"on:begin":(t,i)=>{t.index!==0&&i.ignoreMatch()}},e)},se={begin:"\\\\[\\s\\S]",relevance:0},Kn={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[se]},Zn={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[se]},Wn={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},fe=function(e,n,t={}){let i=Z({scope:"comment",begin:e,end:n,contains:[]},t);i.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let g=we("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return i.contains.push({begin:Q(/[ ]+/,"(",g,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),i},jn=fe("//","$"),qn=fe("/\\*","\\*/"),Xn=fe("#","$"),Yn={scope:"number",begin:Ze,relevance:0},Qn={scope:"number",begin:We,relevance:0},Vn={scope:"number",begin:je,relevance:0},Jn={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[se,{begin:/\[/,end:/\]/,relevance:0,contains:[se]}]},et={scope:"title",begin:Ke,relevance:0},nt={scope:"title",begin:Oe,relevance:0},tt={begin:"\\.\\s*"+Oe,relevance:0},rt=function(e){return Object.assign(e,{"on:begin":(n,t)=>{t.data._beginMatch=n[1]},"on:end":(n,t)=>{t.data._beginMatch!==n[1]&&t.ignoreMatch()}})},ue=Object.freeze({__proto__:null,APOS_STRING_MODE:Kn,BACKSLASH_ESCAPE:se,BINARY_NUMBER_MODE:Vn,BINARY_NUMBER_RE:je,COMMENT:fe,C_BLOCK_COMMENT_MODE:qn,C_LINE_COMMENT_MODE:jn,C_NUMBER_MODE:Qn,C_NUMBER_RE:We,END_SAME_AS_BEGIN:rt,HASH_COMMENT_MODE:Xn,IDENT_RE:Ke,MATCH_NOTHING_RE:Hn,METHOD_GUARD:tt,NUMBER_MODE:Yn,NUMBER_RE:Ze,PHRASAL_WORDS_MODE:Wn,QUOTE_STRING_MODE:Zn,REGEXP_MODE:Jn,RE_STARTERS_RE:Gn,SHEBANG:Fn,TITLE_MODE:et,UNDERSCORE_IDENT_RE:Oe,UNDERSCORE_TITLE_MODE:nt});function it(e,n){e.input[e.index-1]==="."&&n.ignoreMatch()}function at(e,n){e.className!==void 0&&(e.scope=e.className,delete e.className)}function st(e,n){n&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=it,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function ot(e,n){Array.isArray(e.illegal)&&(e.illegal=we(...e.illegal))}function ct(e,n){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function lt(e,n){e.relevance===void 0&&(e.relevance=1)}var ut=(e,n)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let t=Object.assign({},e);Object.keys(e).forEach(i=>{delete e[i]}),e.keywords=t.keywords,e.begin=Q(t.beforeMatch,Ge(t.begin)),e.starts={relevance:0,contains:[Object.assign(t,{endsParent:!0})]},e.relevance=0,delete t.beforeMatch},gt=["of","and","for","in","not","or","if","then","parent","list","value"],dt="keyword";function qe(e,n,t=dt){let i=Object.create(null);return typeof e=="string"?g(t,e.split(" ")):Array.isArray(e)?g(t,e):Object.keys(e).forEach(function(p){Object.assign(i,qe(e[p],n,p))}),i;function g(p,s){n&&(s=s.map(r=>r.toLowerCase())),s.forEach(function(r){let l=r.split("|");i[l[0]]=[p,ft(l[0],l[1])]})}}function ft(e,n){return n?Number(n):bt(e)?0:1}function bt(e){return gt.includes(e.toLowerCase())}var Be={},Y=e=>{console.error(e)},Ue=(e,...n)=>{console.log(`WARN: ${e}`,...n)},ee=(e,n)=>{Be[`${e}/${n}`]||(console.log(`Deprecated as of ${e}. ${n}`),Be[`${e}/${n}`]=!0)},de=new Error;function Xe(e,n,{key:t}){let i=0,g=e[t],p={},s={};for(let r=1;r<=n.length;r++)s[r+i]=g[r],p[r+i]=!0,i+=Fe(n[r-1]);e[t]=s,e[t]._emit=p,e[t]._multi=!0}function pt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw Y("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),de;if(typeof e.beginScope!="object"||e.beginScope===null)throw Y("beginScope must be object"),de;Xe(e,e.begin,{key:"beginScope"}),e.begin=Ae(e.begin,{joinWith:""})}}function ht(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw Y("skip, excludeEnd, returnEnd not compatible with endScope: {}"),de;if(typeof e.endScope!="object"||e.endScope===null)throw Y("endScope must be object"),de;Xe(e,e.end,{key:"endScope"}),e.end=Ae(e.end,{joinWith:""})}}function _t(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function mt(e){_t(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),pt(e),ht(e)}function Et(e){function n(s,r){return new RegExp(ae(s),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class t{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,l){l.position=this.position++,this.matchIndexes[this.matchAt]=l,this.regexes.push([l,r]),this.matchAt+=Fe(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(l=>l[1]);this.matcherRe=n(Ae(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let l=this.matcherRe.exec(r);if(!l)return null;let f=l.findIndex((A,E)=>E>0&&A!==void 0),h=this.matchIndexes[f];return l.splice(0,f),Object.assign(l,h)}}class i{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let l=new t;return this.rules.slice(r).forEach(([f,h])=>l.addRule(f,h)),l.compile(),this.multiRegexes[r]=l,l}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,l){this.rules.push([r,l]),l.type==="begin"&&this.count++}exec(r){let l=this.getMatcher(this.regexIndex);l.lastIndex=this.lastIndex;let f=l.exec(r);if(this.resumingScanAtSamePosition()&&!(f&&f.index===this.lastIndex)){let h=this.getMatcher(0);h.lastIndex=this.lastIndex+1,f=h.exec(r)}return f&&(this.regexIndex+=f.position+1,this.regexIndex===this.count&&this.considerAll()),f}}function g(s){let r=new i;return s.contains.forEach(l=>r.addRule(l.begin,{rule:l,type:"begin"})),s.terminatorEnd&&r.addRule(s.terminatorEnd,{type:"end"}),s.illegal&&r.addRule(s.illegal,{type:"illegal"}),r}function p(s,r){let l=s;if(s.isCompiled)return l;[at,ct,mt,ut].forEach(h=>h(s,r)),e.compilerExtensions.forEach(h=>h(s,r)),s.__beforeBegin=null,[st,ot,lt].forEach(h=>h(s,r)),s.isCompiled=!0;let f=null;return typeof s.keywords=="object"&&s.keywords.$pattern&&(s.keywords=Object.assign({},s.keywords),f=s.keywords.$pattern,delete s.keywords.$pattern),f=f||/\w+/,s.keywords&&(s.keywords=qe(s.keywords,e.case_insensitive)),l.keywordPatternRe=n(f,!0),r&&(s.begin||(s.begin=/\B|\b/),l.beginRe=n(l.begin),!s.end&&!s.endsWithParent&&(s.end=/\B|\b/),s.end&&(l.endRe=n(l.end)),l.terminatorEnd=ae(l.end)||"",s.endsWithParent&&r.terminatorEnd&&(l.terminatorEnd+=(s.end?"|":"")+r.terminatorEnd)),s.illegal&&(l.illegalRe=n(s.illegal)),s.contains||(s.contains=[]),s.contains=[].concat(...s.contains.map(function(h){return Nt(h==="self"?s:h)})),s.contains.forEach(function(h){p(h,l)}),s.starts&&p(s.starts,r),l.matcher=g(l),l}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=Z(e.classNameAliases||{}),p(e)}function Ye(e){return e?e.endsWithParent||Ye(e.starts):!1}function Nt(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(n){return Z(e,{variants:null},n)})),e.cachedVariants?e.cachedVariants:Ye(e)?Z(e,{starts:e.starts?Z(e.starts):null}):Object.isFrozen(e)?Z(e):e}var yt="11.9.0",Se=class extends Error{constructor(n,t){super(n),this.name="HTMLInjectionError",this.html=t}},me=He,Pe=Z,ze=Symbol("nomatch"),St=7,Qe=function(e){let n=Object.create(null),t=Object.create(null),i=[],g=!0,p="Could not find the language '{}', did you forget to load/include a language module?",s={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:ye};function l(a){return r.noHighlightRe.test(a)}function f(a){let o=a.className+" ";o+=a.parentNode?a.parentNode.className:"";let d=r.languageDetectRe.exec(o);if(d){let m=P(d[1]);return m||(Ue(p.replace("{}",d[1])),Ue("Falling back to no-highlight mode for this block.",a)),m?d[1]:"no-highlight"}return o.split(/\s+/).find(m=>l(m)||P(m))}function h(a,o,d){let m="",N="";typeof o=="object"?(m=a,d=o.ignoreIllegals,N=o.language):(ee("10.7.0","highlight(lang, code, ...args) has been deprecated."),ee("10.7.0",`Please use highlight(code, options) instead.
+https://github.com/highlightjs/highlight.js/issues/2277`),N=a,m=o),d===void 0&&(d=!0);let O={code:m,language:N};K("before:highlight",O);let L=O.result?O.result:A(O.language,O.code,d);return L.code=O.code,K("after:highlight",L),L}function A(a,o,d,m){let N=Object.create(null);function O(c,u){return c.keywords[u]}function L(){if(!b.keywords){v.addText(S);return}let c=0;b.keywordPatternRe.lastIndex=0;let u=b.keywordPatternRe.exec(S),_="";for(;u;){_+=S.substring(c,u.index);let y=G.case_insensitive?u[0].toLowerCase():u[0],k=O(b,y);if(k){let[F,An]=k;if(v.addText(_),_="",N[y]=(N[y]||0)+1,N[y]<=St&&(le+=An),F.startsWith("_"))_+=u[0];else{let On=G.classNameAliases[F]||F;H(u[0],On)}}else _+=u[0];c=b.keywordPatternRe.lastIndex,u=b.keywordPatternRe.exec(S)}_+=S.substring(c),v.addText(_)}function oe(){if(S==="")return;let c=null;if(typeof b.subLanguage=="string"){if(!n[b.subLanguage]){v.addText(S);return}c=A(b.subLanguage,S,!0,Ie[b.subLanguage]),Ie[b.subLanguage]=c._top}else c=w(S,b.subLanguage.length?b.subLanguage:null);b.relevance>0&&(le+=c.relevance),v.__addSublanguage(c._emitter,c.language)}function B(){b.subLanguage!=null?oe():L(),S=""}function H(c,u){c!==""&&(v.startScope(u),v.addText(c),v.endScope())}function xe(c,u){let _=1,y=u.length-1;for(;_<=y;){if(!c._emit[_]){_++;continue}let k=G.classNameAliases[c[_]]||c[_],F=u[_];k?H(F,k):(S=F,L(),S=""),_++}}function Re(c,u){return c.scope&&typeof c.scope=="string"&&v.openNode(G.classNameAliases[c.scope]||c.scope),c.beginScope&&(c.beginScope._wrap?(H(S,G.classNameAliases[c.beginScope._wrap]||c.beginScope._wrap),S=""):c.beginScope._multi&&(xe(c.beginScope,u),S="")),b=Object.create(c,{parent:{value:b}}),b}function Me(c,u,_){let y=zn(c.endRe,_);if(y){if(c["on:end"]){let k=new ge(c);c["on:end"](u,k),k.isMatchIgnored&&(y=!1)}if(y){for(;c.endsParent&&c.parent;)c=c.parent;return c}}if(c.endsWithParent)return Me(c.parent,u,_)}function En(c){return b.matcher.regexIndex===0?(S+=c[0],1):(_e=!0,0)}function Nn(c){let u=c[0],_=c.rule,y=new ge(_),k=[_.__beforeBegin,_["on:begin"]];for(let F of k)if(F&&(F(c,y),y.isMatchIgnored))return En(u);return _.skip?S+=u:(_.excludeBegin&&(S+=u),B(),!_.returnBegin&&!_.excludeBegin&&(S=u)),Re(_,c),_.returnBegin?0:u.length}function yn(c){let u=c[0],_=o.substring(c.index),y=Me(b,c,_);if(!y)return ze;let k=b;b.endScope&&b.endScope._wrap?(B(),H(u,b.endScope._wrap)):b.endScope&&b.endScope._multi?(B(),xe(b.endScope,c)):k.skip?S+=u:(k.returnEnd||k.excludeEnd||(S+=u),B(),k.excludeEnd&&(S=u));do b.scope&&v.closeNode(),!b.skip&&!b.subLanguage&&(le+=b.relevance),b=b.parent;while(b!==y.parent);return y.starts&&Re(y.starts,c),k.returnEnd?0:u.length}function Sn(){let c=[];for(let u=b;u!==G;u=u.parent)u.scope&&c.unshift(u.scope);c.forEach(u=>v.openNode(u))}let ce={};function ke(c,u){let _=u&&u[0];if(S+=c,_==null)return B(),0;if(ce.type==="begin"&&u.type==="end"&&ce.index===u.index&&_===""){if(S+=o.slice(u.index,u.index+1),!g){let y=new Error(`0 width match regex (${a})`);throw y.languageName=a,y.badRule=ce.rule,y}return 1}if(ce=u,u.type==="begin")return Nn(u);if(u.type==="illegal"&&!d){let y=new Error('Illegal lexeme "'+_+'" for mode "'+(b.scope||"<unnamed>")+'"');throw y.mode=b,y}else if(u.type==="end"){let y=yn(u);if(y!==ze)return y}if(u.type==="illegal"&&_==="")return 1;if(he>1e5&&he>u.index*3)throw new Error("potential infinite loop, way more iterations than matches");return S+=_,_.length}let G=P(a);if(!G)throw Y(p.replace("{}",a)),new Error('Unknown language: "'+a+'"');let wn=Et(G),pe="",b=m||wn,Ie={},v=new r.__emitter(r);Sn();let S="",le=0,X=0,he=0,_e=!1;try{if(G.__emitTokens)G.__emitTokens(o,v);else{for(b.matcher.considerAll();;){he++,_e?_e=!1:b.matcher.considerAll(),b.matcher.lastIndex=X;let c=b.matcher.exec(o);if(!c)break;let u=o.substring(X,c.index),_=ke(u,c);X=c.index+_}ke(o.substring(X))}return v.finalize(),pe=v.toHTML(),{language:a,value:pe,relevance:le,illegal:!1,_emitter:v,_top:b}}catch(c){if(c.message&&c.message.includes("Illegal"))return{language:a,value:me(o),illegal:!0,relevance:0,_illegalBy:{message:c.message,index:X,context:o.slice(X-100,X+100),mode:c.mode,resultSoFar:pe},_emitter:v};if(g)return{language:a,value:me(o),illegal:!1,relevance:0,errorRaised:c,_emitter:v,_top:b};throw c}}function E(a){let o={value:me(a),illegal:!1,relevance:0,_top:s,_emitter:new r.__emitter(r)};return o._emitter.addText(a),o}function w(a,o){o=o||r.languages||Object.keys(n);let d=E(a),m=o.filter(P).filter(J).map(B=>A(B,a,!1));m.unshift(d);let N=m.sort((B,H)=>{if(B.relevance!==H.relevance)return H.relevance-B.relevance;if(B.language&&H.language){if(P(B.language).supersetOf===H.language)return 1;if(P(H.language).supersetOf===B.language)return-1}return 0}),[O,L]=N,oe=O;return oe.secondBest=L,oe}function I(a,o,d){let m=o&&t[o]||d;a.classList.add("hljs"),a.classList.add(`language-${m}`)}function T(a){let o=null,d=f(a);if(l(d))return;if(K("before:highlightElement",{el:a,language:d}),a.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",a);return}if(a.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("https://github.com/highlightjs/highlight.js/wiki/security"),console.warn("The element with unescaped HTML:"),console.warn(a)),r.throwUnescapedHTML))throw new Se("One of your code blocks includes unescaped HTML.",a.innerHTML);o=a;let m=o.textContent,N=d?h(m,{language:d,ignoreIllegals:!0}):w(m);a.innerHTML=N.value,a.dataset.highlighted="yes",I(a,d,N.language),a.result={language:N.language,re:N.relevance,relevance:N.relevance},N.secondBest&&(a.secondBest={language:N.secondBest.language,relevance:N.secondBest.relevance}),K("after:highlightElement",{el:a,result:N,text:m})}function x(a){r=Pe(r,a)}let W=()=>{M(),ee("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function D(){M(),ee("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let R=!1;function M(){if(document.readyState==="loading"){R=!0;return}document.querySelectorAll(r.cssSelector).forEach(T)}function $(){R&&M()}typeof window<"u"&&window.addEventListener&&window.addEventListener("DOMContentLoaded",$,!1);function C(a,o){let d=null;try{d=o(e)}catch(m){if(Y("Language definition for '{}' could not be registered.".replace("{}",a)),g)Y(m);else throw m;d=s}d.name||(d.name=a),n[a]=d,d.rawDefinition=o.bind(null,e),d.aliases&&V(d.aliases,{languageName:a})}function U(a){delete n[a];for(let o of Object.keys(t))t[o]===a&&delete t[o]}function j(){return Object.keys(n)}function P(a){return a=(a||"").toLowerCase(),n[a]||n[t[a]]}function V(a,{languageName:o}){typeof a=="string"&&(a=[a]),a.forEach(d=>{t[d.toLowerCase()]=o})}function J(a){let o=P(a);return o&&!o.disableAutodetect}function te(a){a["before:highlightBlock"]&&!a["before:highlightElement"]&&(a["before:highlightElement"]=o=>{a["before:highlightBlock"](Object.assign({block:o.el},o))}),a["after:highlightBlock"]&&!a["after:highlightElement"]&&(a["after:highlightElement"]=o=>{a["after:highlightBlock"](Object.assign({block:o.el},o))})}function re(a){te(a),i.push(a)}function ie(a){let o=i.indexOf(a);o!==-1&&i.splice(o,1)}function K(a,o){let d=a;i.forEach(function(m){m[d]&&m[d](o)})}function q(a){return ee("10.7.0","highlightBlock will be removed entirely in v12.0"),ee("10.7.0","Please use highlightElement now."),T(a)}Object.assign(e,{highlight:h,highlightAuto:w,highlightAll:M,highlightElement:T,highlightBlock:q,configure:x,initHighlighting:W,initHighlightingOnLoad:D,registerLanguage:C,unregisterLanguage:U,listLanguages:j,getLanguage:P,registerAliases:V,autoDetection:J,inherit:Pe,addPlugin:re,removePlugin:ie}),e.debugMode=function(){g=!1},e.safeMode=function(){g=!0},e.versionString=yt,e.regex={concat:Q,lookahead:Ge,either:we,optional:Un,anyNumberOfTimes:Bn};for(let a in ue)typeof ue[a]=="object"&&$e(ue[a]);return Object.assign(e,ue),e},ne=Qe({});ne.newInstance=()=>Qe({});Ve.exports=ne;ne.HighlightJS=ne;ne.default=ne});var en=Cn(Je(),1);var z=en.default;var nn="[A-Za-z$_][0-9A-Za-z$_]*",wt=["as","in","of","if","for","while","finally","var","new","function","do","return","void","else","break","catch","instanceof","with","throw","case","default","try","switch","continue","typeof","delete","let","yield","const","class","debugger","async","await","static","import","from","export","extends"],At=["true","false","null","undefined","NaN","Infinity"],tn=["Object","Function","Boolean","Symbol","Math","Date","Number","BigInt","String","RegExp","Array","Float32Array","Float64Array","Int8Array","Uint8Array","Uint8ClampedArray","Int16Array","Int32Array","Uint16Array","Uint32Array","BigInt64Array","BigUint64Array","Set","Map","WeakSet","WeakMap","ArrayBuffer","SharedArrayBuffer","Atomics","DataView","JSON","Promise","Generator","GeneratorFunction","AsyncFunction","Reflect","Proxy","Intl","WebAssembly"],rn=["Error","EvalError","InternalError","RangeError","ReferenceError","SyntaxError","TypeError","URIError"],an=["setInterval","setTimeout","clearInterval","clearTimeout","require","exports","eval","isFinite","isNaN","parseFloat","parseInt","decodeURI","decodeURIComponent","encodeURI","encodeURIComponent","escape","unescape"],Ot=["arguments","this","super","console","window","document","localStorage","sessionStorage","module","global"],Tt=[].concat(an,tn,rn);function Te(e){let n=e.regex,t=(o,{after:d})=>{let m="</"+o[0].slice(1);return o.input.indexOf(m,d)!==-1},i=nn,g={begin:"<>",end:"</>"},p=/<[A-Za-z0-9\\._:-]+\s*\/>/,s={begin:/<[A-Za-z0-9\\._:-]+/,end:/\/[A-Za-z0-9\\._:-]+>|\/>/,isTrulyOpeningTag:(o,d)=>{let m=o[0].length+o.index,N=o.input[m];if(N==="<"||N===","){d.ignoreMatch();return}N===">"&&(t(o,{after:m})||d.ignoreMatch());let O,L=o.input.substring(m);if(O=L.match(/^\s*=/)){d.ignoreMatch();return}if((O=L.match(/^\s+extends\s+/))&&O.index===0){d.ignoreMatch();return}}},r={$pattern:nn,keyword:wt,literal:At,built_in:Tt,"variable.language":Ot},l="[0-9](_?[0-9])*",f=`\\.(${l})`,h="0|[1-9](_?[0-9])*|0[0-7]*[89][0-9]*",A={className:"number",variants:[{begin:`(\\b(${h})((${f})|\\.)?|(${f}))[eE][+-]?(${l})\\b`},{begin:`\\b(${h})\\b((${f})\\b|\\.)?|(${f})\\b`},{begin:"\\b(0|[1-9](_?[0-9])*)n\\b"},{begin:"\\b0[xX][0-9a-fA-F](_?[0-9a-fA-F])*n?\\b"},{begin:"\\b0[bB][0-1](_?[0-1])*n?\\b"},{begin:"\\b0[oO][0-7](_?[0-7])*n?\\b"},{begin:"\\b0[0-7]+n?\\b"}],relevance:0},E={className:"subst",begin:"\\$\\{",end:"\\}",keywords:r,contains:[]},w={begin:"html`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,E],subLanguage:"xml"}},I={begin:"css`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,E],subLanguage:"css"}},T={begin:"gql`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,E],subLanguage:"graphql"}},x={className:"string",begin:"`",end:"`",contains:[e.BACKSLASH_ESCAPE,E]},D={className:"comment",variants:[e.COMMENT(/\/\*\*(?!\/)/,"\\*/",{relevance:0,contains:[{begin:"(?=@[A-Za-z]+)",relevance:0,contains:[{className:"doctag",begin:"@[A-Za-z]+"},{className:"type",begin:"\\{",end:"\\}",excludeEnd:!0,excludeBegin:!0,relevance:0},{className:"variable",begin:i+"(?=\\s*(-)|$)",endsParent:!0,relevance:0},{begin:/(?=[^\n])\s/,relevance:0}]}]}),e.C_BLOCK_COMMENT_MODE,e.C_LINE_COMMENT_MODE]},R=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,w,I,T,x,{match:/\$\d+/},A];E.contains=R.concat({begin:/\{/,end:/\}/,keywords:r,contains:["self"].concat(R)});let M=[].concat(D,E.contains),$=M.concat([{begin:/\(/,end:/\)/,keywords:r,contains:["self"].concat(M)}]),C={className:"params",begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:r,contains:$},U={variants:[{match:[/class/,/\s+/,i,/\s+/,/extends/,/\s+/,n.concat(i,"(",n.concat(/\./,i),")*")],scope:{1:"keyword",3:"title.class",5:"keyword",7:"title.class.inherited"}},{match:[/class/,/\s+/,i],scope:{1:"keyword",3:"title.class"}}]},j={relevance:0,match:n.either(/\bJSON/,/\b[A-Z][a-z]+([A-Z][a-z]*|\d)*/,/\b[A-Z]{2,}([A-Z][a-z]+|\d)+([A-Z][a-z]*)*/,/\b[A-Z]{2,}[a-z]+([A-Z][a-z]+|\d)*([A-Z][a-z]*)*/),className:"title.class",keywords:{_:[...tn,...rn]}},P={label:"use_strict",className:"meta",relevance:10,begin:/^\s*['"]use (strict|asm)['"]/},V={variants:[{match:[/function/,/\s+/,i,/(?=\s*\()/]},{match:[/function/,/\s*(?=\()/]}],className:{1:"keyword",3:"title.function"},label:"func.def",contains:[C],illegal:/%/},J={relevance:0,match:/\b[A-Z][A-Z_0-9]+\b/,className:"variable.constant"};function te(o){return n.concat("(?!",o.join("|"),")")}let re={match:n.concat(/\b/,te([...an,"super","import"]),i,n.lookahead(/\(/)),className:"title.function",relevance:0},ie={begin:n.concat(/\./,n.lookahead(n.concat(i,/(?![0-9A-Za-z$_(])/))),end:i,excludeBegin:!0,keywords:"prototype",className:"property",relevance:0},K={match:[/get|set/,/\s+/,i,/(?=\()/],className:{1:"keyword",3:"title.function"},contains:[{begin:/\(\)/},C]},q="(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|"+e.UNDERSCORE_IDENT_RE+")\\s*=>",a={match:[/const|var|let/,/\s+/,i,/\s*/,/=\s*/,/(async\s*)?/,n.lookahead(q)],keywords:"async",className:{1:"keyword",3:"title.function"},contains:[C]};return{name:"JavaScript",aliases:["js","jsx","mjs","cjs"],keywords:r,exports:{PARAMS_CONTAINS:$,CLASS_REFERENCE:j},illegal:/#(?![$_A-z])/,contains:[e.SHEBANG({label:"shebang",binary:"node",relevance:5}),P,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,w,I,T,x,D,{match:/\$\d+/},A,j,{className:"attr",begin:i+n.lookahead(":"),relevance:0},a,{begin:"("+e.RE_STARTERS_RE+"|\\b(case|return|throw)\\b)\\s*",keywords:"return throw case",relevance:0,contains:[D,e.REGEXP_MODE,{className:"function",begin:q,returnBegin:!0,end:"\\s*=>",contains:[{className:"params",variants:[{begin:e.UNDERSCORE_IDENT_RE,relevance:0},{className:null,begin:/\(\s*\)/,skip:!0},{begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:r,contains:$}]}]},{begin:/,/,relevance:0},{match:/\s+/,relevance:0},{variants:[{begin:g.begin,end:g.end},{match:p},{begin:s.begin,"on:begin":s.isTrulyOpeningTag,end:s.end}],subLanguage:"xml",contains:[{begin:s.begin,end:s.end,skip:!0,contains:["self"]}]}]},V,{beginKeywords:"while if switch catch for"},{begin:"\\b(?!function)"+e.UNDERSCORE_IDENT_RE+"\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)\\s*\\{",returnBegin:!0,label:"func.def",contains:[C,e.inherit(e.TITLE_MODE,{begin:i,className:"title.function"})]},{match:/\.\.\./,relevance:0},ie,{match:"\\$"+i,relevance:0},{match:[/\bconstructor(?=\s*\()/],className:{1:"title.function"},contains:[C]},re,J,U,K,{match:/\$[(.]/}]}}var be="[A-Za-z$_][0-9A-Za-z$_]*",sn=["as","in","of","if","for","while","finally","var","new","function","do","return","void","else","break","catch","instanceof","with","throw","case","default","try","switch","continue","typeof","delete","let","yield","const","class","debugger","async","await","static","import","from","export","extends"],on=["true","false","null","undefined","NaN","Infinity"],cn=["Object","Function","Boolean","Symbol","Math","Date","Number","BigInt","String","RegExp","Array","Float32Array","Float64Array","Int8Array","Uint8Array","Uint8ClampedArray","Int16Array","Int32Array","Uint16Array","Uint32Array","BigInt64Array","BigUint64Array","Set","Map","WeakSet","WeakMap","ArrayBuffer","SharedArrayBuffer","Atomics","DataView","JSON","Promise","Generator","GeneratorFunction","AsyncFunction","Reflect","Proxy","Intl","WebAssembly"],ln=["Error","EvalError","InternalError","RangeError","ReferenceError","SyntaxError","TypeError","URIError"],un=["setInterval","setTimeout","clearInterval","clearTimeout","require","exports","eval","isFinite","isNaN","parseFloat","parseInt","decodeURI","decodeURIComponent","encodeURI","encodeURIComponent","escape","unescape"],gn=["arguments","this","super","console","window","document","localStorage","sessionStorage","module","global"],dn=[].concat(un,cn,ln);function vt(e){let n=e.regex,t=(o,{after:d})=>{let m="</"+o[0].slice(1);return o.input.indexOf(m,d)!==-1},i=be,g={begin:"<>",end:"</>"},p=/<[A-Za-z0-9\\._:-]+\s*\/>/,s={begin:/<[A-Za-z0-9\\._:-]+/,end:/\/[A-Za-z0-9\\._:-]+>|\/>/,isTrulyOpeningTag:(o,d)=>{let m=o[0].length+o.index,N=o.input[m];if(N==="<"||N===","){d.ignoreMatch();return}N===">"&&(t(o,{after:m})||d.ignoreMatch());let O,L=o.input.substring(m);if(O=L.match(/^\s*=/)){d.ignoreMatch();return}if((O=L.match(/^\s+extends\s+/))&&O.index===0){d.ignoreMatch();return}}},r={$pattern:be,keyword:sn,literal:on,built_in:dn,"variable.language":gn},l="[0-9](_?[0-9])*",f=`\\.(${l})`,h="0|[1-9](_?[0-9])*|0[0-7]*[89][0-9]*",A={className:"number",variants:[{begin:`(\\b(${h})((${f})|\\.)?|(${f}))[eE][+-]?(${l})\\b`},{begin:`\\b(${h})\\b((${f})\\b|\\.)?|(${f})\\b`},{begin:"\\b(0|[1-9](_?[0-9])*)n\\b"},{begin:"\\b0[xX][0-9a-fA-F](_?[0-9a-fA-F])*n?\\b"},{begin:"\\b0[bB][0-1](_?[0-1])*n?\\b"},{begin:"\\b0[oO][0-7](_?[0-7])*n?\\b"},{begin:"\\b0[0-7]+n?\\b"}],relevance:0},E={className:"subst",begin:"\\$\\{",end:"\\}",keywords:r,contains:[]},w={begin:"html`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,E],subLanguage:"xml"}},I={begin:"css`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,E],subLanguage:"css"}},T={begin:"gql`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,E],subLanguage:"graphql"}},x={className:"string",begin:"`",end:"`",contains:[e.BACKSLASH_ESCAPE,E]},D={className:"comment",variants:[e.COMMENT(/\/\*\*(?!\/)/,"\\*/",{relevance:0,contains:[{begin:"(?=@[A-Za-z]+)",relevance:0,contains:[{className:"doctag",begin:"@[A-Za-z]+"},{className:"type",begin:"\\{",end:"\\}",excludeEnd:!0,excludeBegin:!0,relevance:0},{className:"variable",begin:i+"(?=\\s*(-)|$)",endsParent:!0,relevance:0},{begin:/(?=[^\n])\s/,relevance:0}]}]}),e.C_BLOCK_COMMENT_MODE,e.C_LINE_COMMENT_MODE]},R=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,w,I,T,x,{match:/\$\d+/},A];E.contains=R.concat({begin:/\{/,end:/\}/,keywords:r,contains:["self"].concat(R)});let M=[].concat(D,E.contains),$=M.concat([{begin:/\(/,end:/\)/,keywords:r,contains:["self"].concat(M)}]),C={className:"params",begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:r,contains:$},U={variants:[{match:[/class/,/\s+/,i,/\s+/,/extends/,/\s+/,n.concat(i,"(",n.concat(/\./,i),")*")],scope:{1:"keyword",3:"title.class",5:"keyword",7:"title.class.inherited"}},{match:[/class/,/\s+/,i],scope:{1:"keyword",3:"title.class"}}]},j={relevance:0,match:n.either(/\bJSON/,/\b[A-Z][a-z]+([A-Z][a-z]*|\d)*/,/\b[A-Z]{2,}([A-Z][a-z]+|\d)+([A-Z][a-z]*)*/,/\b[A-Z]{2,}[a-z]+([A-Z][a-z]+|\d)*([A-Z][a-z]*)*/),className:"title.class",keywords:{_:[...cn,...ln]}},P={label:"use_strict",className:"meta",relevance:10,begin:/^\s*['"]use (strict|asm)['"]/},V={variants:[{match:[/function/,/\s+/,i,/(?=\s*\()/]},{match:[/function/,/\s*(?=\()/]}],className:{1:"keyword",3:"title.function"},label:"func.def",contains:[C],illegal:/%/},J={relevance:0,match:/\b[A-Z][A-Z_0-9]+\b/,className:"variable.constant"};function te(o){return n.concat("(?!",o.join("|"),")")}let re={match:n.concat(/\b/,te([...un,"super","import"]),i,n.lookahead(/\(/)),className:"title.function",relevance:0},ie={begin:n.concat(/\./,n.lookahead(n.concat(i,/(?![0-9A-Za-z$_(])/))),end:i,excludeBegin:!0,keywords:"prototype",className:"property",relevance:0},K={match:[/get|set/,/\s+/,i,/(?=\()/],className:{1:"keyword",3:"title.function"},contains:[{begin:/\(\)/},C]},q="(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|"+e.UNDERSCORE_IDENT_RE+")\\s*=>",a={match:[/const|var|let/,/\s+/,i,/\s*/,/=\s*/,/(async\s*)?/,n.lookahead(q)],keywords:"async",className:{1:"keyword",3:"title.function"},contains:[C]};return{name:"JavaScript",aliases:["js","jsx","mjs","cjs"],keywords:r,exports:{PARAMS_CONTAINS:$,CLASS_REFERENCE:j},illegal:/#(?![$_A-z])/,contains:[e.SHEBANG({label:"shebang",binary:"node",relevance:5}),P,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,w,I,T,x,D,{match:/\$\d+/},A,j,{className:"attr",begin:i+n.lookahead(":"),relevance:0},a,{begin:"("+e.RE_STARTERS_RE+"|\\b(case|return|throw)\\b)\\s*",keywords:"return throw case",relevance:0,contains:[D,e.REGEXP_MODE,{className:"function",begin:q,returnBegin:!0,end:"\\s*=>",contains:[{className:"params",variants:[{begin:e.UNDERSCORE_IDENT_RE,relevance:0},{className:null,begin:/\(\s*\)/,skip:!0},{begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:r,contains:$}]}]},{begin:/,/,relevance:0},{match:/\s+/,relevance:0},{variants:[{begin:g.begin,end:g.end},{match:p},{begin:s.begin,"on:begin":s.isTrulyOpeningTag,end:s.end}],subLanguage:"xml",contains:[{begin:s.begin,end:s.end,skip:!0,contains:["self"]}]}]},V,{beginKeywords:"while if switch catch for"},{begin:"\\b(?!function)"+e.UNDERSCORE_IDENT_RE+"\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)\\s*\\{",returnBegin:!0,label:"func.def",contains:[C,e.inherit(e.TITLE_MODE,{begin:i,className:"title.function"})]},{match:/\.\.\./,relevance:0},ie,{match:"\\$"+i,relevance:0},{match:[/\bconstructor(?=\s*\()/],className:{1:"title.function"},contains:[C]},re,J,U,K,{match:/\$[(.]/}]}}function ve(e){let n=vt(e),t=be,i=["any","void","number","boolean","string","object","never","symbol","bigint","unknown"],g={beginKeywords:"namespace",end:/\{/,excludeEnd:!0,contains:[n.exports.CLASS_REFERENCE]},p={beginKeywords:"interface",end:/\{/,excludeEnd:!0,keywords:{keyword:"interface extends",built_in:i},contains:[n.exports.CLASS_REFERENCE]},s={className:"meta",relevance:10,begin:/^\s*['"]use strict['"]/},r=["type","namespace","interface","public","private","protected","implements","declare","abstract","readonly","enum","override"],l={$pattern:be,keyword:sn.concat(r),literal:on,built_in:dn.concat(i),"variable.language":gn},f={className:"meta",begin:"@"+t},h=(E,w,I)=>{let T=E.contains.findIndex(x=>x.label===w);if(T===-1)throw new Error("can not find mode to replace");E.contains.splice(T,1,I)};Object.assign(n.keywords,l),n.exports.PARAMS_CONTAINS.push(f),n.contains=n.contains.concat([f,g,p]),h(n,"shebang",e.SHEBANG()),h(n,"use_strict",s);let A=n.contains.find(E=>E.label==="func.def");return A.relevance=0,Object.assign(n,{name:"TypeScript",aliases:["ts","tsx","mts","cts"]}),n}function fn(e){let n=e.regex,t=n.concat(/[\p{L}_]/u,n.optional(/[\p{L}0-9_.-]*:/u),/[\p{L}0-9_.-]*/u),i=/[\p{L}0-9._:-]+/u,g={className:"symbol",begin:/&[a-z]+;|&#[0-9]+;|&#x[a-f0-9]+;/},p={begin:/\s/,contains:[{className:"keyword",begin:/#?[a-z_][a-z1-9_-]+/,illegal:/\n/}]},s=e.inherit(p,{begin:/\(/,end:/\)/}),r=e.inherit(e.APOS_STRING_MODE,{className:"string"}),l=e.inherit(e.QUOTE_STRING_MODE,{className:"string"}),f={endsWithParent:!0,illegal:/</,relevance:0,contains:[{className:"attr",begin:i,relevance:0},{begin:/=\s*/,relevance:0,contains:[{className:"string",endsParent:!0,variants:[{begin:/"/,end:/"/,contains:[g]},{begin:/'/,end:/'/,contains:[g]},{begin:/[^\s"'=<>`]+/}]}]}]};return{name:"HTML, XML",aliases:["html","xhtml","rss","atom","xjb","xsd","xsl","plist","wsf","svg"],case_insensitive:!0,unicodeRegex:!0,contains:[{className:"meta",begin:/<![a-z]/,end:/>/,relevance:10,contains:[p,l,r,s,{begin:/\[/,end:/\]/,contains:[{className:"meta",begin:/<![a-z]/,end:/>/,contains:[p,s,l,r]}]}]},e.COMMENT(/<!--/,/-->/,{relevance:10}),{begin:/<!\[CDATA\[/,end:/\]\]>/,relevance:10},g,{className:"meta",end:/\?>/,variants:[{begin:/<\?xml/,relevance:10,contains:[l]},{begin:/<\?[a-z][a-z0-9]+/}]},{className:"tag",begin:/<style(?=\s|>)/,end:/>/,keywords:{name:"style"},contains:[f],starts:{end:/<\/style>/,returnEnd:!0,subLanguage:["css","xml"]}},{className:"tag",begin:/<script(?=\s|>)/,end:/>/,keywords:{name:"script"},contains:[f],starts:{end:/<\/script>/,returnEnd:!0,subLanguage:["javascript","handlebars","xml"]}},{className:"tag",begin:/<>|<\/>/},{className:"tag",begin:n.concat(/</,n.lookahead(n.concat(t,n.either(/\/>/,/>/,/\s/)))),end:/\/?>/,contains:[{className:"name",begin:t,relevance:0,starts:f}]},{className:"tag",begin:n.concat(/<\//,n.lookahead(n.concat(t,/>/))),contains:[{className:"name",begin:t,relevance:0},{begin:/>/,relevance:0,endsParent:!0}]}]}}var xt=e=>({IMPORTANT:{scope:"meta",begin:"!important"},BLOCK_COMMENT:e.C_BLOCK_COMMENT_MODE,HEXCOLOR:{scope:"number",begin:/#(([0-9a-fA-F]{3,4})|(([0-9a-fA-F]{2}){3,4}))\b/},FUNCTION_DISPATCH:{className:"built_in",begin:/[\w-]+(?=\()/},ATTRIBUTE_SELECTOR_MODE:{scope:"selector-attr",begin:/\[/,end:/\]/,illegal:"$",contains:[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE]},CSS_NUMBER_MODE:{scope:"number",begin:e.NUMBER_RE+"(%|em|ex|ch|rem|vw|vh|vmin|vmax|cm|mm|in|pt|pc|px|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?",relevance:0},CSS_VARIABLE:{className:"attr",begin:/--[A-Za-z_][A-Za-z0-9_-]*/}}),Rt=["a","abbr","address","article","aside","audio","b","blockquote","body","button","canvas","caption","cite","code","dd","del","details","dfn","div","dl","dt","em","fieldset","figcaption","figure","footer","form","h1","h2","h3","h4","h5","h6","header","hgroup","html","i","iframe","img","input","ins","kbd","label","legend","li","main","mark","menu","nav","object","ol","p","q","quote","samp","section","span","strong","summary","sup","table","tbody","td","textarea","tfoot","th","thead","time","tr","ul","var","video"],Mt=["any-hover","any-pointer","aspect-ratio","color","color-gamut","color-index","device-aspect-ratio","device-height","device-width","display-mode","forced-colors","grid","height","hover","inverted-colors","monochrome","orientation","overflow-block","overflow-inline","pointer","prefers-color-scheme","prefers-contrast","prefers-reduced-motion","prefers-reduced-transparency","resolution","scan","scripting","update","width","min-width","max-width","min-height","max-height"],kt=["active","any-link","blank","checked","current","default","defined","dir","disabled","drop","empty","enabled","first","first-child","first-of-type","fullscreen","future","focus","focus-visible","focus-within","has","host","host-context","hover","indeterminate","in-range","invalid","is","lang","last-child","last-of-type","left","link","local-link","not","nth-child","nth-col","nth-last-child","nth-last-col","nth-last-of-type","nth-of-type","only-child","only-of-type","optional","out-of-range","past","placeholder-shown","read-only","read-write","required","right","root","scope","target","target-within","user-invalid","valid","visited","where"],It=["after","backdrop","before","cue","cue-region","first-letter","first-line","grammar-error","marker","part","placeholder","selection","slotted","spelling-error"],Ct=["align-content","align-items","align-self","all","animation","animation-delay","animation-direction","animation-duration","animation-fill-mode","animation-iteration-count","animation-name","animation-play-state","animation-timing-function","backface-visibility","background","background-attachment","background-blend-mode","background-clip","background-color","background-image","background-origin","background-position","background-repeat","background-size","block-size","border","border-block","border-block-color","border-block-end","border-block-end-color","border-block-end-style","border-block-end-width","border-block-start","border-block-start-color","border-block-start-style","border-block-start-width","border-block-style","border-block-width","border-bottom","border-bottom-color","border-bottom-left-radius","border-bottom-right-radius","border-bottom-style","border-bottom-width","border-collapse","border-color","border-image","border-image-outset","border-image-repeat","border-image-slice","border-image-source","border-image-width","border-inline","border-inline-color","border-inline-end","border-inline-end-color","border-inline-end-style","border-inline-end-width","border-inline-start","border-inline-start-color","border-inline-start-style","border-inline-start-width","border-inline-style","border-inline-width","border-left","border-left-color","border-left-style","border-left-width","border-radius","border-right","border-right-color","border-right-style","border-right-width","border-spacing","border-style","border-top","border-top-color","border-top-left-radius","border-top-right-radius","border-top-style","border-top-width","border-width","bottom","box-decoration-break","box-shadow","box-sizing","break-after","break-before","break-inside","caption-side","caret-color","clear","clip","clip-path","clip-rule","color","column-count","column-fill","column-gap","column-rule","column-rule-color","column-rule-style","column-rule-width","column-span","column-width","columns","contain","content","content-visibility","counter-increment","counter-reset","cue","cue-after","cue-before","cursor","direction","display","empty-cells","filter","flex","flex-basis","flex-direction","flex-flow","flex-grow","flex-shrink","flex-wrap","float","flow","font","font-display","font-family","font-feature-settings","font-kerning","font-language-override","font-size","font-size-adjust","font-smoothing","font-stretch","font-style","font-synthesis","font-variant","font-variant-caps","font-variant-east-asian","font-variant-ligatures","font-variant-numeric","font-variant-position","font-variation-settings","font-weight","gap","glyph-orientation-vertical","grid","grid-area","grid-auto-columns","grid-auto-flow","grid-auto-rows","grid-column","grid-column-end","grid-column-start","grid-gap","grid-row","grid-row-end","grid-row-start","grid-template","grid-template-areas","grid-template-columns","grid-template-rows","hanging-punctuation","height","hyphens","icon","image-orientation","image-rendering","image-resolution","ime-mode","inline-size","isolation","justify-content","left","letter-spacing","line-break","line-height","list-style","list-style-image","list-style-position","list-style-type","margin","margin-block","margin-block-end","margin-block-start","margin-bottom","margin-inline","margin-inline-end","margin-inline-start","margin-left","margin-right","margin-top","marks","mask","mask-border","mask-border-mode","mask-border-outset","mask-border-repeat","mask-border-slice","mask-border-source","mask-border-width","mask-clip","mask-composite","mask-image","mask-mode","mask-origin","mask-position","mask-repeat","mask-size","mask-type","max-block-size","max-height","max-inline-size","max-width","min-block-size","min-height","min-inline-size","min-width","mix-blend-mode","nav-down","nav-index","nav-left","nav-right","nav-up","none","normal","object-fit","object-position","opacity","order","orphans","outline","outline-color","outline-offset","outline-style","outline-width","overflow","overflow-wrap","overflow-x","overflow-y","padding","padding-block","padding-block-end","padding-block-start","padding-bottom","padding-inline","padding-inline-end","padding-inline-start","padding-left","padding-right","padding-top","page-break-after","page-break-before","page-break-inside","pause","pause-after","pause-before","perspective","perspective-origin","pointer-events","position","quotes","resize","rest","rest-after","rest-before","right","row-gap","scroll-margin","scroll-margin-block","scroll-margin-block-end","scroll-margin-block-start","scroll-margin-bottom","scroll-margin-inline","scroll-margin-inline-end","scroll-margin-inline-start","scroll-margin-left","scroll-margin-right","scroll-margin-top","scroll-padding","scroll-padding-block","scroll-padding-block-end","scroll-padding-block-start","scroll-padding-bottom","scroll-padding-inline","scroll-padding-inline-end","scroll-padding-inline-start","scroll-padding-left","scroll-padding-right","scroll-padding-top","scroll-snap-align","scroll-snap-stop","scroll-snap-type","scrollbar-color","scrollbar-gutter","scrollbar-width","shape-image-threshold","shape-margin","shape-outside","speak","speak-as","src","tab-size","table-layout","text-align","text-align-all","text-align-last","text-combine-upright","text-decoration","text-decoration-color","text-decoration-line","text-decoration-style","text-emphasis","text-emphasis-color","text-emphasis-position","text-emphasis-style","text-indent","text-justify","text-orientation","text-overflow","text-rendering","text-shadow","text-transform","text-underline-position","top","transform","transform-box","transform-origin","transform-style","transition","transition-delay","transition-duration","transition-property","transition-timing-function","unicode-bidi","vertical-align","visibility","voice-balance","voice-duration","voice-family","voice-pitch","voice-range","voice-rate","voice-stress","voice-volume","white-space","widows","width","will-change","word-break","word-spacing","word-wrap","writing-mode","z-index"].reverse();function bn(e){let n=e.regex,t=xt(e),i={begin:/-(webkit|moz|ms|o)-(?=[a-z])/},g="and or not only",p=/@-?\w[\w]*(-\w+)*/,s="[a-zA-Z-][a-zA-Z0-9_-]*",r=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE];return{name:"CSS",case_insensitive:!0,illegal:/[=|'\$]/,keywords:{keyframePosition:"from to"},classNameAliases:{keyframePosition:"selector-tag"},contains:[t.BLOCK_COMMENT,i,t.CSS_NUMBER_MODE,{className:"selector-id",begin:/#[A-Za-z0-9_-]+/,relevance:0},{className:"selector-class",begin:"\\."+s,relevance:0},t.ATTRIBUTE_SELECTOR_MODE,{className:"selector-pseudo",variants:[{begin:":("+kt.join("|")+")"},{begin:":(:)?("+It.join("|")+")"}]},t.CSS_VARIABLE,{className:"attribute",begin:"\\b("+Ct.join("|")+")\\b"},{begin:/:/,end:/[;}{]/,contains:[t.BLOCK_COMMENT,t.HEXCOLOR,t.IMPORTANT,t.CSS_NUMBER_MODE,...r,{begin:/(url|data-uri)\(/,end:/\)/,relevance:0,keywords:{built_in:"url data-uri"},contains:[...r,{className:"string",begin:/[^)]/,endsWithParent:!0,excludeEnd:!0}]},t.FUNCTION_DISPATCH]},{begin:n.lookahead(/@/),end:"[{;]",relevance:0,illegal:/:/,contains:[{className:"keyword",begin:p},{begin:/\s/,endsWithParent:!0,excludeEnd:!0,relevance:0,keywords:{$pattern:/[a-z-]+/,keyword:g,attribute:Mt.join(" ")},contains:[{begin:/[a-z-]+(?=:)/,className:"attribute"},...r,t.CSS_NUMBER_MODE]}]},{className:"selector-tag",begin:"\\b("+Rt.join("|")+")\\b"}]}}function pn(e){let n={className:"attr",begin:/"(\\.|[^\\"\r\n])*"(?=\s*:)/,relevance:1.01},t={match:/[{}[\],:]/,className:"punctuation",relevance:0},i=["true","false","null"],g={scope:"literal",beginKeywords:i.join(" ")};return{name:"JSON",keywords:{literal:i},contains:[n,t,e.QUOTE_STRING_MODE,g,e.C_NUMBER_MODE,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE],illegal:"\\S"}}function hn(e){let n=e.regex,t={},i={begin:/\$\{/,end:/\}/,contains:["self",{begin:/:-/,contains:[t]}]};Object.assign(t,{className:"variable",variants:[{begin:n.concat(/\$[\w\d#@][\w\d_]*/,"(?![\\w\\d])(?![$])")},i]});let g={className:"subst",begin:/\$\(/,end:/\)/,contains:[e.BACKSLASH_ESCAPE]},p={begin:/<<-?\s*(?=\w+)/,starts:{contains:[e.END_SAME_AS_BEGIN({begin:/(\w+)/,end:/(\w+)/,className:"string"})]}},s={className:"string",begin:/"/,end:/"/,contains:[e.BACKSLASH_ESCAPE,t,g]};g.contains.push(s);let r={match:/\\"/},l={className:"string",begin:/'/,end:/'/},f={match:/\\'/},h={begin:/\$?\(\(/,end:/\)\)/,contains:[{begin:/\d+#[0-9a-f]+/,className:"number"},e.NUMBER_MODE,t]},A=["fish","bash","zsh","sh","csh","ksh","tcsh","dash","scsh"],E=e.SHEBANG({binary:`(${A.join("|")})`,relevance:10}),w={className:"function",begin:/\w[\w\d_]*\s*\(\s*\)\s*\{/,returnBegin:!0,contains:[e.inherit(e.TITLE_MODE,{begin:/\w[\w\d_]*/})],relevance:0},I=["if","then","else","elif","fi","for","while","until","in","do","done","case","esac","function","select"],T=["true","false"],x={match:/(\/[a-z._-]+)+/},W=["break","cd","continue","eval","exec","exit","export","getopts","hash","pwd","readonly","return","shift","test","times","trap","umask","unset"],D=["alias","bind","builtin","caller","command","declare","echo","enable","help","let","local","logout","mapfile","printf","read","readarray","source","type","typeset","ulimit","unalias"],R=["autoload","bg","bindkey","bye","cap","chdir","clone","comparguments","compcall","compctl","compdescribe","compfiles","compgroups","compquote","comptags","comptry","compvalues","dirs","disable","disown","echotc","echoti","emulate","fc","fg","float","functions","getcap","getln","history","integer","jobs","kill","limit","log","noglob","popd","print","pushd","pushln","rehash","sched","setcap","setopt","stat","suspend","ttyctl","unfunction","unhash","unlimit","unsetopt","vared","wait","whence","where","which","zcompile","zformat","zftp","zle","zmodload","zparseopts","zprof","zpty","zregexparse","zsocket","zstyle","ztcp"],M=["chcon","chgrp","chown","chmod","cp","dd","df","dir","dircolors","ln","ls","mkdir","mkfifo","mknod","mktemp","mv","realpath","rm","rmdir","shred","sync","touch","truncate","vdir","b2sum","base32","base64","cat","cksum","comm","csplit","cut","expand","fmt","fold","head","join","md5sum","nl","numfmt","od","paste","ptx","pr","sha1sum","sha224sum","sha256sum","sha384sum","sha512sum","shuf","sort","split","sum","tac","tail","tr","tsort","unexpand","uniq","wc","arch","basename","chroot","date","dirname","du","echo","env","expr","factor","groups","hostid","id","link","logname","nice","nohup","nproc","pathchk","pinky","printenv","printf","pwd","readlink","runcon","seq","sleep","stat","stdbuf","stty","tee","test","timeout","tty","uname","unlink","uptime","users","who","whoami","yes"];return{name:"Bash",aliases:["sh"],keywords:{$pattern:/\b[a-z][a-z0-9._-]+\b/,keyword:I,literal:T,built_in:[...W,...D,"set","shopt",...R,...M]},contains:[E,e.SHEBANG(),w,h,e.HASH_COMMENT_MODE,p,x,s,r,l,f,t]}}function _n(e){let n=e.regex,t={begin:/<\/?[A-Za-z_]/,end:">",subLanguage:"xml",relevance:0},i={begin:"^[-\\*]{3,}",end:"$"},g={className:"code",variants:[{begin:"(`{3,})[^`](.|\\n)*?\\1`*[ ]*"},{begin:"(~{3,})[^~](.|\\n)*?\\1~*[ ]*"},{begin:"```",end:"```+[ ]*$"},{begin:"~~~",end:"~~~+[ ]*$"},{begin:"`.+?`"},{begin:"(?=^( {4}|\\t))",contains:[{begin:"^( {4}|\\t)",end:"(\\n)$"}],relevance:0}]},p={className:"bullet",begin:"^[ 	]*([*+-]|(\\d+\\.))(?=\\s+)",end:"\\s+",excludeEnd:!0},s={begin:/^\[[^\n]+\]:/,returnBegin:!0,contains:[{className:"symbol",begin:/\[/,end:/\]/,excludeBegin:!0,excludeEnd:!0},{className:"link",begin:/:\s*/,end:/$/,excludeBegin:!0}]},r=/[A-Za-z][A-Za-z0-9+.-]*/,l={variants:[{begin:/\[.+?\]\[.*?\]/,relevance:0},{begin:/\[.+?\]\(((data|javascript|mailto):|(?:http|ftp)s?:\/\/).*?\)/,relevance:2},{begin:n.concat(/\[.+?\]\(/,r,/:\/\/.*?\)/),relevance:2},{begin:/\[.+?\]\([./?&#].*?\)/,relevance:1},{begin:/\[.*?\]\(.*?\)/,relevance:0}],returnBegin:!0,contains:[{match:/\[(?=\])/},{className:"string",relevance:0,begin:"\\[",end:"\\]",excludeBegin:!0,returnEnd:!0},{className:"link",relevance:0,begin:"\\]\\(",end:"\\)",excludeBegin:!0,excludeEnd:!0},{className:"symbol",relevance:0,begin:"\\]\\[",end:"\\]",excludeBegin:!0,excludeEnd:!0}]},f={className:"strong",contains:[],variants:[{begin:/_{2}(?!\s)/,end:/_{2}/},{begin:/\*{2}(?!\s)/,end:/\*{2}/}]},h={className:"emphasis",contains:[],variants:[{begin:/\*(?![*\s])/,end:/\*/},{begin:/_(?![_\s])/,end:/_/,relevance:0}]},A=e.inherit(f,{contains:[]}),E=e.inherit(h,{contains:[]});f.contains.push(E),h.contains.push(A);let w=[t,l];return[f,h,A,E].forEach(x=>{x.contains=x.contains.concat(w)}),w=w.concat(f,h),{name:"Markdown",aliases:["md","mkdown","mkd"],contains:[{className:"section",variants:[{begin:"^#{1,6}",end:"$",contains:w},{begin:"(?=^.+?\\n[=-]{2,}$)",contains:[{begin:"^[=-]*$"},{begin:"^",end:"\\n",contains:w}]}]},t,p,f,h,{className:"quote",begin:"^>\\s+",contains:w,end:"$"},g,i,l,s]}}function mn(e){let n=e.regex,t=e.COMMENT("--","$"),i={className:"string",variants:[{begin:/'/,end:/'/,contains:[{begin:/''/}]}]},g={begin:/"/,end:/"/,contains:[{begin:/""/}]},p=["true","false","unknown"],s=["double precision","large object","with timezone","without timezone"],r=["bigint","binary","blob","boolean","char","character","clob","date","dec","decfloat","decimal","float","int","integer","interval","nchar","nclob","national","numeric","real","row","smallint","time","timestamp","varchar","varying","varbinary"],l=["add","asc","collation","desc","final","first","last","view"],f=["abs","acos","all","allocate","alter","and","any","are","array","array_agg","array_max_cardinality","as","asensitive","asin","asymmetric","at","atan","atomic","authorization","avg","begin","begin_frame","begin_partition","between","bigint","binary","blob","boolean","both","by","call","called","cardinality","cascaded","case","cast","ceil","ceiling","char","char_length","character","character_length","check","classifier","clob","close","coalesce","collate","collect","column","commit","condition","connect","constraint","contains","convert","copy","corr","corresponding","cos","cosh","count","covar_pop","covar_samp","create","cross","cube","cume_dist","current","current_catalog","current_date","current_default_transform_group","current_path","current_role","current_row","current_schema","current_time","current_timestamp","current_path","current_role","current_transform_group_for_type","current_user","cursor","cycle","date","day","deallocate","dec","decimal","decfloat","declare","default","define","delete","dense_rank","deref","describe","deterministic","disconnect","distinct","double","drop","dynamic","each","element","else","empty","end","end_frame","end_partition","end-exec","equals","escape","every","except","exec","execute","exists","exp","external","extract","false","fetch","filter","first_value","float","floor","for","foreign","frame_row","free","from","full","function","fusion","get","global","grant","group","grouping","groups","having","hold","hour","identity","in","indicator","initial","inner","inout","insensitive","insert","int","integer","intersect","intersection","interval","into","is","join","json_array","json_arrayagg","json_exists","json_object","json_objectagg","json_query","json_table","json_table_primitive","json_value","lag","language","large","last_value","lateral","lead","leading","left","like","like_regex","listagg","ln","local","localtime","localtimestamp","log","log10","lower","match","match_number","match_recognize","matches","max","member","merge","method","min","minute","mod","modifies","module","month","multiset","national","natural","nchar","nclob","new","no","none","normalize","not","nth_value","ntile","null","nullif","numeric","octet_length","occurrences_regex","of","offset","old","omit","on","one","only","open","or","order","out","outer","over","overlaps","overlay","parameter","partition","pattern","per","percent","percent_rank","percentile_cont","percentile_disc","period","portion","position","position_regex","power","precedes","precision","prepare","primary","procedure","ptf","range","rank","reads","real","recursive","ref","references","referencing","regr_avgx","regr_avgy","regr_count","regr_intercept","regr_r2","regr_slope","regr_sxx","regr_sxy","regr_syy","release","result","return","returns","revoke","right","rollback","rollup","row","row_number","rows","running","savepoint","scope","scroll","search","second","seek","select","sensitive","session_user","set","show","similar","sin","sinh","skip","smallint","some","specific","specifictype","sql","sqlexception","sqlstate","sqlwarning","sqrt","start","static","stddev_pop","stddev_samp","submultiset","subset","substring","substring_regex","succeeds","sum","symmetric","system","system_time","system_user","table","tablesample","tan","tanh","then","time","timestamp","timezone_hour","timezone_minute","to","trailing","translate","translate_regex","translation","treat","trigger","trim","trim_array","true","truncate","uescape","union","unique","unknown","unnest","update","upper","user","using","value","values","value_of","var_pop","var_samp","varbinary","varchar","varying","versioning","when","whenever","where","width_bucket","window","with","within","without","year"],h=["abs","acos","array_agg","asin","atan","avg","cast","ceil","ceiling","coalesce","corr","cos","cosh","count","covar_pop","covar_samp","cume_dist","dense_rank","deref","element","exp","extract","first_value","floor","json_array","json_arrayagg","json_exists","json_object","json_objectagg","json_query","json_table","json_table_primitive","json_value","lag","last_value","lead","listagg","ln","log","log10","lower","max","min","mod","nth_value","ntile","nullif","percent_rank","percentile_cont","percentile_disc","position","position_regex","power","rank","regr_avgx","regr_avgy","regr_count","regr_intercept","regr_r2","regr_slope","regr_sxx","regr_sxy","regr_syy","row_number","sin","sinh","sqrt","stddev_pop","stddev_samp","substring","substring_regex","sum","tan","tanh","translate","translate_regex","treat","trim","trim_array","unnest","upper","value_of","var_pop","var_samp","width_bucket"],A=["current_catalog","current_date","current_default_transform_group","current_path","current_role","current_schema","current_transform_group_for_type","current_user","session_user","system_time","system_user","current_time","localtime","current_timestamp","localtimestamp"],E=["create table","insert into","primary key","foreign key","not null","alter table","add constraint","grouping sets","on overflow","character set","respect nulls","ignore nulls","nulls first","nulls last","depth first","breadth first"],w=h,I=[...f,...l].filter(R=>!h.includes(R)),T={className:"variable",begin:/@[a-z0-9][a-z0-9_]*/},x={className:"operator",begin:/[-+*/=%^~]|&&?|\|\|?|!=?|<(?:=>?|<|>)?|>[>=]?/,relevance:0},W={begin:n.concat(/\b/,n.either(...w),/\s*\(/),relevance:0,keywords:{built_in:w}};function D(R,{exceptions:M,when:$}={}){let C=$;return M=M||[],R.map(U=>U.match(/\|\d+$/)||M.includes(U)?U:C(U)?`${U}|0`:U)}return{name:"SQL",case_insensitive:!0,illegal:/[{}]|<\//,keywords:{$pattern:/\b[\w\.]+/,keyword:D(I,{when:R=>R.length<3}),literal:p,type:r,built_in:A},contains:[{begin:n.either(...E),relevance:0,keywords:{$pattern:/[\w\.]+/,keyword:I.concat(E),literal:p,type:r}},{className:"type",begin:n.either(...s)},W,T,i,g,e.C_NUMBER_MODE,e.C_BLOCK_COMMENT_MODE,t,x]}}z.registerLanguage("javascript",Te);z.registerLanguage("typescript",ve);z.registerLanguage("tsx",ve);z.registerLanguage("jsx",Te);z.registerLanguage("xml",fn);z.registerLanguage("css",bn);z.registerLanguage("json",pn);z.registerLanguage("bash",hn);z.registerLanguage("markdown",_n);z.registerLanguage("sql",mn);window.hljs=z;})();
+
+</script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>
