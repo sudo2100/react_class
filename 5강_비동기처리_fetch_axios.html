@@ -166,15 +166,10 @@ hue-6-2: #e6c07b
       <li><a href="#m3">콜백을 사용한 비동기 처리 — async02.js</a></li>
       <li><a href="#m4">async / await — async03.js</a></li>
       <li><a href="#m5">리엑트에서 비동기 처리와 useEffect</a></li>
-      <li><a href="#m6">fetch vs axios · JSONPlaceholder</a></li>
-      <li><a href="#m7">REST API 이해하기</a></li>
-      <li><a href="#m8">JSON 데이터 다루기</a></li>
-      <li><a href="#m9">fetch로 할 일 목록 전체 가져오기</a></li>
-      <li><a href="#m10">fetch로 할 일 1건 가져오기</a></li>
-      <li><a href="#m11">axios 소개와 메서드</a></li>
-      <li><a href="#m12">axios로 할 일 목록 가져오기</a></li>
-      <li><a href="#m13">axios로 할 일 1건 가져오기</a></li>
-      <li><a href="#m14">axios로 할 일 추가하기 (POST)</a></li>
+      <li><a href="#m6">fetch vs axios · JSONPlaceholder · JSON 데이터</a></li>
+      <li><a href="#m7">fetch로 할 일 목록·1건 가져오기</a></li>
+      <li><a href="#m8">REST API 이해하기와 axios 소개</a></li>
+      <li><a href="#m9">axios로 할 일 목록·1건 가져오기와 추가하기</a></li>
     </ol>
   </nav>
 
@@ -228,7 +223,7 @@ displayA();
 displayB();
 displayC();</code></pre>
       <div class="out"><span class="rt">브라우저 출력</span>
-        <pre><code class="language-text">A
+        <pre><code class="nohighlight">A
 C
 B</code></pre>
       </div>
@@ -261,7 +256,7 @@ function displayC() {
 displayA();
 displayB(displayC);</code></pre>
       <div class="out"><span class="rt">브라우저 출력</span>
-        <pre><code class="language-text">A
+        <pre><code class="nohighlight">A
 B
 C</code></pre>
       </div>
@@ -383,10 +378,12 @@ useEffect(() =&gt; {
   </section>
 
   <section class="module" id="m6">
-    <h2><span class="num">6</span> fetch vs axios · JSONPlaceholder</h2>
+    <h2><span class="num">6</span> fetch vs axios · JSONPlaceholder · JSON 데이터</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
       <li>fetch와 axios의 차이를 표로 비교한다.</li>
       <li>테스트용 무료 REST API인 JSONPlaceholder의 용도를 이해한다.</li>
+      <li>JSON의 기본 구조(키/값)와 배열·객체 표현을 이해한다.</li>
+      <li>JSON이 어디에 사용되는지 파악한다.</li>
     </ul></div>
     <div class="concept"><h3 class="blk">📖 fetch() 와 axios() 차이</h3>
       <table>
@@ -417,36 +414,6 @@ useEffect(() =&gt; {
         </div>
       </div>
     </div>
-  </section>
-
-  <section class="module" id="m7">
-    <h2><span class="num">7</span> REST API 이해하기</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
-      <li>REST API의 개념과 리소스/HTTP 메서드의 관계를 이해한다.</li>
-    </ul></div>
-    <div class="concept"><h3 class="blk">📖 REST API란?</h3>
-      <p><strong>REST API</strong>(Representational State Transfer API)는 웹에서 서버와 클라이언트가 데이터를 주고받기 위한 표준적인 방식입니다. 웹사이트나 모바일 앱에서 회원 정보, 게시글, 상품 목록 등을 조회하거나 저장할 때 REST API를 사용합니다.</p>
-      <p>핵심 개념은 "<strong>리소스(Resource)를 URL로 표현하고, 그 리소스에 대한 행위는 HTTP 메서드로 구분한다</strong>"는 것입니다. REST API는 웹에서 사용하는 HTTP를 기반으로 동작합니다.</p>
-      <h3 class="blk">📖 주요 HTTP 메서드</h3>
-      <table>
-        <thead><tr><th>메서드</th><th>기능</th></tr></thead>
-        <tbody>
-          <tr><td>GET</td><td>데이터 조회</td></tr>
-          <tr><td>POST</td><td>데이터 생성</td></tr>
-          <tr><td>PUT</td><td>데이터 전체 수정</td></tr>
-          <tr><td>PATCH</td><td>데이터 일부 수정</td></tr>
-          <tr><td>DELETE</td><td>데이터 삭제</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="module" id="m8">
-    <h2><span class="num">8</span> JSON 데이터 다루기</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
-      <li>JSON의 기본 구조(키/값)와 배열·객체 표현을 이해한다.</li>
-      <li>JSON이 어디에 사용되는지 파악한다.</li>
-    </ul></div>
     <div class="concept"><h3 class="blk">📖 JSON이란?</h3>
       <p><strong>JSON</strong>(JavaScript Object Notation)은 데이터를 문자열 형태로 표현하는 규칙(포맷)입니다. JSON은 <strong>키(key)와 값(value)</strong>으로 이루어져 있습니다.</p>
 <pre><code class="language-json">{
@@ -510,11 +477,13 @@ useEffect(() =&gt; {
     </div>
   </section>
 
-  <section class="module" id="m9">
-    <h2><span class="num">9</span> fetch로 할 일 목록 전체 가져오기</h2>
+  <section class="module" id="m7">
+    <h2><span class="num">7</span> fetch로 할 일 목록·1건 가져오기</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
       <li><code>fetch</code>와 <code>useEffect</code>로 목록 데이터를 받아와 상태에 저장하고 렌더링한다.</li>
       <li>라우터로 목록/상세 페이지를 구성한다.</li>
+      <li><code>useParams</code>로 URL의 id를 읽어 특정 데이터를 조회한다.</li>
+      <li>의존성 배열에 id를 넣어 id가 바뀔 때마다 다시 요청한다.</li>
     </ul></div>
     <div class="ex"><div class="lbl">💡 예제 — 라우터 설정</div>
       <span class="fname">App.jsx</span>
@@ -571,17 +540,17 @@ export default FetchTodos;</code></pre>
       <div class="out"><span class="rt">브라우저 출력</span>
         <h4 style="text-align:center;margin:.4em 0">할 일(To-do) 데이터</h4>
         <ul style="text-align:center;list-style:none;padding:0">
-          <li><a href="#m10">delectus aut autem</a></li>
-          <li><a href="#m10">quis ut nam facilis et officia qui</a></li>
-          <li><a href="#m10">fugiat veniam minus</a></li>
-          <li><a href="#m10">et porro tempora</a></li>
+          <li><a href="#m7">delectus aut autem</a></li>
+          <li><a href="#m7">quis ut nam facilis et officia qui</a></li>
+          <li><a href="#m7">fugiat veniam minus</a></li>
+          <li><a href="#m7">et porro tempora</a></li>
           <li>… (총 200건)</li>
         </ul>
       </div>
       <div class="tip"><span class="lbl">💡 정리</span> <code>data.map</code>으로 각 항목을 <code>&lt;Link&gt;</code>로 렌더링해 클릭 시 상세 페이지(<code>/:id</code>)로 이동합니다. <code>key</code>에는 <code>todo.id</code>를 사용합니다. 콘솔에는 <code>(200) [{…}, {…}, …]</code>처럼 200건의 배열이 출력됩니다.</div>
     </div>
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 9-1. 게시글 목록 가져오기</h4>
+      <h4>실습 7-1. 게시글 목록 가져오기</h4>
       <p><code>https://jsonplaceholder.typicode.com/posts</code>에서 게시글 목록을 <code>fetch</code>로 가져와 각 게시글의 <code>title</code>을 <code>&lt;li&gt;</code>로 출력하는 <code>FetchPosts</code> 컴포넌트를 작성하세요.</p>
       <details><summary>정답 보기</summary>
 <pre><code class="language-jsx">import { useState, useEffect } from "react";
@@ -608,14 +577,6 @@ const FetchPosts = () =&gt; {
 export default FetchPosts;</code></pre>
       </details>
     </div>
-  </section>
-
-  <section class="module" id="m10">
-    <h2><span class="num">10</span> fetch로 할 일 1건 가져오기</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
-      <li><code>useParams</code>로 URL의 id를 읽어 특정 데이터를 조회한다.</li>
-      <li>의존성 배열에 id를 넣어 id가 바뀔 때마다 다시 요청한다.</li>
-    </ul></div>
     <div class="ex"><div class="lbl">💡 예제 — id로 1건 가져오기</div>
       <span class="fname">fetch_ex/FetchTodoById.jsx</span>
 <pre><code class="language-jsx">import { useParams } from "react-router-dom";
@@ -662,7 +623,7 @@ const FetchTodoById = () =&gt; {
       <div class="tip"><span class="lbl">💡 정리</span> 데이터가 도착하기 전 <code>data</code>는 <code>null</code>이므로 <code>{data &amp;&amp; (...)}</code>로 데이터가 있을 때만 렌더링해 에러를 방지합니다. 의존성 배열에 <code>[id]</code>를 넣어 URL의 id가 바뀔 때마다 다시 요청합니다.</div>
     </div>
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 10-1. 로딩 표시 추가하기</h4>
+      <h4>실습 7-2. 로딩 표시 추가하기</h4>
       <p>위 <code>FetchTodoById</code>에서 데이터가 도착하기 전까지 "불러오는 중..."을 보여주도록 수정하세요.</p>
       <details><summary>정답 보기</summary>
 <pre><code class="language-jsx">return (
@@ -685,12 +646,28 @@ const FetchTodoById = () =&gt; {
     </div>
   </section>
 
-  <section class="module" id="m11">
-    <h2><span class="num">11</span> axios 소개와 메서드</h2>
+  <section class="module" id="m8">
+    <h2><span class="num">8</span> REST API 이해하기와 axios 소개</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>REST API의 개념과 리소스/HTTP 메서드의 관계를 이해한다.</li>
       <li>axios를 설치하고 사용하는 이유를 이해한다.</li>
       <li>HTTP 메서드별 axios 함수를 익힌다.</li>
     </ul></div>
+    <div class="concept"><h3 class="blk">📖 REST API란?</h3>
+      <p><strong>REST API</strong>(Representational State Transfer API)는 웹에서 서버와 클라이언트가 데이터를 주고받기 위한 표준적인 방식입니다. 웹사이트나 모바일 앱에서 회원 정보, 게시글, 상품 목록 등을 조회하거나 저장할 때 REST API를 사용합니다.</p>
+      <p>핵심 개념은 "<strong>리소스(Resource)를 URL로 표현하고, 그 리소스에 대한 행위는 HTTP 메서드로 구분한다</strong>"는 것입니다. REST API는 웹에서 사용하는 HTTP를 기반으로 동작합니다.</p>
+      <h3 class="blk">📖 주요 HTTP 메서드</h3>
+      <table>
+        <thead><tr><th>메서드</th><th>기능</th></tr></thead>
+        <tbody>
+          <tr><td>GET</td><td>데이터 조회</td></tr>
+          <tr><td>POST</td><td>데이터 생성</td></tr>
+          <tr><td>PUT</td><td>데이터 전체 수정</td></tr>
+          <tr><td>PATCH</td><td>데이터 일부 수정</td></tr>
+          <tr><td>DELETE</td><td>데이터 삭제</td></tr>
+        </tbody>
+      </table>
+    </div>
     <div class="concept"><h3 class="blk">📖 axios 라이브러리 설치</h3>
 <pre><code class="language-bash">npm install axios</code></pre>
       <p><strong>axios란?</strong> HTTP 요청을 쉽게 보내기 위한 라이브러리입니다.</p>
@@ -720,11 +697,14 @@ const FetchTodoById = () =&gt; {
     </div>
   </section>
 
-  <section class="module" id="m12">
-    <h2><span class="num">12</span> axios로 할 일 목록 가져오기</h2>
+  <section class="module" id="m9">
+    <h2><span class="num">9</span> axios로 할 일 목록·1건 가져오기와 추가하기</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
       <li><code>axios.get</code>으로 목록을 가져오고 <code>response.data</code>로 데이터에 접근한다.</li>
       <li>fetch 방식과의 차이(JSON 변환 자동)를 비교한다.</li>
+      <li><code>useParams</code>와 <code>axios.get</code>으로 특정 id의 데이터를 조회한다.</li>
+      <li>제어 컴포넌트(입력 상태 관리)와 폼 제출을 결합한다.</li>
+      <li><code>axios.post</code>로 새 데이터를 서버에 생성 요청한다.</li>
     </ul></div>
     <div class="ex"><div class="lbl">💡 예제 — axios 라우터 설정</div>
       <span class="fname">App.jsx</span>
@@ -795,7 +775,7 @@ const FetchTodoById = () =&gt; {
       <div class="tip"><span class="lbl">💡 정리</span> axios는 응답 데이터를 <code>response.data</code>로 바로 접근할 수 있어 <code>response.json()</code> 호출이 필요 없습니다. 목록의 링크는 <code>/axios/${todo.id}</code>로 연결됩니다.</div>
     </div>
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 12-1. fetch를 axios로 바꾸기</h4>
+      <h4>실습 9-1. fetch를 axios로 바꾸기</h4>
       <p>아래 fetch 코드를 axios로 바꿔 <code>users</code>를 가져오세요.</p>
 <pre><code class="language-jsx">fetch("https://jsonplaceholder.typicode.com/users")
   .then((res) =&gt; res.json())
@@ -806,13 +786,6 @@ const FetchTodoById = () =&gt; {
   .catch((error) =&gt; console.error(error));</code></pre>
       </details>
     </div>
-  </section>
-
-  <section class="module" id="m13">
-    <h2><span class="num">13</span> axios로 할 일 1건 가져오기</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
-      <li><code>useParams</code>와 <code>axios.get</code>으로 특정 id의 데이터를 조회한다.</li>
-    </ul></div>
     <div class="ex"><div class="lbl">💡 예제 — id로 1건 가져오기</div>
       <span class="fname">axios_ex/AxiosTodoById.jsx</span>
 <pre><code class="language-jsx">const AxiosTodoById = () =&gt; {
@@ -854,14 +827,6 @@ const FetchTodoById = () =&gt; {
         <p><strong>완료 여부:</strong> ○ 미완료</p>
       </div>
     </div>
-  </section>
-
-  <section class="module" id="m14">
-    <h2><span class="num">14</span> axios로 할 일 추가하기 (POST)</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
-      <li>제어 컴포넌트(입력 상태 관리)와 폼 제출을 결합한다.</li>
-      <li><code>axios.post</code>로 새 데이터를 서버에 생성 요청한다.</li>
-    </ul></div>
     <div class="ex"><div class="lbl">💡 예제 — 입력 상태와 POST 요청</div>
       <span class="fname">axios_ex/AxiosNewTodo.jsx</span>
 <pre><code class="language-jsx">import axios from "axios";
@@ -920,7 +885,7 @@ const AxiosPost = () =&gt; {
       <div class="tip"><span class="lbl">💡 정리</span> 입력값을 <code>title</code> 상태로 관리하는 <strong>제어 컴포넌트</strong> 패턴입니다. <code>handleSubmit</code>에서 <code>e.preventDefault()</code>로 새로고침을 막고, <code>axios.post</code>의 두 번째 인자로 보낼 데이터 객체를 전달합니다. JSONPlaceholder는 실제로 저장하지 않고 가짜 응답(생성된 id 포함)만 돌려줍니다.</div>
     </div>
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 14-1. 빈 값 제출 막기</h4>
+      <h4>실습 9-2. 빈 값 제출 막기</h4>
       <p>입력값이 비어 있으면 POST 요청을 보내지 않고 "할 일을 입력하세요"를 alert로 띄우도록 <code>handleSubmit</code>을 수정하세요.</p>
       <details><summary>정답 보기</summary>
 <pre><code class="language-jsx">const handleSubmit = (e) =&gt; {
