@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>10강. 웹서버 만들기 (Express)</title>
+<title>6강. 웹서버 만들기 (Express)</title>
 <style>
 /* highlight.js atom-one-dark theme (inlined) */
 pre code.hljs {
@@ -501,13 +501,9 @@ app.listen(PORT, () =&gt; {
   <section class="module" id="m6">
     <h2><span class="num">6</span> MySQL 설치·데이터 타입, 테이블 만들기와 제약 조건</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
-      <li>MySQL DBMS와 Workbench를 설치하고 root 계정으로 접속할 수 있다.</li>
-      <li>MySQL의 주요 데이터 타입을 이해하고 용도에 맞게 선택할 수 있다.</li>
-      <li>Workbench에서 root 계정으로 데이터베이스를 생성하고 사용할 수 있다.</li>
-      <li>테이블을 생성하고 데이터를 삽입·조회할 수 있다.</li>
-      <li>ER 다이어그램으로 개체와 관계를 표현하는 방법을 이해한다.</li>
-      <li>NOT NULL · PRIMARY KEY 제약 조건의 의미와 필요성을 설명할 수 있다.</li>
-      <li>제약 조건 위반 시 발생하는 오류(1062, 1364)를 이해한다.</li>
+      <li>MySQL과 Workbench를 설치하고 주요 데이터 타입을 이해한다.</li>
+      <li>데이터베이스와 테이블을 만들고 데이터를 삽입·조회할 수 있다.</li>
+      <li>ER 다이어그램과 제약 조건(NOT NULL · PRIMARY KEY)의 의미를 이해한다.</li>
     </ul></div>
     <div class="concept"><h3 class="blk">📖 MySQL DBMS 설치</h3>
       <p>웹 애플리케이션에서 데이터베이스와의 연동은 필수적인 작업입니다. 이런 상호작용을 위해서는 <strong>데이터베이스 관리 시스템(DBMS)</strong>이 설치되어야 합니다.</p>
@@ -927,18 +923,9 @@ app.put('/products/:id', (req, res) =&gt; {
   <section class="module" id="m9">
     <h2><span class="num">9</span> 리엑트(UI) + 익스프레스(Server)</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
-      <li>react-server 풀스택 프로젝트의 구성 요소(리액트 클라이언트 + Express 서버 + MySQL)를 이해한다.</li>
-      <li>미리 만든 서버 폴더에 Vite 리액트 클라이언트를 추가하고 라우터를 설치하는 절차를 익힌다.</li>
-      <li>터미널을 분할해 서버와 클라이언트를 동시에 실행하는 개발 흐름을 파악한다.</li>
-      <li>클라이언트에서 axios 인스턴스를 만들어 API 서버의 baseURL을 지정하는 방법을 익힌다.</li>
-      <li>서버에서 CORS를 허용해 다른 포트의 리액트 앱과 통신할 수 있게 설정한다.</li>
-      <li>axios 인스턴스를 별도 모듈로 분리해 재사용하는 구조를 이해한다.</li>
-      <li>BrowserRouter와 Routes/Route로 상품 CRUD 페이지 경로를 정의한다.</li>
-      <li>NavLink로 공통 네비게이션(Header)을 구성한다.</li>
-      <li>동적 경로 파라미터(<code>:id</code>)를 사용한 상세/수정 경로 패턴을 이해한다.</li>
-      <li>index.css로 링크·버튼·폼 등 공통 요소의 기본 스타일을 정의한다.</li>
-      <li>App.css로 헤더·상품 리스트·상품 정보 영역의 레이아웃 스타일을 정의한다.</li>
-      <li>CSS 변수(<code>var(--accent)</code> 등)를 활용해 색상을 일관되게 관리한다.</li>
+      <li>리액트(클라이언트) + Express(서버) + MySQL 풀스택 구조를 이해하고 서버·클라이언트를 함께 실행한다.</li>
+      <li>axios 인스턴스(baseURL)와 서버 CORS 설정으로 클라이언트-서버 통신을 연결한다.</li>
+      <li>Router로 상품 페이지 경로를 구성하고, index.css · App.css로 공통 스타일을 정의한다.</li>
     </ul></div>
 
     <div class="concept">
@@ -977,23 +964,11 @@ npm install react-router-dom</code></pre>
     <div class="ex"><div class="lbl">💡 예제 — 터미널 분할 실행</div>
       <span class="fname">터미널 분할 (server / client)</span>
 <pre><code class="language-bash"># server 실행
-npx nodemon index
+npm run dev
 
 # client 실행
 npm run dev</code></pre>
       <div class="tip"><span class="lbl">💡 정리</span> 서버(Express)와 클라이언트(Vite)는 서로 다른 포트에서 각각 실행됩니다. 두 프로세스를 동시에 띄우기 위해 터미널을 분할해 사용합니다.</div>
-    </div>
-
-    <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 9-1. 개발 서버 실행 명령</h4>
-      <p>기존 server 폴더에 새로 만든 client(Vite 리액트)를 함께 개발하려고 합니다. 서버와 클라이언트를 각각 실행하는 명령어를 쓰세요.</p>
-      <details><summary>정답 보기</summary>
-<pre><code class="language-bash"># server 실행 (nodemon으로 파일 변경 감지)
-npx nodemon index
-
-# client 실행 (Vite 개발 서버)
-npm run dev</code></pre>
-      </details>
     </div>
 
     <div class="concept">
@@ -1005,11 +980,15 @@ npm run dev</code></pre>
     <div class="ex"><div class="lbl">💡 예제 — 클라이언트 측 통신 (axios)</div>
       <span class="fname">터미널 (client)</span>
 <pre><code class="language-bash">npm install axios</code></pre>
-      <span class="fname">api 폴더 하위에 api.js 작성</span>
-<pre><code class="language-javascript">// baseURL 설정: API 서버의 기본 URL을 지정
+      <span class="fname">src/api/api.js</span>
+<pre><code class="language-javascript">import axios from 'axios'
+
+// baseURL 설정: API 서버의 기본 URL을 지정
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
-})</code></pre>
+  baseURL: 'http://localhost:8000/api',
+})
+
+export default api</code></pre>
     </div>
 
     <div class="ex"><div class="lbl">💡 예제 — 서버 측 통신 (cors())</div>
@@ -1023,33 +1002,6 @@ app.use(cors({
       <div class="tip"><span class="lbl">💡 정리</span> 서버의 <code>origin</code>에는 <strong>클라이언트(리액트)의 주소</strong>를, 클라이언트 axios의 <code>baseURL</code>에는 <strong>서버의 주소</strong>를 지정합니다. 방향이 서로 반대라는 점에 주의하세요.</div>
     </div>
 
-    <div class="ex"><div class="lbl">💡 예제 — axios 인스턴스 모듈</div>
-      <span class="fname">src/api/api.jsx</span>
-<pre><code class="language-jsx">import axios from 'axios'
-
-// axios 인스턴스 생성
-// baseURL 설정: API 서버의 기본 URL을 지정
-const api = axios.create({
-  baseURL: 'http://localhost:8000',
-})
-
-export default api</code></pre>
-      <div class="tip"><span class="lbl">💡 정리</span> axios 인스턴스를 한 곳(api.jsx)에서 만들어 <code>export default</code> 하면, 모든 컴포넌트가 <code>import api from '../api/api'</code>로 가져와 공통 baseURL을 재사용할 수 있습니다.</div>
-    </div>
-
-    <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 9-2. axios 인스턴스 만들기</h4>
-      <p>서버 주소가 <code>http://localhost:8000</code>일 때, 이를 baseURL로 갖는 axios 인스턴스를 만들어 default export 하는 <code>api.jsx</code>를 작성하세요.</p>
-      <details><summary>정답 보기</summary>
-<pre><code class="language-jsx">import axios from 'axios'
-
-const api = axios.create({
-  baseURL: 'http://localhost:8000',
-})
-
-export default api</code></pre>
-      </details>
-    </div>
 
     <div class="concept">
       <h3 class="blk">📖 라우트 설계</h3>
@@ -1133,13 +1085,6 @@ export default Home</code></pre>
       </div>
     </div>
 
-    <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 9-3. 동적 경로 추가</h4>
-      <p>상품 리뷰 페이지를 <code>/products/:id/review</code> 경로에 <code>Review</code> 컴포넌트로 연결하는 <code>&lt;Route&gt;</code>를 작성하세요.</p>
-      <details><summary>정답 보기</summary>
-<pre><code class="language-jsx">&lt;Route path="/products/:id/review" element={&lt;Review /&gt;} /&gt;</code></pre>
-      </details>
-    </div>
 
     <div class="ex"><div class="lbl">💡 예제 — index.css (링크·버튼·폼 공통)</div>
       <span class="fname">src/index.css</span>
@@ -1248,35 +1193,14 @@ form button {
       <div class="tip"><span class="lbl">💡 정리</span> <code>border-collapse: collapse</code>는 표 셀의 이중 테두리를 하나로 합쳐 깔끔하게 만듭니다. 상품 목록 표(product-list)와 상품 정보 카드(product-details)의 시각적 스타일을 App.css가 담당합니다.</div>
     </div>
 
-    <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 9-4. 표 헤더 배경색</h4>
-      <p>상품 목록 표의 헤더(<code>th</code>)에 회색 배경(<code>#f2f2f2</code>)을 지정하는 CSS를 작성하세요.</p>
-      <details><summary>정답 보기</summary>
-<pre><code class="language-css">.product-list th{
-  background-color: #f2f2f2;
-}</code></pre>
-      </details>
-    </div>
   </section>
 
   <section class="module" id="m10">
     <h2><span class="num">10</span> 상품 관리 화면 — 목록 · 등록 · 정보 · 삭제 · 수정 (CRUD)</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
-      <li>useEffect + api.get으로 마운트 시 상품 목록을 불러온다.</li>
-      <li>응답 데이터를 useState에 저장하고 map으로 표에 렌더링한다.</li>
-      <li>dayjs로 날짜를 포맷하고, Link로 상세 페이지로 이동한다.</li>
-      <li>객체 형태의 formData 상태와 공통 handleInputChange로 여러 입력을 관리한다.</li>
-      <li>api.post로 새 상품을 등록하고, 성공 시 목록 페이지로 이동한다.</li>
-      <li>e.preventDefault()로 폼 기본 제출(새로고침)을 막는다.</li>
-      <li>useParams로 URL의 <code>:id</code>를 읽어 특정 상품을 조회한다.</li>
-      <li>조건부 렌더링으로 로딩 상태와 데이터 표시를 구분한다.</li>
-      <li>수정·삭제·목록 버튼으로 다른 페이지로 이동하는 흐름을 구성한다.</li>
-      <li>window.confirm으로 삭제 전 사용자 확인을 받는다.</li>
-      <li>api.delete로 상품을 삭제하고 목록으로 이동한다.</li>
-      <li>삭제 성공/실패 시 적절한 안내(alert)와 에러 처리를 한다.</li>
-      <li>마운트 시 기존 상품 정보를 조회해 폼의 초기값으로 채운다.</li>
-      <li>api.put으로 수정 내용을 서버에 반영한다.</li>
-      <li>서버 응답의 <code>product_name</code>을 폼의 <code>productName</code>에 매핑하는 차이를 이해한다.</li>
+      <li>api.get · post · put · delete로 상품 목록 조회·등록·수정·삭제를 구현한다.</li>
+      <li>useEffect · useState · useParams로 데이터를 불러오고 화면에 표시한다.</li>
+      <li>폼 입력 상태 관리, 삭제 전 확인, 페이지 이동 흐름을 구성한다.</li>
     </ul></div>
 
     <div class="concept">
@@ -1297,14 +1221,16 @@ const ProductList = () =&gt; {
   const [products, setProducts] = useState([])
 
   useEffect(() =&gt; {
-    // 상품 목록 조회 API 호출
-    api.get('/products')
-      .then(response =&gt; {
+    // fetchProducts 함수 정의: API 호출 및 상태 업데이트
+    const fetchProducts = async () =&gt; {
+      try {
+        const response = await api.get('/products')
         setProducts(response.data) // 응답 데이터로 상태 업데이트
-      })
-      .catch(error =&gt; {
+      } catch (error) {
         console.error('상품 목록 조회 에러:', error)
-      })
+      }
+    }
+    fetchProducts() // 상품 목록 조회 함수 호출
   }, [])
 
   return (
@@ -1359,21 +1285,6 @@ export default ProductList</code></pre>
       <div class="tip"><span class="lbl">💡 정리</span> useEffect의 의존성 배열이 <code>[]</code>이므로 컴포넌트가 처음 마운트될 때 <strong>한 번만</strong> 조회합니다. 리스트 렌더링 시 각 <code>&lt;tr&gt;</code>에 고유 <code>key={product.id}</code>를 지정해야 합니다.</div>
     </div>
 
-    <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 10-1. 목록 조회 API 호출</h4>
-      <p>마운트 시 <code>/products</code>를 조회해 <code>products</code> 상태에 저장하는 useEffect를 작성하세요. (에러는 콘솔 출력)</p>
-      <details><summary>정답 보기</summary>
-<pre><code class="language-jsx">useEffect(() =&gt; {
-  api.get('/products')
-    .then(response =&gt; {
-      setProducts(response.data)
-    })
-    .catch(error =&gt; {
-      console.error('상품 목록 조회 에러:', error)
-    })
-}, [])</code></pre>
-      </details>
-    </div>
 
     <div class="concept">
       <h3 class="blk">📖 하나의 상태 객체로 폼 관리</h3>
@@ -1487,16 +1398,6 @@ export default AddProduct</code></pre>
       <div class="tip"><span class="lbl">💡 정리</span> <code>type="submit"</code> 버튼과 <code>type="button"</code> 버튼을 구분해야 합니다. 취소 버튼을 <code>type="button"</code>으로 두지 않으면 폼이 제출되어 버립니다.</div>
     </div>
 
-    <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 10-2. 공통 입력 핸들러</h4>
-      <p>여러 입력을 하나의 <code>formData</code> 객체로 관리할 때, 입력의 <code>name</code>을 키로 사용하는 공통 변경 핸들러를 작성하세요.</p>
-      <details><summary>정답 보기</summary>
-<pre><code class="language-jsx">const handleInputChange = (e) =&gt; {
-  const { name, value } = e.target
-  setFormData({ ...formData, [name]: value })
-}</code></pre>
-      </details>
-    </div>
 
     <div class="concept">
       <h3 class="blk">📖 상세 조회 흐름</h3>
@@ -1511,14 +1412,15 @@ export default AddProduct</code></pre>
   const [product, setProduct] = useState(null)
 
   useEffect(() =&gt; {
-    // 상품 상세 조회 API 호출
-    api.get(`/products/${id}`)
-      .then(response =&gt; {
+    const fetchProduct = async () =&gt; {
+      try {
+        const response = await api.get(`/products/${id}`)
         setProduct(response.data) // 응답 데이터로 상태 업데이트
-      })
-      .catch(error =&gt; {
+      } catch (error) {
         console.error('상품 상세 조회 에러:', error)
-      })
+      }
+    }
+    fetchProduct()
   }, [id])
 
   return (
@@ -1572,19 +1474,6 @@ export default ProductInfo</code></pre>
       <div class="tip"><span class="lbl">💡 정리</span> 초기 상태를 <code>null</code>로 두고 <code>{product ? (...) : (...)}</code> 삼항 연산자로 로딩 화면을 처리하면, 데이터 도착 전 <code>product.id</code> 접근으로 인한 에러를 방지할 수 있습니다.</div>
     </div>
 
-    <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 10-3. URL 파라미터로 상세 조회</h4>
-      <p><code>useParams</code>로 얻은 <code>id</code>로 상품을 조회하고, id가 바뀌면 다시 조회하도록 useEffect를 작성하세요.</p>
-      <details><summary>정답 보기</summary>
-<pre><code class="language-jsx">const { id } = useParams()
-
-useEffect(() =&gt; {
-  api.get(`/products/${id}`)
-    .then(response =&gt; setProduct(response.data))
-    .catch(error =&gt; console.error('상품 상세 조회 에러:', error))
-}, [id])</code></pre>
-      </details>
-    </div>
 
     <div class="concept">
       <h3 class="blk">📖 삭제 흐름</h3>
@@ -1619,23 +1508,6 @@ useEffect(() =&gt; {
       <div class="tip"><span class="lbl">💡 정리</span> REST 규칙상 삭제는 <code>DELETE /products/:id</code> 메서드를 사용합니다. 삭제 후에는 이미 사라진 상세 페이지에 머무를 수 없으므로 목록(<code>/products</code>)으로 이동시킵니다.</div>
     </div>
 
-    <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 10-4. 확인 후 삭제</h4>
-      <p>사용자가 확인창에서 "확인"을 눌렀을 때만 <code>id</code> 상품을 삭제하고 목록으로 이동하는 코드를 작성하세요.</p>
-      <details><summary>정답 보기</summary>
-<pre><code class="language-jsx">if (window.confirm('정말 삭제하시겠습니까?')) {
-  api.delete(`/products/${id}`)
-    .then(() =&gt; {
-      alert('상품이 삭제되었습니다.')
-      navigate('/products')
-    })
-    .catch(error =&gt; {
-      console.error('상품 삭제 에러:', error)
-      alert('상품 삭제 중 오류가 발생했습니다.')
-    })
-}</code></pre>
-      </details>
-    </div>
 
     <div class="concept">
       <h3 class="blk">📖 수정 흐름</h3>
@@ -1656,16 +1528,18 @@ useEffect(() =&gt; {
 
   // 컴포넌트가 마운트될 때 상품 정보를 조회하여 폼에 초기값 설정
   useEffect(() =&gt; {
-    api.get(`/products/${id}`)
-      .then(response =&gt; {
+    const fetchProduct = async () =&gt; {
+      try {
+        const response = await api.get(`/products/${id}`)
         setFormData({
           productName: response.data.product_name,
           price: response.data.price
         })
-      })
-      .catch(error =&gt; {
+      } catch (error) {
         console.error('상품 조회 에러:', error)
-      })
+      }
+    }
+    fetchProduct()
   }, [id])</code></pre>
     </div>
 
@@ -1752,27 +1626,9 @@ export default UpdateProduct</code></pre>
       <div class="tip"><span class="lbl">💡 정리</span> 서버는 <code>product_name</code>(snake_case)으로 응답하지만 폼 상태는 <code>productName</code>(camelCase)을 사용하므로, 초기값을 채울 때 <code>productName: response.data.product_name</code>처럼 <strong>키 이름을 맞춰 매핑</strong>해야 합니다.</div>
     </div>
 
-    <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 10-5. 수정 요청 보내기</h4>
-      <p><code>formData</code>로 <code>id</code> 상품을 수정하고, 성공하면 해당 상품 상세 페이지로 이동하는 <code>handleSubmit</code>을 작성하세요.</p>
-      <details><summary>정답 보기</summary>
-<pre><code class="language-jsx">const handleSubmit = (e) =&gt; {
-  e.preventDefault()
-  api.put(`/products/${id}`, formData)
-    .then(() =&gt; {
-      alert('상품이 성공적으로 수정되었습니다.')
-      navigate(`/products/${id}`)
-    })
-    .catch(error =&gt; {
-      console.error('상품 수정 에러:', error)
-      alert('상품 수정 중 오류가 발생했습니다.')
-    })
-}</code></pre>
-      </details>
-    </div>
   </section>
 
-  <footer>10강. 웹서버 만들기 (Express) · 학습 교안<br>모듈별 학습목표 · 개념 · 예제 · 실습문제 구성</footer>
+  <footer>6강. 웹서버 만들기 (Express) · 학습 교안<br>모듈별 학습목표 · 개념 · 예제 · 실습문제 구성</footer>
 </div>
 
 <script>
