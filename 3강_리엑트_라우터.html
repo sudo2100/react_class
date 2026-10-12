@@ -915,37 +915,101 @@ export default AddProduct;</code></pre>
       <li>상품 목록을 표(table) 형태로 렌더링할 수 있다.</li>
       <li>테이블 셀 안의 상품명에 상세 페이지 Link를 걸 수 있다.</li>
     </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — App.jsx (container로 감싸기)</div>
+      <span class="fname">src/App.jsx</span>
+      <pre><code class="language-jsx">function App() {
+
+  return (
+    &lt;&gt;
+      &lt;section className="app"&gt;
+        &lt;BrowserRouter&gt;
+          &lt;Header /&gt;
+          &lt;div className='container'&gt;
+            &lt;Routes&gt;
+              &lt;Route path='/' element={&lt;Main /&gt;} /&gt;
+              &lt;Route path='/products' element={&lt;ProductList /&gt;} /&gt;
+              &lt;Route path='/products/:id' element={&lt;ProductInfo /&gt;} /&gt;
+              &lt;Route path='/add-product' element={&lt;AddProduct /&gt;} /&gt;
+            &lt;/Routes&gt;
+          &lt;/div&gt;
+        &lt;/BrowserRouter&gt;
+      &lt;/section&gt;
+    &lt;/&gt;
+  )
+}
+
+export default App</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — Main.jsx (메인 이미지)</div>
+      <span class="fname">src/layouts/Main.jsx</span>
+      <pre><code class="language-jsx">import mainImage from '../assets/hero.png'
+
+const Main = () =&gt; {
+  return (
+    &lt;main className="main"&gt;
+      &lt;h2&gt;컴퓨터 기기 쇼핑몰&lt;/h2&gt;
+      &lt;section&gt;
+        &lt;p&gt;최신 컴퓨터 기기를 한 곳에서 만나보세요!&lt;/p&gt;
+        &lt;div&gt;
+          &lt;img src={mainImage} alt="메인 이미지" /&gt;
+        &lt;/div&gt; 
+      &lt;/section&gt;
+    &lt;/main&gt;
+  )
+}
+
+export default Main</code></pre>
+    </div>
     <div class="ex"><div class="lbl">💡 예제 — 테이블 형태의 상품 목록</div>
       <span class="fname">src/pages/ProductList.jsx</span>
-      <pre><code class="language-jsx">&lt;h2&gt;상품 리스트&lt;/h2&gt;
-&lt;table className="table-list"&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th&gt;번호&lt;/th&gt;
-      &lt;th&gt;상품명&lt;/th&gt;
-      &lt;th&gt;가격&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    {products.map((product) =&gt; (
-      &lt;tr key={product.id}&gt;
-        &lt;td&gt;{product.id}&lt;/td&gt;
-        &lt;td&gt;
-          &lt;Link to={`/products/${product.id}`}&gt;{product.name}&lt;/Link&gt;
-        &lt;/td&gt;
-        &lt;td&gt;{product.price}&lt;/td&gt;
-      &lt;/tr&gt;
-    ))}
-  &lt;/tbody&gt;
-&lt;/table&gt;</code></pre>
+      <pre><code class="language-jsx">const ProductList = () =&gt; { 
+  
+  return (
+    &lt;section className="product-list"&gt;
+      &lt;h2&gt;상품 리스트&lt;/h2&gt;
+      &lt;table&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th&gt;상품ID&lt;/th&gt;
+            &lt;th&gt;상품명&lt;/th&gt;
+            &lt;th&gt;가격&lt;/th&gt;
+            &lt;th&gt;설명&lt;/th&gt;
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          {products.map((product) =&gt; (
+            &lt;tr key={product.id}&gt;
+              &lt;td&gt;{product.id}&lt;/td&gt;
+              &lt;td&gt;
+                &lt;Link to={`/products/${product.id}`}&gt;{product.name}&lt;/Link&gt;
+              &lt;/td&gt;
+              &lt;td&gt;{product.price}&lt;/td&gt;
+              &lt;td&gt;{product.description}&lt;/td&gt;
+            &lt;/tr&gt;
+          ))}
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/section&gt;
+  )
+}
+
+export default ProductList</code></pre>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — 스타일(App.css) 추가</div>
       <span class="fname">src/App.css</span>
-      <pre><code class="language-css">/* 상품 목록 스타일 */
-.product-list {width: 1000px; margin: 0 auto; text-align: left;}
-.table-list {width: 60%; margin: 0 auto; border-collapse: collapse;}
-.table-list th, .table-list td {border: 1px solid #ddd;padding: 8px;}
-.table-list th {text-align: center; background-color: #f2f2f2;}
+      <pre><code class="language-css">/* Main 스타일 */
+.main {
+  width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+}
+.main img {margin-top: 20px;}
+
+/* 상품 목록 스타일 */
+.product-list table{width: 60%; margin: 20px auto; border-collapse: collapse;}
+.product-list table th, td {border: 1px solid #ddd;padding: 8px;}
+.product-list table th {background-color: #f2f2f2;}
 .product-list .btn-add {text-align: right; margin-top: 20px; margin-right: 20%;}
 .product-list .btn-add button {
   padding: 10px 20px;
@@ -955,20 +1019,17 @@ export default AddProduct;</code></pre>
   border: none;
   cursor: pointer;
 }
-.btn-add button:hover {background-color: #0056b3;}
+.product-list .btn-add button:hover {background-color: #0056b3;}
 
 /* 상품 상세 정보 */
-.product-info{width: 60%; margin: 0 auto;}
-.product-details {
-  width: 50%;
-  margin: 0 auto;
-  text-align: left;
-  border: 1px solid #ddd;
-  padding: 20px;
+.product-info .detail{
+  width: 50%; 
+  margin: 20px auto; 
+  background-color: #f9f9f9; 
+  padding: 20px; 
   border-radius: 8px;
-  background-color: #f0f0f0;
 }
-.product-details p {margin-bottom: 10px;}
+.product-info .detail p {margin-bottom: 16px;}
 .product-info .btn-list{
   text-align: right;
   margin-top: 20px;
@@ -983,8 +1044,12 @@ export default AddProduct;</code></pre>
 }
 
 /* 상품 등록 폼 */
-.add-product{width: 40%; margin: 0 auto; text-align: left;}
-.add-product form label {display: block; margin-bottom: 8px; font-weight: bold;}
+.add-product form{width: 40%; margin: 0 auto; text-align: left;}
+.add-product form label {
+  display: block; 
+  margin-bottom: 8px; 
+  font-weight: bold;
+}
 .add-product form input,
 .add-product form textarea {
   width: 100%;
@@ -1016,6 +1081,42 @@ export default AddProduct;</code></pre>
         </table>
         <div class="demo" style="text-align:right;"><button>상품 등록하기</button></div>
       </div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 공통 스타일(index.css) 추가</div>
+      <span class="fname">src/index.css</span>
+      <pre><code class="language-css">.container{
+  width: 1100px;
+  margin: 20px auto;
+}
+h1,
+h2 {
+  font-family: var(--heading);
+  font-weight: 500;
+  color: var(--text-h);
+}
+h1 {
+  font-size: 56px;
+  letter-spacing: -1.68px;
+  margin: 32px 0;
+  @media (max-width: 1024px) {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+}
+h2 {
+  font-size: 24px;
+  line-height: 118%;
+  letter-spacing: -0.24px;
+  margin: 0 0 8px;
+  @media (max-width: 1024px) {
+    font-size: 20px;
+  }
+}
+p {margin: 0;}
+ul {
+  list-style: none;
+  padding-left: 0;
+}</code></pre>
     </div>
   </section>
 
@@ -1064,13 +1165,16 @@ export default users;</code></pre>
       &lt;div className="app"&gt;
         &lt;BrowserRouter&gt;
           &lt;Header isLoggedIn={isLoggedIn} username={username} onLogout={handleLogout} /&gt;
-          &lt;Routes&gt;
-            &lt;Route path="/" element={&lt;Main /&gt;} /&gt;
-            &lt;Route path="/products" element={&lt;ProductList /&gt;} /&gt;
-            &lt;Route path="/products/:id" element={&lt;ProductInfo /&gt;} /&gt;
-            &lt;Route path="/add-product" element={&lt;AddProduct /&gt;} /&gt;
-            &lt;Route path="/signin" element={&lt;SignIn onLogin={handleLogin} /&gt;} /&gt;
-          &lt;/Routes&gt;
+          &lt;div className="container"&gt;
+            &lt;Routes&gt;
+              &lt;Route path="/" element={&lt;Main /&gt;} /&gt;
+              &lt;Route path="/products" element={&lt;ProductList /&gt;} /&gt;
+              &lt;Route path="/products/:id" element={&lt;ProductInfo /&gt;} /&gt;
+              &lt;Route path="/add-product" element={&lt;AddProduct /&gt;} /&gt;
+              &lt;Route path="/signin" element={&lt;SignIn onLogin={handleLogin} /&gt;} /&gt;
+              &lt;Route path='/signup' element={&lt;SignUp /&gt;} /&gt;
+            &lt;/Routes&gt;
+          &lt;/div&gt;
         &lt;/BrowserRouter&gt;
       &lt;/div&gt;
     &lt;/&gt;
