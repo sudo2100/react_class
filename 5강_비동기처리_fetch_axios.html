@@ -719,7 +719,7 @@ const FetchTodoById = () =&gt; {
           &lt;Route path="/:id" element={&lt;FetchTodoById /&gt;} /&gt;
 
           {/* Axios Todo */}
-          &lt;Route path="/axios" element={&lt;AxiosTodos /&gt;} /&gt;
+          &lt;Route path="/" element={&lt;AxiosTodos /&gt;} /&gt;
           &lt;Route path="/axios/:id" element={&lt;AxiosTodoById /&gt;} /&gt;
           &lt;Route path="/axios-post" element={&lt;AxiosPost /&gt;} /&gt;
         &lt;/Routes&gt;
@@ -844,23 +844,29 @@ const AxiosPost = () =&gt; {
   const handleSubmit = (e) =&gt; {
     e.preventDefault(); // 폼 제출 시 페이지 새로고침 방지
 
+    // 입력값이 비어있으면 POST 요청을 보내지 않음
+    if (title.trim() === "") {
+      alert("할 일을 입력해주세요.");
+      return;
+    }
+
     // JSONPlaceholder API에 POST 요청 보내기
+    // axios.post()-인수1: 요청을 보낼 URL, 인수2: 서버로 보낼 데이터 객체
     axios.post("https://jsonplaceholder.typicode.com/todos", {
       title: title,
       completed: false
-    })</code></pre>
-    </div>
-    <div class="ex"><div class="lbl">💡 예제 — 응답 처리와 폼 렌더링</div>
-      <span class="fname">axios_ex/AxiosNewTodo.jsx</span>
-<pre><code class="language-jsx">    .then((response) =&gt; {
+    })
+    .then(response =&gt; {
       console.log("추가된 데이터:", response.data);
       alert("추가 완료!");
       setTitle(""); // 입력 필드 초기화
     })
     .catch((error) =&gt; console.log(error)) // 에러 처리
-  }
-
-  return(
+  }</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 응답 처리와 폼 렌더링</div>
+      <span class="fname">axios_ex/AxiosNewTodo.jsx</span>
+<pre><code class="language-jsx">  return(
     &lt;div className="axios-new-todo"&gt;
       &lt;h2&gt;할 일 추가&lt;/h2&gt;
       &lt;form onSubmit={handleSubmit}&gt;
