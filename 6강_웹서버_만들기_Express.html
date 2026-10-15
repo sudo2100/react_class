@@ -179,6 +179,7 @@ hue-6-2: #e6c07b
       <li><a href="#m8">상품 CRUD API (DB 연동)</a></li>
       <li><a href="#m9">리엑트(UI) + 익스프레스(Server)</a></li>
       <li><a href="#m10">상품 관리 화면 — 목록 · 등록 · 정보 · 삭제 · 수정 (CRUD)</a></li>
+      <li><a href="#m11">회원 API 테스트</a></li>
     </ol>
   </nav>
 
@@ -1012,8 +1013,145 @@ app.use(cors({
     </div>
 
 
+    <div class="ex"><div class="lbl">💡 예제 — MySQL Workbench jsdb</div>
+      <span class="fname">MySQL Workbench — jsdb</span>
+<pre><code class="language-sql">-- product 테이블 생성
+create table product(
+	id int auto_increment primary key,
+    product_name varchar(20) not null,
+    price int not null,
+    description text,
+    created_at timestamp default current_timestamp
+);
+
+-- 상품 추가
+insert into product(product_name, price, description) 
+values('무선마우스', 32000, 'SPACE 무선 마우스 그레이 500');
+
+-- 상품 검색
+select * from product;
+
+commit;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — server/index.js</div>
+      <span class="fname">server/index.js</span>
+<pre><code class="language-javascript">import express from 'express';
+import mysql from 'mysql2';
+import cors from 'cors';
+
+const app = express();
+const PORT = 8000;
+
+// MySQL 연결 설정
+const db = mysql.createConnection({
+  host: 'localhost',
+  user: 'jsuser',
+  password: 'pwjs',
+  database: 'jsdb'
+});
+
+// MySQL 연결 확인
+db.connect((err) =&gt; {
+  if (err) {
+    console.error('Error connecting to MySQL:', err);
+    return;
+  }
+  console.log('MySQL에 연결되었습니다.');
+});
+
+// CORS 설정 - 리엑트와 통신하기 위해 필요
+app.use(cors({
+  origin: 'http://localhost:5173', // 리엑트 앱이 실행되는 주소
+}));
+
+// 라우트 설정
+app.get('/', (req, res) =&gt; {
+  res.send('Hello, World!');
+});
+
+//상품 목록 조회 라우트 설정
+app.get('/api/products', (req, res) =&gt; {
+  const sql = 'SELECT * FROM product';
+  db.query(sql, (err, results) =&gt; {
+    if (err) {
+      // 에러 발생 시 500 상태 코드와 에러 메시지 반환
+      console.error('상품 조회 에러:', err);
+      res.status(500).send('상품 조회 중 오류가 발생했습니다.');
+      return; // 즉시 종료
+    }
+    res.json(results); // 성공 시 상품 목록을 JSON 형식으로 반환
+  });
+});
+
+// JSON 요청 본문을 파싱하기 위한 미들웨어 설정
+app.use(express.json());
+
+// 상품 등록 페이지 요청 라우트 설정
+app.post('/api/products', (req, res) =&gt; {
+  const { productName, price, description } = req.body; // 요청 본문에서 상품 이름과 가격 추출
+  const sql = 'INSERT INTO product (product_name, price, description) VALUES (?, ?, ?)';
+  db.query(sql, [productName, price, description], (err, results) =&gt; {
+    if (err) {
+      // 에러 발생 시 500 상태 코드와 에러 메시지 반환  
+      console.error('상품 등록 에러:', err);
+      res.status(500).send('상품 등록 중 오류가 발생했습니다.');
+      return; // 즉시 종료
+    }
+    res.status(201).send('상품이 성공적으로 등록되었습니다.'); 
+  });
+});
+
+// 상품 상세 조회 라우트 설정
+app.get('/api/products/:id', (req, res) =&gt; {
+  const productId = req.params.id; // URL 경로에서 상품 ID 추출
+  const sql = 'SELECT * FROM product WHERE id = ?';
+  db.query(sql, [productId], (err, results) =&gt; {
+    if (err) {
+      console.error('상품 조회 에러:', err);
+      res.status(500).send('상품 조회 중 오류가 발생했습니다.');
+      return;
+    }
+    res.json(results[0]);
+  });
+});
+
+// 상품 삭제 라우트 설정
+app.delete('/api/products/:id', (req, res) =&gt; {
+  const productId = req.params.id; // URL 경로에서 상품 ID 추출
+  const sql = 'DELETE FROM product WHERE id = ?';
+  db.query(sql, [productId], (err, results) =&gt; {
+    if (err) {
+      console.error('상품 삭제 에러:', err);
+      res.status(500).send('상품 삭제 중 오류가 발생했습니다.');
+      return;
+    }
+    res.send('상품이 성공적으로 삭제되었습니다.');
+  });
+});
+
+// 상품 수정 라우트 설정
+app.put('/api/products/:id', (req, res) =&gt; {
+  const productId = req.params.id; // URL 경로에서 상품 ID 추출
+  const { productName, price, description } = req.body; // 요청 본문에서 상품 이름과 가격 추출
+  const sql = 'UPDATE product SET product_name=?, price=?, description=? WHERE id = ?';
+  db.query(sql, [productName, price, description, productId], (err, results) =&gt; {
+    if (err) {
+      console.error('상품 수정 에러:', err);
+      res.status(500).send('상품 수정 중 오류가 발생했습니다.');
+      return;
+    }
+    res.send('상품이 성공적으로 수정되었습니다.');
+  });
+});
+
+// 서버 시작
+app.listen(PORT, () =&gt; {
+  console.log(`http://localhost:${PORT}에서 서버 실행중...`);
+});</code></pre>
+    </div>
+
     <div class="concept">
-      <h3 class="blk">📖 라우트 설계</h3>
+      <h3 class="blk">📖 리엑트 라우터 설계</h3>
       <table>
         <tr><th>경로</th><th>컴포넌트</th><th>기능</th></tr>
         <tr><td>/</td><td>Home</td><td>메인 화면</td></tr>
@@ -1030,21 +1168,25 @@ app.use(cors({
 
   return (
     &lt;&gt;
-      &lt;section id="center"&gt;
+      &lt;section className="app"&gt;
         &lt;BrowserRouter&gt;
           &lt;Header /&gt;
-          &lt;Routes&gt;
-            &lt;Route path="/" element={&lt;Home /&gt;} /&gt;
-            &lt;Route path="/products" element={&lt;ProductList /&gt;} /&gt;
-            &lt;Route path="/products/new" element={&lt;AddProduct /&gt;} /&gt;
-            &lt;Route path="/products/:id" element={&lt;ProductInfo /&gt;} /&gt;
-            &lt;Route path="/products/update/:id" element={&lt;UpdateProduct /&gt;} /&gt;
-          &lt;/Routes&gt;
+          &lt;div className="container"&gt;
+            &lt;Routes&gt;
+              &lt;Route path="/" element={&lt;Main /&gt;} /&gt;
+              &lt;Route path="/products" element={&lt;ProductList /&gt;} /&gt;
+              &lt;Route path="/products/new" element={&lt;AddProduct /&gt;} /&gt;
+              &lt;Route path="/products/:id" element={&lt;ProductInfo /&gt;} /&gt;
+              &lt;Route path="/products/update/:id" element={&lt;UpdateProduct /&gt;} /&gt;
+            &lt;/Routes&gt;
+          &lt;/div&gt;
         &lt;/BrowserRouter&gt;
       &lt;/section&gt;
     &lt;/&gt;
   )
-}</code></pre>
+}
+
+export default App</code></pre>
     </div>
 
     <div class="ex"><div class="lbl">💡 예제 — Header.jsx 네비게이션</div>
@@ -1097,107 +1239,139 @@ export default Home</code></pre>
 
     <div class="ex"><div class="lbl">💡 예제 — index.css (링크·버튼·폼 공통)</div>
       <span class="fname">src/index.css</span>
-<pre><code class="language-css">p {
-  margin: 10px 0;
+<pre><code class="language-css">.container{
+  width: 1100px;
+  margin: 20px auto;
 }
+p {margin: 10px 0;}
 a {
   color: var(--accent);
   text-decoration: none;
 }
-a:hover {
-  text-decoration: underline;
-}
-button{
-  padding: 5px 10px;
-}
-
-/* form 스타일 */
-form{
-  margin: 20px auto;
-  max-width: 400px;
-  text-align: left;
-}
-form div {
-  margin-bottom: 15px;
-}
-form label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: 500;
-}
-form input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-}
-form button {
-  padding: 10px 20px;
-  background-color: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}</code></pre>
+a:hover {text-decoration: underline;}</code></pre>
     </div>
 
     <div class="ex"><div class="lbl">💡 예제 — App.css (헤더·리스트·정보 레이아웃)</div>
       <span class="fname">src/App.css</span>
-<pre><code class="language-css">#center{
-  margin: 10px auto;
-}
+<pre><code class="language-css">/* Header 스타일 */
 .header{
-  margin: 20px auto;
+  background-color: #333;
+  padding: 20px;
 }
 .header a{
-  padding: 0 20px;
+  color: yellowgreen;
+  margin: 0 16px;
   text-decoration: none;
-  color: black;
 }
+/* 마우스 올렸을때 스타일 */
 .header a:hover{
-  color: gray;
+  color: #eee;
+}
+.header-user{
+  display: inline-flex; 
+  text-align: center;
+  gap: 16px;
+  color: #f5f5f5;
+}
+.header-user .logout-btn{
+  padding: 6px 12px;
+  border: 1px solid yellowgreen;
+  background-color: transparent;
+  border-radius: 6px;
+  color: yellowgreen;
+  cursor: pointer;
 }
 
-/* 상품 리스트 스타일 */
-.product-list{
-  margin: 30px auto;
-}
-.product-list h2{
-  text-align: center;
-  margin-bottom: 20px;
-}
+/* Main 스타일 */
+.main img{margin-top: 20px;}
+
+/* 상품 목록 스타일 */
 .product-list table{
-  width: 100%;
+  width: 60%;
+  margin: 20px auto;
+  border: 1px solid #ccc;
   border-collapse: collapse;
 }
-.product-list th, .product-list td{
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center;
+.product-list table thead{
+  background-color: #eee;
 }
-.product-list th{
-  background-color: #f2f2f2;
+.product-list table th, td{
+  border: 1px solid #ccc;
+  padding: 6px;
 }
 .product-list .btn-add{
   text-align: right;
-  margin-top: 10px;
+  margin-right: 20%;
+}
+.product-list .btn-add button{
+  padding: 8px 16px;
 }
 
-/* 상품 정보 스타일 */
-.product-details{
-  width: 80%;
+/* 상품 상세 페이지 스타일 */
+.product-info .detail{
+  width: 40%;
   margin: 20px auto;
-  text-align: left;
-  border: 1px solid #ddd;
+  background-color: #f0f0f0;
   padding: 20px;
   border-radius: 8px;
-  background-color: #f0f0f0;
 }
-.edit-buttons {
-  margin-top: 20px;
+.product-info .detail p{
+  margin: 16px;
 }
-.edit-buttons button {
-  margin-right: 10px;
+.product-info button{
+  margin: 5px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+/* 상품 등록 폼 */
+.add-product form{
+  width: 30%;
+  margin: 20px auto;
+}
+.add-product form label{
+  display: block;  /* 수직 배치 */
+  margin-bottom: 8px;
+  text-align: left;
+}
+.add-product form input, 
+.add-product form textarea{
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+}
+.add-product form textarea{
+  resize: vertical; /* 크기 조절 방향(수직) */
+}
+.add-product form button{
+  margin: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+/* 상품 수정 폼 */
+.update-product form{
+  width: 30%;
+  margin: 20px auto;
+}
+.update-product form label{
+  display: block;  /* 수직 배치 */
+  margin-bottom: 8px;
+  text-align: left;
+}
+.update-product form input, 
+.update-product form textarea{
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+}
+.update-product form textarea{
+  resize: vertical; /* 크기 조절 방향(수직) */
+}
+.update-product form button{
+  margin: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
 }</code></pre>
       <div class="tip"><span class="lbl">💡 정리</span> <code>border-collapse: collapse</code>는 표 셀의 이중 테두리를 하나로 합쳐 깔끔하게 만듭니다. 상품 목록 표(product-list)와 상품 정보 카드(product-details)의 시각적 스타일을 App.css가 담당합니다.</div>
     </div>
@@ -1301,21 +1475,20 @@ export default ProductList</code></pre>
       <div class="flow">입력 변경 → handleInputChange → setFormData({...formData, [name]: value}) → 제출 → api.post('/products', formData) → navigate('/products')</div>
     </div>
 
-    <div class="ex"><div class="lbl">💡 예제 — 상태와 핸들러</div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품등록</div>
       <span class="fname">src/products/AddProduct.jsx</span>
 <pre><code class="language-jsx">import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import api from '../api/api'
+import { useNavigate } from 'react-router-dom'
 
 const AddProduct = () =&gt; {
-  // const [productName, setProductName] = useState('')
-  // const [price, setPrice] = useState('')
   const [formData, setFormData] = useState({
     productName: '',
-    price: ''
+    price: '',
+    description: ''
   })
   // formData에서 productName과 price 추출
-  const { productName, price } = formData
+  const { productName, price, description } = formData
   const navigate = useNavigate();
 
   // 입력값 변경 핸들러
@@ -1324,36 +1497,30 @@ const AddProduct = () =&gt; {
     const { name, value } = e.target
     // formData의 해당 필드 업데이트
     setFormData({ ...formData, [name]: value })
-  }</code></pre>
-    </div>
-
-    <div class="ex"><div class="lbl">💡 예제 — 등록/취소 처리</div>
-      <span class="fname">src/products/AddProduct.jsx</span>
-<pre><code class="language-jsx">  const handleSubmit = (e) =&gt; {
-    e.preventDefault() // 폼 제출 시 페이지 새로고침 방지
-    // 상품 등록 API 호출
-    api.post('/products', formData)
-      .then(response =&gt; {
-        alert('상품이 성공적으로 등록되었습니다.')
-        navigate('/products') // 상품 목록 페이지로 이동
-      })
-      .catch(error =&gt; {
-        console.error('상품 등록 에러:', error)
-        alert('상품 등록 중 오류가 발생했습니다.')
-      })
   }
+
+  const handleSubmit = async (e) =&gt; {
+    e.preventDefault() // 폼 제출 시 페이지 새로고침 방지
+    try {
+      // 상품 등록 API 호출
+      await api.post('/products', formData)
+      alert('상품이 성공적으로 등록되었습니다.')
+      navigate('/products') // 상품 목록 페이지로 이동
+    } catch (error) {
+      console.error('상품 등록 에러:', error)
+      alert('상품 등록 중 오류가 발생했습니다.')
+    }
+  } 
   // 취소 버튼 클릭시 입력상자 초기화
   const handleCancel = () =&gt; {
     setFormData({
       productName: '',
-      price: ''
+      price: '',
+      description: ''
     })
-  }</code></pre>
-    </div>
+  }
 
-    <div class="ex"><div class="lbl">💡 예제 — 등록 폼 렌더링</div>
-      <span class="fname">src/products/AddProduct.jsx</span>
-<pre><code class="language-jsx">  return (
+  return (
     &lt;div className='add-product'&gt;
       &lt;h2&gt;상품 등록&lt;/h2&gt;
       &lt;form onSubmit={handleSubmit}&gt;
@@ -1361,6 +1528,7 @@ const AddProduct = () =&gt; {
           &lt;label htmlFor="productName"&gt;상품명&lt;/label&gt;
           &lt;input
             type="text"
+            id="productName"
             name="productName"
             value={productName}
             onChange={handleInputChange}
@@ -1371,24 +1539,32 @@ const AddProduct = () =&gt; {
           &lt;label htmlFor="price"&gt;가격&lt;/label&gt;
           &lt;input
             type="number"
+            id="number"
             name="price"
             value={price}
             onChange={handleInputChange}
             placeholder='가격을 입력하세요'
           /&gt;
         &lt;/div&gt;
-        &lt;button type="submit"&gt;등록&lt;/button&gt;
-        &lt;button
-          type="button"
-          onClick={handleCancel}
-          style={{background: '#aaa', color: '#fff'}}
-        &gt;
-          취소
-        &lt;/button&gt;
+        &lt;div&gt;
+            &lt;label htmlFor="description"&gt;설명&lt;/label&gt;
+            &lt;textarea
+                id="description"
+                name="description"
+                rows={5}
+                value={description}
+                onChange={handleInputChange}
+                placeholder="상품 설명을 입력하세요"
+            /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;button type="submit"&gt;등록&lt;/button&gt;
+          &lt;button type="button" onClick={handleCancel}&gt;취소&lt;/button&gt;
+        &lt;/div&gt;
       &lt;/form&gt;
     &lt;/div&gt;
   )
-}
+} 
 
 export default AddProduct</code></pre>
       <div class="out"><span class="rt">브라우저 출력</span>
@@ -1399,6 +1575,8 @@ export default AddProduct</code></pre>
             <input type="text" placeholder="상품명을 입력하세요" style="width:100%;padding:6px;margin-bottom:10px">
             <label style="display:block;color:#888">가격</label>
             <input type="number" placeholder="가격을 입력하세요" style="width:100%;padding:6px;margin-bottom:10px">
+            <label style="display:block;color:#888">설명</label>
+            <textarea rows="3" placeholder="상품 설명을 입력하세요" style="width:100%;padding:6px;margin-bottom:10px"></textarea>
             <button style="background:#a64ff0;color:#fff;padding:8px 16px;border:none;border-radius:4px">등록</button>
             <button style="background:#aaa;color:#fff;padding:8px 16px;border:none;border-radius:4px">취소</button>
           </div>
@@ -1407,7 +1585,6 @@ export default AddProduct</code></pre>
       <div class="tip"><span class="lbl">💡 정리</span> <code>type="submit"</code> 버튼과 <code>type="button"</code> 버튼을 구분해야 합니다. 취소 버튼을 <code>type="button"</code>으로 두지 않으면 폼이 제출되어 버립니다.</div>
     </div>
 
-
     <div class="concept">
       <h3 class="blk">📖 상세 조회 흐름</h3>
       <p><code>useParams()</code>로 경로의 <code>id</code>를 얻어 <code>api.get(`/products/${id}`)</code>로 단일 상품을 조회합니다. 아직 데이터가 없으면(<code>product</code>가 null) "불러오는 중" 문구를, 도착하면 상세 정보를 보여줍니다. 의존성 배열에 <code>[id]</code>를 넣어 id가 바뀌면 다시 조회합니다.</p>
@@ -1415,7 +1592,12 @@ export default AddProduct</code></pre>
 
     <div class="ex"><div class="lbl">💡 예제 — 상품 상세 조회 및 표시</div>
       <span class="fname">src/products/ProductInfo.jsx</span>
-<pre><code class="language-jsx">const ProductInfo = () =&gt; {
+<pre><code class="language-jsx">import { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import api from '../api/api'
+import dayjs from 'dayjs'
+
+const ProductInfo = () =&gt; {
   const {id} = useParams()
   const navigate = useNavigate()
   const [product, setProduct] = useState(null)
@@ -1436,29 +1618,29 @@ export default AddProduct</code></pre>
     &lt;div className='product-info'&gt;
       &lt;h2&gt;상품 정보&lt;/h2&gt;
       {product ? (
-        &lt;div className='product-details'&gt;
+        &lt;div className='detail'&gt;
           &lt;p&gt;상품 ID: {product.id}&lt;/p&gt;
           &lt;p&gt;상품명: {product.product_name}&lt;/p&gt;
           &lt;p&gt;가격: {product.price}원&lt;/p&gt;
+          &lt;p&gt;설명: {product.description}&lt;/p&gt;
           &lt;p&gt;등록일: {dayjs(product.created_at).format('YYYY-MM-DD HH:mm:ss')}&lt;/p&gt;
         &lt;/div&gt;
       ) : (
         &lt;p&gt;상품 정보를 불러오는 중입니다...&lt;/p&gt;
       )}
 
-      &lt;div className='edit-buttons'&gt;
+      &lt;div&gt;
         &lt;button onClick={() =&gt; navigate(`/products/update/${id}`)}&gt;수정&lt;/button&gt;
-        &lt;button onClick={() =&gt; {
+        &lt;button onClick={async () =&gt; {
           if (window.confirm('정말 삭제하시겠습니까?')) {
-            api.delete(`/products/${id}`)
-              .then(() =&gt; {
-                alert('상품이 삭제되었습니다.')
-                navigate('/products')
-              })
-              .catch(error =&gt; {
-                console.error('상품 삭제 에러:', error)
-                alert('상품 삭제 중 오류가 발생했습니다.')
-              })
+            try {
+              await api.delete(`/products/${id}`)
+              alert('상품이 삭제되었습니다.')
+              navigate('/products')
+            } catch (error) {
+              console.error('상품 삭제 에러:', error)
+              alert('상품 삭제 중 오류가 발생했습니다.')
+            }
           }
         }}&gt;삭제&lt;/button&gt;
         &lt;button onClick={() =&gt; navigate('/products')}&gt;목록&lt;/button&gt;
@@ -1475,6 +1657,7 @@ export default ProductInfo</code></pre>
             <p>상품 ID: 4</p>
             <p>상품명: 무선 키보드</p>
             <p>가격: 35000원</p>
+            <p>설명: 무선 블루투스 키보드</p>
             <p>등록일: 2026-04-07 11:42:19</p>
           </div>
           <div style="margin-top:12px"><button>수정</button> <button>삭제</button> <button>목록</button></div>
@@ -1526,13 +1709,18 @@ export default ProductInfo</code></pre>
 
     <div class="ex"><div class="lbl">💡 예제 — 기존 값 불러오기</div>
       <span class="fname">src/products/UpdateProduct.jsx</span>
-<pre><code class="language-jsx">const UpdateProduct = () =&gt; {
+<pre><code class="language-jsx">import { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import api from '../api/api'
+
+const UpdateProduct = () =&gt; {
   const { id } = useParams()
   const [formData, setFormData] = useState({
     productName: '',
-    price: ''
+    price: '',
+    description: ''
   })
-  const { productName, price } = formData
+  const { productName, price, description } = formData
   const navigate = useNavigate()
 
   // 컴포넌트가 마운트될 때 상품 정보를 조회하여 폼에 초기값 설정
@@ -1542,48 +1730,43 @@ export default ProductInfo</code></pre>
         const response = await api.get(`/products/${id}`)
         setFormData({
           productName: response.data.product_name,
-          price: response.data.price
+          price: response.data.price,
+          description: response.data.description
         })
       } catch (error) {
         console.error('상품 조회 에러:', error)
       }
     }
     fetchProduct()
-  }, [id])</code></pre>
-    </div>
+  }, [id])
 
-    <div class="ex"><div class="lbl">💡 예제 — 수정 제출과 취소</div>
-      <span class="fname">src/products/UpdateProduct.jsx</span>
-<pre><code class="language-jsx">  // 입력값 변경 핸들러
+  // 입력값 변경 핸들러
   const handleInputChange = (e) =&gt; {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
   }
 
-  const handleSubmit = (e) =&gt; {
+  const handleSubmit = async (e) =&gt; {
     e.preventDefault()
-    api.put(`/products/${id}`, formData)
-      .then(() =&gt; {
-        alert('상품이 성공적으로 수정되었습니다.')
-        navigate(`/products/${id}`)
-      })
-      .catch(error =&gt; {
-        console.error('상품 수정 에러:', error)
-        alert('상품 수정 중 오류가 발생했습니다.')
-      })
+    try {
+      await api.put(`/products/${id}`, formData)
+      alert('상품이 성공적으로 수정되었습니다.')
+      navigate(`/products/${id}`)
+    } catch (error) {
+      console.error('상품 수정 에러:', error)
+      alert('상품 수정 중 오류가 발생했습니다.')
+    }
   }
 
   const handleCancel = () =&gt; {
     setFormData({
       productName: '',
-      price: ''
+      price: '',
+      description: ''
     })
-  }</code></pre>
-    </div>
+  }
 
-    <div class="ex"><div class="lbl">💡 예제 — 수정 폼 렌더링</div>
-      <span class="fname">src/products/UpdateProduct.jsx</span>
-<pre><code class="language-jsx">  return (
+  return (
     &lt;div className='update-product'&gt;
       &lt;h2&gt;상품 수정&lt;/h2&gt;
       &lt;form onSubmit={handleSubmit}&gt;
@@ -1605,14 +1788,20 @@ export default ProductInfo</code></pre>
             onChange={handleInputChange}
           /&gt;
         &lt;/div&gt;
-        &lt;button type="submit"&gt;수정&lt;/button&gt;
-        &lt;button
-          type="button"
-          onClick={handleCancel}
-          style={{background: '#aaa', color: '#fff'}}
-        &gt;
-          취소
-        &lt;/button&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="description"&gt;설명&lt;/label&gt;
+          &lt;textarea
+              id="description"
+              name="description"
+              rows={5}
+              value={description}
+              onChange={handleInputChange}
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;button type="submit"&gt;수정&lt;/button&gt;
+          &lt;button type="button" onClick={handleCancel}&gt;취소&lt;/button&gt;
+        &lt;/div&gt;
       &lt;/form&gt;
     &lt;/div&gt;
   )
@@ -1627,6 +1816,8 @@ export default UpdateProduct</code></pre>
             <input type="text" value="USB 메모리" style="width:100%;padding:6px;margin-bottom:10px">
             <label style="display:block;color:#888">가격</label>
             <input type="number" value="12000" style="width:100%;padding:6px;margin-bottom:10px">
+            <label style="display:block;color:#888">설명</label>
+            <textarea rows="3" style="width:100%;padding:6px;margin-bottom:10px">32GB USB 3.0 메모리</textarea>
             <button style="background:#a64ff0;color:#fff;padding:8px 16px;border:none;border-radius:4px">수정</button>
             <button style="background:#aaa;color:#fff;padding:8px 16px;border:none;border-radius:4px">취소</button>
           </div>
@@ -1635,6 +1826,145 @@ export default UpdateProduct</code></pre>
       <div class="tip"><span class="lbl">💡 정리</span> 서버는 <code>product_name</code>(snake_case)으로 응답하지만 폼 상태는 <code>productName</code>(camelCase)을 사용하므로, 초기값을 채울 때 <code>productName: response.data.product_name</code>처럼 <strong>키 이름을 맞춰 매핑</strong>해야 합니다.</div>
     </div>
 
+    <div class="ex"><div class="lbl">💡 예제 — 상품 목록 검색 기능</div>
+      <span class="fname">src/products/ProductList.jsx</span>
+<pre><code class="language-jsx">const ProductList = () =&gt; {
+  // 전체 상품 목록 상태 관리
+  const [products, setProducts] = useState([]);
+
+  // 검색 키워드 상태 관리
+  const [searchKeyword, setSearchKeyword] = useState('');
+
+  useEffect(() =&gt; {
+    // fetchProducts 함수 정의: API 호출 및 상태 업데이트
+    const fetchProducts = async () =&gt; {
+      try {
+        const response = await api.get('/products')
+        setProducts(response.data) // 응답 데이터로 상태 업데이트
+      } catch (error) {
+        console.error('상품 목록 조회 에러:', error)
+      }
+    }
+    fetchProducts() // 상품 목록 조회 함수 호출
+  }, []);
+
+  // 검색 키워드에 따라 필터링된 상품 목록
+  const filteredProducts = products.filter(product =&gt;
+    product.product_name.toLowerCase().includes(searchKeyword.toLowerCase())
+  );
+
+  return (
+    &lt;div className="product-list"&gt;
+      {/* 검색 기능 */}
+    &lt;div className="search-bar"&gt;
+      &lt;input
+        type="text"
+        placeholder="상품명으로 검색"
+        onChange={(e) =&gt; setSearchKeyword(e.target.value)} 
+      /&gt;
+    &lt;/div&gt;
+
+      {/* 상품 목록 테이블 */}
+      &lt;table&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th&gt;번호&lt;/th&gt;
+            &lt;th&gt;상품명&lt;/th&gt;
+            &lt;th&gt;가격&lt;/th&gt;
+            &lt;th&gt;등록일&lt;/th&gt;
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          {filteredProducts.map(product =&gt; (
+            &lt;tr key={product.id}&gt;
+              &lt;td&gt;{product.id}&lt;/td&gt;
+              &lt;td&gt;
+                &lt;Link to={`/products/${product.id}`}&gt;{product.product_name}&lt;/Link&gt;
+              &lt;/td&gt;
+              &lt;td&gt;{product.price}원&lt;/td&gt;
+              &lt;td&gt;{dayjs(product.created_at).format('YYYY-MM-DD HH:mm:ss')}&lt;/td&gt;
+            &lt;/tr&gt;
+          ))}
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+      &lt;div className='btn-add'&gt;
+        &lt;Link to="/products/new"&gt;&lt;button&gt;상품 등록&lt;/button&gt;&lt;/Link&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default ProductList</code></pre>
+    </div>
+  </section>
+
+  <section class="module" id="m11">
+    <h2><span class="num">11</span> 회원 API 테스트</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>회원 정보를 저장할 user 테이블을 만들고 테스트 데이터를 넣을 수 있다.</li>
+    </ul></div>
+    <div class="ex"><div class="lbl">💡 예제 — user 테이블 만들기</div>
+      <span class="fname">MySQL Workbench — jsdb</span>
+<pre><code class="language-sql">-- user 테이블 생성
+create table user(
+	id int auto_increment primary key,
+    username varchar(50) not null unique,
+    password varchar(255) not null,
+    email varchar(100) not null,
+    role varchar(20) not null default 'user'
+);
+
+select * from user;
+
+insert into user(username, password, email) values ('user1', 'u1111', 'user1@user1.com');
+
+commit;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 회원 API (목록 · 가입 · 상세)</div>
+      <span class="fname">index.js (서버)</span>
+<pre><code class="language-javascript">// 회원 목록
+app.get("/api/users", (req, res) =&gt; {
+  const sql = 'SELECT * FROM user';
+  db.query(sql, (err, results) =&gt; {
+    if (err) {
+      // 에러 발생 시 500 상태 코드와 에러 메시지 반환
+      console.error('회원 조회 에러:', err);
+      res.status(500).send('회원 조회 중 오류가 발생했습니다.');
+      return; // 즉시 종료
+    }
+    res.json(results); // 성공 시 회원 목록을 JSON 형식으로 반환
+  });
+});
+
+// 회원 가입
+app.post('/api/users', (req, res) =&gt; {
+  const { username, password, email } = req.body; // 요청 본문에서 상품 이름과 가격 추출
+  const sql = 'INSERT INTO user (username, password, email) VALUES (?, ?, ?)';
+  db.query(sql, [username, password, email], (err, results) =&gt; {
+    if (err) {
+      // 에러 발생 시 500 상태 코드와 에러 메시지 반환  
+      console.error('회원 가입 에러:', err);
+      res.status(500).send('회원 가입 중 오류가 발생했습니다.');
+      return; // 즉시 종료
+    }
+    res.status(201).send('회원이 성공적으로 가입되었습니다.'); 
+  });
+});
+
+// 회원 상세 보기(username 기준)
+app.get('/api/users/:username', (req, res) =&gt; {
+  const username = req.params.username; // URL 경로에서 상품 ID 추출
+  const sql = 'SELECT * FROM user WHERE username = ?';
+  db.query(sql, [username], (err, results) =&gt; {
+    if (err) {
+      console.error('회원 조회 에러:', err);
+      res.status(500).send('회원 조회 중 오류가 발생했습니다.');
+      return;
+    }
+    res.json(results[0]);
+  });
+});</code></pre>
+    </div>
   </section>
 
   <footer>6강. 웹서버 만들기 (Express) · 학습 교안<br>모듈별 학습목표 · 개념 · 예제 · 실습문제 구성</footer>
