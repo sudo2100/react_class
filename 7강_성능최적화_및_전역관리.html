@@ -154,9 +154,9 @@ hue-6-2: #e6c07b
 <header class="hero">
   <div class="eyebrow">React 심화 · Chapter 06 · 학습 교안</div>
   <h1>성능 최적화 및 전역 관리</h1>
-  <p>useRef · useCallback · useReducer · useContext로 리렌더링과 상태를 다루고, Redux와 Redux Toolkit으로 전역 상태 관리를 완성합니다.</p>
+  <p>useRef · useReducer · useContext로 리렌더링과 상태를 다루고, Redux와 Redux Toolkit으로 전역 상태 관리를 완성합니다.</p>
   <div class="tags">
-    <span>🏷️ useRef</span><span>🏷️ useCallback</span><span>🏷️ useReducer</span>
+    <span>🏷️ useRef</span><span>🏷️ useReducer</span>
     <span>🏷️ useContext</span><span>🏷️ Redux</span><span>🏷️ Redux Toolkit</span>
     <span>🏷️ createSlice</span><span>🏷️ useSelector / useDispatch</span>
   </div>
@@ -166,14 +166,13 @@ hue-6-2: #e6c07b
     <h2>📚 학습 목차</h2>
     <ol>
       <li><a href="#m1">useRef() — 값 저장과 DOM 접근</a></li>
-      <li><a href="#m2">useCallback() — 함수 메모이제이션</a></li>
-      <li><a href="#m3">useReducer() — 체계적인 상태 관리</a></li>
-      <li><a href="#m4">useContext() — 전역 데이터 공유</a></li>
-      <li><a href="#m5">Redux — 전역 상태 관리 기초</a></li>
-      <li><a href="#m6">Redux Toolkit — 간결한 Redux</a></li>
-      <li><a href="#m7">실전 앱 ① Counter (RTK 통합)</a></li>
-      <li><a href="#m8">실전 앱 ② Bank System</a></li>
-      <li><a href="#m9">실전 앱 ③ To-do</a></li>
+      <li><a href="#m2">useReducer() — 체계적인 상태 관리</a></li>
+      <li><a href="#m3">useContext() — 전역 데이터 공유</a></li>
+      <li><a href="#m4">Redux — 전역 상태 관리 기초</a></li>
+      <li><a href="#m5">Redux Toolkit — 간결한 Redux</a></li>
+      <li><a href="#m6">실전 앱 ① Counter (RTK 통합)</a></li>
+      <li><a href="#m7">실전 앱 ② Bank System</a></li>
+      <li><a href="#m8">실전 앱 ③ To-do</a></li>
     </ol>
   </nav>
   <section class="module" id="m1">
@@ -327,101 +326,7 @@ export default PrevValue;</code></pre>      </details>
     </div>
   </section>
   <section class="module" id="m2">
-    <h2><span class="num">2</span> useCallback() — 함수 메모이제이션</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
-      <li>state가 바뀔 때마다 컴포넌트 내부 함수가 새로 만들어진다는 문제를 이해한다.</li>
-      <li>useCallback으로 의존성이 바뀔 때만 함수를 새로 생성하도록 최적화한다.</li>
-      <li>useEffect의 의존성 배열로 함수가 실제로 재생성되는 시점을 검증한다.</li>
-    </ul></div>
-
-    <div class="concept">
-      <h3 class="blk">📖 useCallback()을 사용하는 이유</h3>
-      <p>React 컴포넌트는 state가 바뀔 때마다 함수 전체가 다시 실행됩니다. 그러면 컴포넌트 안에 선언된 함수도 <strong>매번 새로 만들어집니다</strong>(메모리 주소가 바뀜).</p>
-<pre><code class="language-jsx">const handleClick = () =&gt; {
-  console.log("클릭");
-};
-// 렌더링될 때마다 새로운 함수가 생성됨(메모리 주소가 바뀜)</code></pre>      <p><code>useCallback()</code>으로 감싸면 의존성이 같을 때 이전 함수를 재사용합니다.</p>
-<pre><code class="language-jsx">const handleClick = useCallback(() =&gt; {
-  console.log("number=", number);
-}, [number]);
-// number가 바뀌지 않으면 → 이전 함수 재사용
-// number가 바뀌면 → 함수 새로 생성</code></pre>      <p><code>useEffect</code>로 함수가 실제로 새로 만들어질 때만 effect가 실행되는지 검증할 수 있습니다.</p>
-<pre><code class="language-jsx">useEffect(() =&gt; {
-  console.log("handleClick 함수가 변경되었습니다.");
-}, [handleClick]);
-// handleClick이 진짜로 새로 만들어질 때만 이 effect가 실행</code></pre>    </div>
-
-    <div class="ex"><div class="lbl">💡 예제 — useCallback으로 함수 재생성 제어</div>
-      <span class="fname">UseCallbackExample.jsx</span>
-<pre><code class="language-jsx">import { useState, useCallback, useEffect } from "react";
-
-function UseCallbackExample() {
-  const [number, setNumber] = useState(0);
-
-  /*const handleClick = () =&gt; {
-    console.log("handleClick 실행, number=", number);
-  }*/
-
-  // number가 변경될 때만 handleClick 함수가 새로 생성됩니다.
-  const handleClick = useCallback(() =&gt; {
-    console.log("number=", number);
-  }, [number]); // number가 변경될 때만 handleClick 함수가 새로 생성.
-
-  // useEffect를 사용하여 검증
-  useEffect(() =&gt; {
-    console.log("handleClick 함수가 변경되었습니다.");
-  }, [handleClick]); // handleClick이 변경될 때마다 이 useEffect가 실행.
-
-  return (
-    &lt;div&gt;
-      &lt;h3&gt;number: {number}&lt;/h3&gt;
-      &lt;input
-        type="number"
-        value={number}
-        onChange={(e) =&gt; setNumber(Number(e.target.value))}
-      /&gt;
-      &lt;button onClick={handleClick}&gt;클릭&lt;/button&gt;
-    &lt;/div&gt;
-  );
-}</code></pre>      <div class="out"><span class="rt">브라우저 출력</span>
-        <p style="text-align:center"><strong>number: 4</strong></p>
-        <div class="demo"><input type="number" value="4" style="padding:6px;width:80px"> <button>클릭</button></div>
-        <p class="muted">콘솔: number 값을 바꿀 때만 "handleClick 함수가 변경되었습니다."가 출력됩니다. 값이 그대로면 함수는 재사용되어 effect가 실행되지 않습니다.</p>
-      </div>
-    </div>
-
-    <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 2-1. 자식 컴포넌트 리렌더링 막기</h4>
-      <p>부모의 다른 state가 바뀌어도 자식에게 넘긴 콜백이 재생성되지 않도록 useCallback을 적용하세요. (React.memo로 감싼 자식과 함께 사용)</p>
-      <details><summary>정답 보기</summary>
-<pre><code class="language-jsx">import { useState, useCallback, memo } from "react";
-
-const Child = memo(function Child({ onClick }) {
-  console.log("Child 렌더링");
-  return &lt;button onClick={onClick}&gt;자식 버튼&lt;/button&gt;;
-});
-
-function Parent() {
-  const [count, setCount] = useState(0);
-  const [other, setOther] = useState(0);
-
-  // other가 바뀌어도 onClick은 재생성되지 않음 → Child 리렌더링 방지
-  const handleClick = useCallback(() =&gt; {
-    setCount((c) =&gt; c + 1);
-  }, []);
-
-  return (
-    &lt;div&gt;
-      &lt;p&gt;count: {count} / other: {other}&lt;/p&gt;
-      &lt;Child onClick={handleClick} /&gt;
-      &lt;button onClick={() =&gt; setOther(other + 1)}&gt;other 증가&lt;/button&gt;
-    &lt;/div&gt;
-  );
-}</code></pre>      </details>
-    </div>
-  </section>
-  <section class="module" id="m3">
-    <h2><span class="num">3</span> useReducer() — 체계적인 상태 관리</h2>
+    <h2><span class="num">2</span> useReducer() — 체계적인 상태 관리</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
       <li>reducer / dispatch / action의 역할을 구분해 설명한다.</li>
       <li>switch 문으로 action.type에 따라 새로운 state를 반환하는 reducer를 작성한다.</li>
@@ -564,7 +469,7 @@ export default BankReducer;</code></pre>      <div class="out"><span class="rt">
     </div>
 
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 3-1. 할 일 개수 카운터</h4>
+      <h4>실습 2-1. 할 일 개수 카운터</h4>
       <p><code>{ count: 0 }</code> 상태에 대해 ADD(개수 +1), REMOVE(개수 -1, 단 0 미만 불가)를 처리하는 reducer를 useReducer로 작성하세요.</p>
       <details><summary>정답 보기</summary>
 <pre><code class="language-jsx">import { useReducer } from "react";
@@ -593,8 +498,8 @@ function TodoCounter() {
 }</code></pre>      </details>
     </div>
   </section>
-  <section class="module" id="m4">
-    <h2><span class="num">4</span> useContext() — 전역 데이터 공유</h2>
+  <section class="module" id="m3">
+    <h2><span class="num">3</span> useContext() — 전역 데이터 공유</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
       <li>props drilling 문제를 이해하고 useContext로 해결한다.</li>
       <li>createContext → Provider → useContext의 3단계 사용법을 익힌다.</li>
@@ -632,61 +537,63 @@ User          → Provider로 user 데이터 제공
  └ UserChild  → user 데이터 몰라도 됨 (단순 중간 컴포넌트)
     └ UserGrandChild → useContext로 직접 user 데이터 접근
       </div>
-      <span class="fname">User.jsx</span>
-<pre><code class="language-jsx">import { createContext, useContext } from 'react';
-import UserChild from './UserChild';
+      <span class="fname">UserContext.jsx</span>
+<pre><code class="language-jsx">import { createContext } from "react";
 
-// UserContext를 생성합니다. 기본값은 빈 객체입니다.
-export const UserContext = createContext({});
+// 빈 객체를 초기값으로 가지는 UserContext 생성
+export const UserContext = createContext({});</code></pre>      <span class="fname">UserParent.jsx</span>
+<pre><code class="language-jsx">import { UserContext } from "./UserContext";
+import UserChild from "./UserChild";
 
-const User = () =&gt; {
-  // user 데이터를 정의합니다.
+const UserParent = () =&gt; {
   const user = {
-    name: "이순신",
-    age: 45,
-  };
+    name: "오상식",
+    age: 45
+  }
 
-  return (
-    &lt;div className='user'&gt;
-      &lt;h2&gt;User 컴포넌트입니다.&lt;/h2&gt;
-      {/* UserContext.Provider로 감싸서 user 값을
-          하위 컴포넌트에 제공합니다 */}
+  return(
+    &lt;div className="user-parent"&gt;
+      &lt;h2&gt;UserParent 컴포넌트입니다.&lt;/h2&gt;
+      {/* UserContext.Provider로 감싸면 하위 컴포넌트 어디서든 
+          user 데이터를 꺼내 쓸 수 있음 */}
       &lt;UserContext.Provider value={user}&gt;
+        {/* props 전달 없음 */}
         &lt;UserChild /&gt;
       &lt;/UserContext.Provider&gt;
     &lt;/div&gt;
-  );
+  )
 }
 
-export default User;</code></pre>      <span class="fname">UserChild.jsx</span>
-<pre><code class="language-jsx">import UserGrandChild from './UserGrandChild';
+export default UserParent;</code></pre>      <span class="fname">UserChild.jsx</span>
+<pre><code class="language-jsx">import UserGrandChild from "./UserGrandChild";
 
+// 중간 컴포넌트: user를 사용하지도, props로 넘기지도 않음
 const UserChild = () =&gt; {
-
-  return (
-    &lt;div className='user-child'&gt;
-      &lt;h3&gt;UserChild 컴포넌트입니다.&lt;/h3&gt;
-      &lt;p&gt;user props를 받지 않아도 GrandChild가 Context에서 직접 사용합니다.&lt;/p&gt;
+  return(
+    &lt;div className="user-child"&gt;
+      &lt;h2&gt;UserChild 컴포넌트입니다.&lt;/h2&gt;
+      &lt;p&gt;(user 데이터를 전달하지 않음)&lt;/p&gt;
       &lt;UserGrandChild /&gt;
     &lt;/div&gt;
-  );
+  )
 }
 
 export default UserChild;</code></pre>      <span class="fname">UserGrandChild.jsx</span>
-<pre><code class="language-jsx">import { useContext } from 'react';
-import { UserContext } from './User';
+<pre><code class="language-jsx">import { useContext } from "react";
+import { UserContext } from "./UserContext";
 
+// 손자 컴포넌트: 중간(UserChild)을 거치지 않고 Context에서 직접 user를 받음
 const UserGrandChild = () =&gt; {
-  // UserContext에서 user 데이터를 가져옵니다.
+  // useContext 훅으로 UserContext에서 user 데이터를 꺼내옴
   const user = useContext(UserContext);
 
-  return (
-    &lt;div className='user-grandchild'&gt;
-      &lt;h4&gt;UserGrandChild 컴포넌트입니다.&lt;/h4&gt;
-      &lt;p&gt;사용자 이름: {user.name}&lt;/p&gt;
-      &lt;p&gt;사용자 나이: {user.age}&lt;/p&gt;
+  return(
+    &lt;div className="user-grandchild"&gt;
+      &lt;h2&gt;UserGrandChild 컴포넌트입니다.&lt;/h2&gt;
+      &lt;p&gt;이름: {user.name}&lt;/p&gt;
+      &lt;p&gt;나이: {user.age}&lt;/p&gt;
     &lt;/div&gt;
-  );
+  )
 }
 
 export default UserGrandChild;</code></pre>      <div class="out"><span class="rt">브라우저 출력</span>
@@ -702,95 +609,35 @@ export default UserGrandChild;</code></pre>      <div class="out"><span class="r
       </div>
     </div>
 
-    <div class="ex"><div class="lbl">💡 예제 B — 테마 변경(값 + 함수를 함께 공유)</div>
-      <p>Context의 value에 <code>{ currentTheme, toggleTheme }</code>처럼 상태와 상태변경 함수를 함께 담아 자식이 직접 테마를 토글하게 합니다.</p>
-      <span class="fname">ParentTheme.jsx</span>
-<pre><code class="language-jsx">import { createContext, useState } from "react";
-import ChildTheme from "./ChildTheme";
-
-// Context 생성
-export const ThemeContext = createContext("light");
-
-const ParentTheme = () =&gt; {
-  const [currentTheme, setCurrentTheme] = useState("light");
-
-  // 테마 토글 함수
-  const toggleTheme = () =&gt; {
-    setCurrentTheme(prevTheme =&gt; (
-      prevTheme === 'light' ? 'dark' : 'light'
-    ))
-  }
-
-  // 부모 컴포넌트 스타일
-  const parentStyle = {
-    background: currentTheme === 'dark' ? '#333' : '#fff',
-    color: currentTheme === 'dark' ? '#fff' : '#333',
-    padding: '20px'
-  }
-
-  // 부모 컴포넌트 렌더링
-  return(
-    &lt;div style={parentStyle}&gt;
-      &lt;h3&gt;현재 테마: {currentTheme}&lt;/h3&gt;
-      {/* 하위 컴포넌트에 Context 제공 */}
-      &lt;ThemeContext.Provider value={{ currentTheme, toggleTheme }}&gt;
-        &lt;ChildTheme /&gt;
-      &lt;/ThemeContext.Provider&gt;
-    &lt;/div&gt;
-  )
-}
-
-export default ParentTheme;</code></pre>      <span class="fname">ChildTheme.jsx</span>
-<pre><code class="language-jsx">import { useContext } from "react"
-import { ThemeContext } from "./ParentTheme"
-
-const ChildTheme = () =&gt; {
-  // Context 사용
-  const { currentTheme, toggleTheme } = useContext(ThemeContext);
-  console.log("현재 테마:", currentTheme);
-
-  // 자식 컴포넌트 스타일
-  const childStyle = {
-    background: currentTheme === 'dark' ? '#555' : '#f0f0f0',
-    color: currentTheme === 'dark' ? '#fff' : '#333',
-    padding: '15px',
-  };
-
-  // 자식 컴포넌트 렌더링
-  return(
-    &lt;div style={childStyle}&gt;
-      &lt;h4&gt;Child 컴포넌트&lt;/h4&gt;
-      &lt;p&gt;현재 테마: &lt;strong&gt;{currentTheme}&lt;/strong&gt;&lt;/p&gt;
-      &lt;button onClick={toggleTheme}&gt;
-        테마 변경
-      &lt;/button&gt;
-    &lt;/div&gt;
-  )
-}
-
-export default ChildTheme</code></pre>      <div class="out"><span class="rt">브라우저 출력</span>
-        <p style="text-align:center"><strong>현재 테마: light</strong></p>
-        <div style="background:#f0f0f0;padding:12px;text-align:center">
-          <strong>Child 컴포넌트</strong>
-          <p>현재 테마: <strong>light</strong></p>
-          <button>테마 변경</button>
-        </div>
-      </div>
-    </div>
-
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 4-1. 로그인 상태 전역 공유</h4>
+      <h4>실습 3-1. 로그인 상태 전역 공유</h4>
       <p>Context로 <code>isLogin</code> 상태와 <code>toggleLogin</code> 함수를 제공하고, 자식 컴포넌트에서 로그인 상태를 표시하고 토글하는 버튼을 만드세요.</p>
       <details><summary>정답 보기</summary>
-<pre><code class="language-jsx">// AuthContext.jsx
-import { createContext, useContext, useState } from "react";
+<pre><code class="language-jsx">// App.jsx
+&lt;AuthProvider&gt;
+   &lt;Status /&gt;
+&lt;/AuthProvider&gt;
 
-const AuthContext = createContext();
+
+// AuthContext.jsx
+import { createContext } from "react";
+
+export const AuthContext = createContext();
+
+
+// AuthProvider.jsx
+import { useState } from "react";
+import { AuthContext } from "./AuthContextValue";
 
 export function AuthProvider({ children }) {
-  const [isLogin, setIsLogin] = useState(false);
-  const toggleLogin = () =&gt; setIsLogin((prev) =&gt; !prev);
+  const [isLogin, setIsLogin] = useState(false); 
+  // 로그인 상태를 토글하는 함수
+  const toggleLogin = () =&gt; setIsLogin((prev) =&gt; !prev); 
+
   return (
+    // {children}은 AuthProvider를 감싸는 JSX 안에 넣은 자식 요소를 표시합니다. 
+    // React는 그 자식 요소들을 children이라는 prop으로 전달합니다.
+
     &lt;AuthContext.Provider value={{ isLogin, toggleLogin }}&gt;
       {children}
     &lt;/AuthContext.Provider&gt;
@@ -798,8 +645,13 @@ export function AuthProvider({ children }) {
 }
 
 // Status.jsx
+import { useContext } from "react";
+import { AuthContext } from "./AuthContextValue";
+
 export function Status() {
+  // AuthContext에서 상태와 함수를 가져오기
   const { isLogin, toggleLogin } = useContext(AuthContext);
+
   return (
     &lt;div&gt;
       &lt;p&gt;상태: {isLogin ? "로그인" : "로그아웃"}&lt;/p&gt;
@@ -811,8 +663,8 @@ export function Status() {
 }</code></pre>      </details>
     </div>
   </section>
-  <section class="module" id="m5">
-    <h2><span class="num">5</span> Redux — 전역 상태 관리 기초</h2>
+  <section class="module" id="m4">
+    <h2><span class="num">4</span> Redux — 전역 상태 관리 기초</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
       <li>기존 React의 상태 전달 한계를 이해하고 Redux의 필요성을 설명한다.</li>
       <li>Store · Action · Reducer의 역할을 구분한다.</li>
@@ -856,8 +708,8 @@ export function Status() {
   }
 }</code></pre>    </div>
   </section>
-  <section class="module" id="m6">
-    <h2><span class="num">6</span> Redux Toolkit — 간결한 Redux</h2>
+  <section class="module" id="m5">
+    <h2><span class="num">5</span> Redux Toolkit — 간결한 Redux</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
       <li>순수 Redux의 반복 코드 문제와 Redux Toolkit(RTK)의 이점을 이해한다.</li>
       <li>createSlice로 action + reducer를 한 번에 생성한다.</li>
@@ -947,8 +799,8 @@ const Counter = () =&gt; {
 
     <div class="tip"><span class="lbl">💡 정리</span> <code>useSelector</code>는 store의 state를 읽고(값이 바뀌면 자동 리렌더링), <code>useDispatch</code>는 action을 store로 보냅니다. createSlice가 만들어준 <code>slice.actions</code>가 액션 생성자입니다.</div>
   </section>
-  <section class="module" id="m7">
-    <h2><span class="num">7</span> 실전 앱 ① Counter (RTK 통합)</h2>
+  <section class="module" id="m6">
+    <h2><span class="num">6</span> 실전 앱 ① Counter (RTK 통합)</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
       <li>여러 slice를 하나의 store에 등록해 라우팅과 함께 통합 앱을 구성한다.</li>
       <li>incrementByAmount처럼 payload를 받는 액션을 다룬다.</li>
@@ -1108,8 +960,8 @@ export default Counter</code></pre>      <div class="out"><span class="rt">브�
       </div>
     </div>
   </section>
-  <section class="module" id="m8">
-    <h2><span class="num">8</span> 실전 앱 ② Bank System</h2>
+  <section class="module" id="m7">
+    <h2><span class="num">7</span> 실전 앱 ② Bank System</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
       <li>balance와 transactions처럼 여러 값을 가진 state를 slice로 관리한다.</li>
       <li>배열 push와 조건 분기(잔액 부족 처리)를 reducer 안에서 처리한다.</li>
@@ -1222,7 +1074,7 @@ export default ReduxBank</code></pre>      <div class="out"><span class="rt">브
     </div>
 
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 8-1. 이자 지급 액션 추가</h4>
+      <h4>실습 7-1. 이자 지급 액션 추가</h4>
       <p>bankSlice에 잔액의 10%를 이자로 더하는 <code>addInterest</code> 리듀서를 추가하고, 거래 내역에도 기록되도록 하세요.</p>
       <details><summary>정답 보기</summary>
 <pre><code class="language-javascript">// bankSlice.js reducers 안에 추가
@@ -1240,8 +1092,8 @@ addInterest: (state) =&gt; {
 export const { deposit, withdraw, addInterest } = bankSlice.actions</code></pre>      </details>
     </div>
   </section>
-  <section class="module" id="m9">
-    <h2><span class="num">9</span> 실전 앱 ③ To-do</h2>
+  <section class="module" id="m8">
+    <h2><span class="num">8</span> 실전 앱 ③ To-do</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
       <li>배열 상태에 대해 추가(push) · 토글(find) · 삭제(filter)를 slice로 구현한다.</li>
       <li>고유 id로 항목을 식별하고 체크박스로 완료 상태를 토글한다.</li>
@@ -1362,7 +1214,7 @@ export default Todos</code></pre>      <div class="out"><span class="rt">브라�
     </div>
 
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 9-1. 완료된 항목만 필터링</h4>
+      <h4>실습 8-1. 완료된 항목만 필터링</h4>
       <p>completed가 true인 할 일 개수를 <code>useSelector</code>로 계산해 "완료: N개"로 표시하세요.</p>
       <details><summary>정답 보기</summary>
 <pre><code class="language-jsx">const doneCount = useSelector(
