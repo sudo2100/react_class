@@ -451,7 +451,7 @@ const BankReducer = () =&gt; {
       &lt;input
         type="number"
         value={amount}
-        onChange={(e) =&gt; setAmount(parseInt(e.target.value))}
+        onChange={(e) =&gt; setAmount(Number(e.target.value) || 0)}
         step="1000"
       /&gt;
       &lt;button onClick={() =&gt;
