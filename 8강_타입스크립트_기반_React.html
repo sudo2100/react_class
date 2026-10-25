@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>7강. 타입스크립트(TypeScript) 기반 React</title>
+<title>8강. 타입스크립트(TypeScript) 기반 React</title>
 <style>
 /* highlight.js atom-one-dark theme (inlined) */
 pre code.hljs {
@@ -171,31 +171,31 @@ hue-6-2: #e6c07b
   <nav class="toc">
     <h2>📚 학습 목차</h2>
     <ol>
-      <li><a href="#m1">TypeScript 개요와 특징</a></li>
-      <li><a href="#m2">설치·실행과 JavaScript의 문제점</a></li>
-      <li><a href="#m3">기본 타입과 any</a></li>
-      <li><a href="#m4">interface — 객체 구조의 설계도</a></li>
-      <li><a href="#m5">type(타입 별칭)과 Union 타입</a></li>
-      <li><a href="#m6">함수의 타입</a></li>
-      <li><a href="#m7">제네릭과 유틸리티 타입</a></li>
-      <li><a href="#m8">React + TypeScript 프로젝트 시작</a></li>
-      <li><a href="#m9">Props에 타입 지정하기</a></li>
-      <li><a href="#m10">useState와 이벤트 객체 타입</a></li>
-      <li><a href="#m11">할 일 관리 앱 만들기</a></li>
-      <li><a href="#m12">useEffect 훅 — Clock 구현</a></li>
-      <li><a href="#m13">React Router 주요 Hook</a></li>
-      <li><a href="#m14">비동기 처리 — axios로 할 일 CRUD</a></li>
+      <li><a href="#m1">TypeScript 개요와 설치·실행</a></li>
+      <li><a href="#m2">기본 타입과 any</a></li>
+      <li><a href="#m3">interface와 type(타입 별칭)</a></li>
+      <li><a href="#m4">함수의 타입</a></li>
+      <li><a href="#m5">제네릭과 유틸리티 타입</a></li>
+      <li><a href="#m6">React + TypeScript 프로젝트 시작</a></li>
+      <li><a href="#m7">Props에 타입 지정하기</a></li>
+      <li><a href="#m8">useState와 이벤트 객체 타입</a></li>
+      <li><a href="#m9">할 일 관리 앱 만들기</a></li>
+      <li><a href="#m10">useEffect 훅 — Clock 구현</a></li>
+      <li><a href="#m11">React Router 주요 Hook</a></li>
+      <li><a href="#m12">비동기 처리 — axios로 할 일 CRUD</a></li>
     </ol>
   </nav>
 
   <!-- ================= MODULE 1 ================= -->
   <section class="module" id="m1">
-    <h2><span class="num">1</span> TypeScript 개요와 특징</h2>
+    <h2><span class="num">1</span> TypeScript 개요와 설치·실행</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li>TypeScript가 무엇이고 JavaScript와 어떤 관계인지 설명할 수 있다.</li>
         <li>TypeScript를 사용하는 이유와 실무 현황을 이해한다.</li>
         <li>타입을 명시한 변수 선언 문법을 읽을 수 있다.</li>
+        <li>TypeScript 설치와 컴파일·실행 흐름을 이해한다.</li>
+        <li>타입이 없을 때 발생하는 JavaScript의 대표적 문제를 안다.</li>
       </ul>
     </div>
 
@@ -218,17 +218,7 @@ let age: number = 30;
 let isStudent: boolean = false;</code></pre>
       <p>실무에서는 <b>React 프로젝트(특히 협업)</b>, <b>대규모 웹 서비스</b>, <b>유지보수가 중요한 프로젝트</b>에서 널리 쓰이며, 요즘은 <b>React + TypeScript 조합이 거의 표준</b>입니다.</p>
     </div>
-  </section>
 
-  <!-- ================= MODULE 2 ================= -->
-  <section class="module" id="m2">
-    <h2><span class="num">2</span> 설치·실행과 JavaScript의 문제점</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div>
-      <ul>
-        <li>TypeScript 설치와 컴파일·실행 흐름을 이해한다.</li>
-        <li>타입이 없을 때 발생하는 JavaScript의 대표적 문제를 안다.</li>
-      </ul>
-    </div>
 
     <div class="concept">
       <h3 class="blk">📖 설치 및 실행</h3>
@@ -284,9 +274,12 @@ function add(x, y) {
     </div>
   </section>
 
+  <!-- ================= MODULE 2 ================= -->
+
+
   <!-- ================= MODULE 3 ================= -->
-  <section class="module" id="m3">
-    <h2><span class="num">3</span> 기본 타입과 any</h2>
+  <section class="module" id="m2">
+    <h2><span class="num">2</span> 기본 타입과 any</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li>string·number·boolean·배열 등 기본 타입을 선언할 수 있다.</li>
@@ -340,7 +333,7 @@ console.log(`value = ${value}`);</code></pre>
     </div>
 
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 3-1. 프로필 변수 선언</h4>
+      <h4>실습 2-1. 프로필 변수 선언</h4>
       <p>이름(string), 나이(number), 취미 목록(string 배열)을 담는 변수를 타입을 명시해 선언하고 콘솔에 출력하세요.</p>
       <details><summary>정답 보기</summary>
         <pre><code class="language-typescript">let userName: string = "홍길동";
@@ -353,13 +346,15 @@ console.log(`${userName}(${userAge})의 취미: ${hobbies.join(", ")}`);</code><
   </section>
 
   <!-- ================= MODULE 4 ================= -->
-  <section class="module" id="m4">
-    <h2><span class="num">4</span> interface — 객체 구조의 설계도</h2>
+  <section class="module" id="m3">
+    <h2><span class="num">3</span> interface와 type(타입 별칭)</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li>interface로 객체의 구조(속성과 타입)를 정의할 수 있다.</li>
         <li><code>readonly</code>와 선택적 속성(<code>?</code>)의 의미를 이해한다.</li>
         <li>interface와 type의 차이를 표로 비교할 수 있다.</li>
+        <li>type 별칭으로 객체·유니온 타입을 정의할 수 있다.</li>
+        <li>interface와 type을 함께 사용하는 예제를 읽을 수 있다.</li>
       </ul>
     </div>
 
@@ -395,24 +390,26 @@ const member1: Member = {
 
     <div class="ex"><div class="lbl">💡 예제 — interface로 객체 만들기</div>
       <span class="fname">interface_ex.ts</span>
-      <pre><code class="language-typescript">interface Person {
-    name: string;
-    age: number;
+      <pre><code class="language-typescript">// 인터페이스(interface) 정의
+interface Person{
+  name: string,
+  age: number
+}
+
+// 인터페이스를 활용한 객체 생성
+let person1: Person = {
+  name: "정윤하",
+  age: 35
 }
 
 let person2: Person = {
-    name: "홍길동",
-    age: 25, // age 속성이 누락되면 오류 발생
-};
-
-let person3: Person = {
-    name: "우영우",
-    age: 30,
-};
+  name: "박재명",
+  age: 30
+}
 
 // 출력
-console.log(`이름: ${person2.name}, 나이: ${person2.age}`);
-console.log(`이름: ${person3.name}, 나이: ${person3.age}`);</code></pre>
+console.log(`이름: ${person1.name}, 나이: ${person1.age}` );
+console.log(`이름: ${person2.name}, 나이: ${person2.age}` );</code></pre>
     </div>
 
     <div class="ex"><div class="lbl">💡 예제 — readonly와 선택적 속성(?)</div>
@@ -437,18 +434,7 @@ console.log(`이름: ${user2.name}, 나이: ${user2.age}`);
 user1.id = 3; // 오류: id는 readonly 속성이므로 변경할 수 없습니다.</code></pre>
       <div class="tip"><span class="lbl">💡 정리</span> <code>readonly</code>는 재할당을 막고, <code>?</code>는 해당 속성을 생략할 수 있게 만듭니다.</div>
     </div>
-  </section>
 
-  <!-- ================= MODULE 5 ================= -->
-  <section class="module" id="m5">
-    <h2><span class="num">5</span> type(타입 별칭)과 Union 타입</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div>
-      <ul>
-        <li>type 별칭으로 객체·유니온 타입을 정의할 수 있다.</li>
-        <li>Union 타입(<code>"admin" | "user"</code>)의 의미를 이해한다.</li>
-        <li>interface와 type을 함께 사용하는 예제를 읽을 수 있다.</li>
-      </ul>
-    </div>
 
     <div class="concept">
       <h3 class="blk">📖 type이란?</h3>
@@ -459,6 +445,10 @@ user1.id = 3; // 오류: id는 readonly 속성이므로 변경할 수 없습니�
   name: string;
   age: number;
 };</code></pre>
+      <p><strong>타입 별칭(Type Alias)</strong>은 타입에 새 이름(별명)을 붙이는 것입니다. <code>type 이름 = 타입</code> 형식으로 쓰고, 한 번 정의한 이름은 그 타입 대신 어디서든 쓸 수 있습니다.</p>
+      <pre><code class="language-typescript">type MemberRole = "admin" | "user";   // Union 타입에 이름 붙이기
+type Point = [number, number];        // 튜플에 이름 붙이기
+type Member = { id: number; name: string; role: MemberRole }; // 객체 타입에 이름 붙이기</code></pre>
     </div>
 
     <div class="ex"><div class="lbl">💡 예제 — Union 타입과 type</div>
@@ -532,7 +522,7 @@ student1.subjects.forEach(subject =&gt; {
     </div>
 
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 5-1. 결제 수단 Union 타입</h4>
+      <h4>실습 3-1. 결제 수단 Union 타입</h4>
       <p><code>PayMethod</code>를 <code>"card" | "cash" | "point"</code> 유니온 타입으로 정의하고, 이를 속성으로 갖는 <code>Order</code> type을 만들어 주문 객체를 하나 생성하세요.</p>
       <details><summary>정답 보기</summary>
         <pre><code class="language-typescript">type PayMethod = "card" | "cash" | "point";
@@ -549,9 +539,12 @@ console.log(`주문 ${order1.id}: ${order1.amount}원 (${order1.method})`);</cod
     </div>
   </section>
 
+  <!-- ================= MODULE 5 ================= -->
+
+
   <!-- ================= MODULE 6 ================= -->
-  <section class="module" id="m6">
-    <h2><span class="num">6</span> 함수의 타입</h2>
+  <section class="module" id="m4">
+    <h2><span class="num">4</span> 함수의 타입</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li>매개변수와 반환값에 타입을 지정할 수 있다.</li>
@@ -610,8 +603,8 @@ console.log(`사용자 ID: ${user_kim.id}, 이름: ${user_kim.name}`);</code></p
   </section>
 
   <!-- ================= MODULE 7 ================= -->
-  <section class="module" id="m7">
-    <h2><span class="num">7</span> 제네릭과 유틸리티 타입</h2>
+  <section class="module" id="m5">
+    <h2><span class="num">5</span> 제네릭과 유틸리티 타입</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li>제네릭(Generic)이 무엇인지 이해한다.</li>
@@ -627,9 +620,32 @@ console.log(`사용자 ID: ${user_kim.id}, 이름: ${user_kim.name}`);</code></p
 const [isLoggedIn, setIsLoggedIn] = useState&lt;boolean&gt;(false);</code></pre>
     </div>
 
+    <div class="ex"><div class="lbl">💡 예제 — 제네릭 배열 · 함수</div>
+      <span class="fname">example.ts</span>
+      <pre><code class="language-typescript">// 1. 제네릭 배열 : Array&lt;T&gt;는 T[]와 같은 의미
+const scores: Array&lt;number&gt; = [90, 85, 100];
+console.log(scores.join(", "));
+
+// 2. 제네릭 함수 : &lt;T&gt;는 호출할 때 정해지는 타입 자리
+function getFirst&lt;T&gt;(arr: T[]): T {
+  return arr[0];
+}
+
+const num = getFirst&lt;number&gt;([10, 20, 30]);       // T = number
+const str = getFirst&lt;string&gt;(["사과", "바나나"]); // T = string
+const auto = getFirst([true, false]);             // 타입 추론 → T = boolean
+
+console.log(num, str, auto);</code></pre>
+      <div class="out"><span class="rt">실행 결과</span>
+        <p>90, 85, 100</p>
+        <p>10 사과 true</p>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> 제네릭은 <b>타입을 매개변수처럼</b> 받습니다. 함수를 한 번만 만들고, 사용할 때 <code>&lt;number&gt;</code>, <code>&lt;string&gt;</code>처럼 타입만 바꿔 재사용할 수 있습니다.</div>
+    </div>
+
     <div class="concept">
       <h3 class="blk">📖 유틸리티 타입</h3>
-      <p>타입스크립트는 다양한 <b>유틸리티 타입</b>을 기본 제공하여 타입 선언을 더 간결하고 유연하게 만들 수 있게 돕습니다. 대표적으로 <code>Partial</code>, <code>Omit</code>, <code>Record</code> 등이 있습니다.</p>
+      <p>타입스크립트는 다양한 <b>유틸리티 타입</b>을 기본 제공하여 타입 선언을 더 간결하고 유연하게 만들 수 있게 돕습니다. 대표적으로 <code>Omit</code>, <code>Record</code> 등이 있습니다.</p>
       <pre><code class="language-typescript">const handleAddProduct = (newProduct: Omit&lt;Product, 'id'&gt;) =&gt; { }
 // Product 타입에서 id 속성을 제외한 나머지 속성들로 구성된 타입입니다.
 // Omit&lt;T, K&gt; - 선택한 속성(K)을 제외한 나머지를 가져옵니다.</code></pre>
@@ -642,11 +658,13 @@ const [isLoggedIn, setIsLoggedIn] = useState&lt;boolean&gt;(false);</code></pre>
         <li><b>K (Keys)</b>: 객체의 속성 키로 사용할 타입 (보통 문자열 리터럴의 유니온이나 <code>string</code>, <code>number</code> 등).</li>
         <li><b>T (Type)</b>: 각 키에 할당될 값의 타입.</li>
       </ul>
-      <pre><code class="language-typescript">type StringMap = Record&lt;string, string&gt;;
-const translations: StringMap = {
-  hello: '안녕하세요',
-  goodbye: '안녕히 가세요',
-};</code></pre>
+      <pre><code class="language-typescript">type Fruit = 'apple' | 'banana' | 'orange';
+
+const prices: Record&lt;Fruit, number&gt; = {
+  apple: 2000,
+  banana: 1500,
+  orange: 1000
+}</code></pre>
     </div>
 
     <div class="ex"><div class="lbl">💡 예제 — Record로 동적 키/값</div>
@@ -693,8 +711,8 @@ for (const fruit in prices) {
   </section>
 
   <!-- ================= MODULE 8 ================= -->
-  <section class="module" id="m8">
-    <h2><span class="num">8</span> React + TypeScript 프로젝트 시작</h2>
+  <section class="module" id="m6">
+    <h2><span class="num">6</span> React + TypeScript 프로젝트 시작</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li>Vite로 React + TypeScript 프로젝트를 생성할 수 있다.</li>
@@ -746,6 +764,19 @@ createRoot(document.getElementById('root')!).render(
       <div class="tip"><span class="lbl">💡 정리</span> <code>getElementById('root')!</code>의 <code>!</code>는 "이 값은 null이 아니다"라고 알려 주는 <b>Non-null 단언 연산자</b>입니다.</div>
     </div>
 
+  </section>
+
+  <!-- ================= MODULE 9 ================= -->
+  <section class="module" id="m7">
+    <h2><span class="num">7</span> Props에 타입 지정하기</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li>인라인 방식으로 Props 타입을 지정할 수 있다.</li>
+        <li>객체·함수 Props의 타입을 작성할 수 있다.</li>
+        <li>type 별칭(<code>PlayerProps</code>)으로 Props 타입을 분리할 수 있다.</li>
+      </ul>
+    </div>
+
     <div class="ex"><div class="lbl">💡 예제 — App.tsx</div>
       <span class="fname">src/App.tsx</span>
       <pre><code class="language-tsx">function App() {
@@ -762,24 +793,12 @@ createRoot(document.getElementById('root')!).render(
 
 export default App</code></pre>
     </div>
-  </section>
-
-  <!-- ================= MODULE 9 ================= -->
-  <section class="module" id="m9">
-    <h2><span class="num">9</span> Props에 타입 지정하기</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div>
-      <ul>
-        <li>인라인 방식으로 Props 타입을 지정할 수 있다.</li>
-        <li>객체·함수 Props의 타입을 작성할 수 있다.</li>
-        <li>type 별칭(<code>PlayerProps</code>)으로 Props 타입을 분리할 수 있다.</li>
-      </ul>
-    </div>
 
     <div class="ex"><div class="lbl">💡 예제 — 문자열 Props 타입(인라인)</div>
       <span class="fname">src/Greet.tsx</span>
-      <pre><code class="language-tsx">// Props의 타입 정의
-const Greet = ({name}: {name: string}) =&gt; {
-  return &lt;h2&gt;Hello, {name}!&lt;/h2&gt;
+      <pre><code class="language-tsx">// age 변수 추가
+const Greet = ({name, age}: {name: string, age: number}) =&gt; {
+  return &lt;h2&gt;이름: {name}, 나이: {age}&lt;/h2&gt;
 }
 
 export default Greet</code></pre>
@@ -862,8 +881,8 @@ const Player2 = ({ player, clickHandler }: PlayerProps) =&gt; {
   </section>
 
   <!-- ================= MODULE 10 ================= -->
-  <section class="module" id="m10">
-    <h2><span class="num">10</span> useState와 이벤트 객체 타입</h2>
+  <section class="module" id="m8">
+    <h2><span class="num">8</span> useState와 이벤트 객체 타입</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li>제네릭으로 useState의 상태 타입을 명시할 수 있다.</li>
@@ -970,7 +989,7 @@ const Player2 = ({ player, clickHandler }: PlayerProps) =&gt; {
     </div>
 
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 10-1. 숫자 배열 상태</h4>
+      <h4>실습 8-1. 숫자 배열 상태</h4>
       <p><code>useState&lt;number[]&gt;</code>로 <code>[1, 2, 3]</code> 상태를 만들고, 버튼을 누르면 마지막 값 +1을 배열에 추가하는 컴포넌트를 작성하세요.</p>
       <details><summary>정답 보기</summary>
         <pre><code class="language-tsx">const NumberList = () =&gt; {
@@ -993,8 +1012,8 @@ const Player2 = ({ player, clickHandler }: PlayerProps) =&gt; {
   </section>
 
   <!-- ================= MODULE 11 ================= -->
-  <section class="module" id="m11">
-    <h2><span class="num">11</span> 할 일 관리 앱 만들기</h2>
+  <section class="module" id="m9">
+    <h2><span class="num">9</span> 할 일 관리 앱 만들기</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li>Todo 타입을 정의하고 <code>useState&lt;Todo[]&gt;</code>로 목록을 관리한다.</li>
@@ -1128,8 +1147,8 @@ export default TodoList</code></pre>
   </section>
 
   <!-- ================= MODULE 12 ================= -->
-  <section class="module" id="m12">
-    <h2><span class="num">12</span> useEffect 훅 — Clock 구현</h2>
+  <section class="module" id="m10">
+    <h2><span class="num">10</span> useEffect 훅 — Clock 구현</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li><code>useEffect</code>와 <code>setInterval</code>로 실시간 시계를 만든다.</li>
@@ -1190,8 +1209,8 @@ const style = {
   </section>
 
   <!-- ================= MODULE 13 ================= -->
-  <section class="module" id="m13">
-    <h2><span class="num">13</span> React Router 주요 Hook</h2>
+  <section class="module" id="m11">
+    <h2><span class="num">11</span> React Router 주요 Hook</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li>React Router의 대표 Hook 4가지의 역할을 안다.</li>
@@ -1230,8 +1249,8 @@ navigate('/dashboard');</code></pre>
   </section>
 
   <!-- ================= MODULE 14 ================= -->
-  <section class="module" id="m14">
-    <h2><span class="num">14</span> 비동기 처리 — axios로 할 일 CRUD</h2>
+  <section class="module" id="m12">
+    <h2><span class="num">12</span> 비동기 처리 — axios로 할 일 CRUD</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li><code>async/await</code>와 <code>Promise(.then)</code> 방식을 비교한다.</li>
@@ -1491,7 +1510,7 @@ const AddTodo = () =&gt; {
     </div>
 
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 14-1. 삭제(DELETE) 기능 추가</h4>
+      <h4>실습 12-1. 삭제(DELETE) 기능 추가</h4>
       <p>목록의 각 항목에 "삭제" 버튼을 추가하고, 클릭 시 axios로 DELETE 요청을 보낸 뒤 화면 상태에서도 해당 항목을 제거하는 함수를 작성하세요. (jsonplaceholder는 실제로 삭제하지 않지만 요청은 성공으로 응답합니다.)</p>
       <details><summary>정답 보기</summary>
         <pre><code class="language-tsx">const deleteTodo = async (id: number) =&gt; {
