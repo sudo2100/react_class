@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>9강. 쇼핑몰 프로젝트</title>
+<style>
+/* highlight.js atom-one-dark theme (inlined) */
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*
+
+Atom One Dark by Daniel Gamage
+Original One Dark Syntax theme from https://github.com/atom/one-dark-syntax
+
+base:    #282c34
+mono-1:  #abb2bf
+mono-2:  #818896
+mono-3:  #5c6370
+hue-1:   #56b6c2
+hue-2:   #61aeee
+hue-3:   #c678dd
+hue-4:   #98c379
+hue-5:   #e06c75
+hue-5-2: #be5046
+hue-6:   #d19a66
+hue-6-2: #e6c07b
+
+*/
+.hljs {
+  color: #abb2bf;
+  background: #282c34
+}
+.hljs-comment,
+.hljs-quote {
+  color: #5c6370;
+  font-style: italic
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #c678dd
+}
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+  color: #e06c75
+}
+.hljs-literal {
+  color: #56b6c2
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #98c379
+}
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: #d19a66
+}
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #61aeee
+}
+.hljs-built_in,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: #e6c07b
+}
+.hljs-emphasis {
+  font-style: italic
+}
+.hljs-strong {
+  font-weight: bold
+}
+.hljs-link {
+  text-decoration: underline
+}
+</style>
+<style>
+  :root{--bg:#f4f6f9;--card:#fff;--ink:#1f2933;--muted:#52606d;--line:#e4e7eb;--accent:#2965f1;--accent2:#1b3a8f;--code-bg:#282c34;--goal:#eafaf1;--goal-line:#27ae60;--ex:#eef4ff;--ex-line:#5b8def;--lab:#eef7ff;--lab-line:#2965f1;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Malgun Gothic","맑은 고딕",-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.75;}
+  header.hero{background:linear-gradient(135deg,#2965f1,#1b3a8f 60%,#153e75);color:#fff;padding:52px 24px;text-align:center;}
+  header.hero .eyebrow{letter-spacing:3px;font-size:.78rem;opacity:.92;text-transform:uppercase}
+  header.hero h1{margin:12px 0 8px;font-size:1.9rem}header.hero p{margin:0;opacity:.94}
+  header.hero .tags{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  header.hero .tags span{background:rgba(255,255,255,.18);border-radius:999px;padding:5px 13px;font-size:.82rem}
+  .wrap{max-width:920px;margin:0 auto;padding:32px 20px 80px}
+  nav.toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 26px;margin-bottom:34px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  nav.toc h2{margin:0 0 12px;font-size:1.05rem;color:var(--accent2)}
+  nav.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+  nav.toc a{color:var(--ink);text-decoration:none}nav.toc a:hover{color:var(--accent);text-decoration:underline}
+  section.module{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px 30px;margin-bottom:26px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  section.module > h2{margin:0 0 6px;font-size:1.4rem;color:var(--accent2);display:flex;align-items:center;gap:12px;}
+  section.module > h2 .num{background:var(--accent);color:#fff;font-size:.95rem;font-weight:800;padding:4px 12px;border-radius:10px;min-width:38px;text-align:center;}
+  h3.blk{font-size:1.02rem;margin:22px 0 8px;font-weight:800}
+  .goal{background:var(--goal);border-left:5px solid var(--goal-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:14px 0}
+  .goal .lbl{font-weight:800;color:#1e874b}.goal ul{margin:8px 0 0}
+  .concept h3.blk{color:var(--ink);border-left:4px solid var(--accent);padding-left:10px}
+  .ex{background:var(--ex);border-left:5px solid var(--ex-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .ex .lbl{font-weight:800;color:#2f5fc7}
+  .lab{background:var(--lab);border-left:5px solid var(--lab-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .lab .lbl{font-weight:800;color:#1b4fc0}.lab h4{margin:6px 0 6px;font-size:.98rem}
+  ul{margin:8px 0}li{margin:5px 0}.muted{color:var(--muted)}
+  code{background:#eceef1;padding:2px 6px;border-radius:5px;font-size:.92em;font-family:Consolas,"D2Coding",monospace}
+  pre{background:var(--code-bg);border-radius:10px;padding:0;overflow-x:auto;margin:10px 0}
+  pre code{display:block;padding:16px 18px;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;line-height:1.6;background:var(--code-bg);color:#abb2bf;border-radius:10px;white-space:pre}
+  pre code.hljs{background:var(--code-bg);padding:16px 18px}
+  .fname{display:inline-block;background:#1b3a8f;color:#fff;font-family:Consolas,"D2Coding",monospace;font-size:.8rem;font-weight:700;padding:4px 12px;border-radius:8px 8px 0 0;margin:10px 0 -8px}
+  .fname + pre{border-top-left-radius:0}
+  .out{background:#fff;color:var(--ink);border:1px solid var(--line);border-left:4px solid #27ae60;border-radius:8px;padding:12px 16px;margin:8px 0 0}
+  .out .rt{font-size:.72rem;letter-spacing:1px;color:#27ae60;font-weight:800;text-transform:uppercase;display:block;margin-bottom:6px}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:.93rem}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:#eef2fb;color:var(--accent2)}td.c,th.c{text-align:center}
+  td code,th code{background:#eef1f5}
+  details{margin-top:10px;background:#fff;border:1px solid #cfe0ff;border-radius:8px;padding:8px 14px}
+  details summary{cursor:pointer;font-weight:700;color:#1b4fc0}details pre{margin-top:10px}
+  footer{text-align:center;color:var(--muted);font-size:.85rem;padding:30px 20px}
+  .pill{display:inline-block;background:#eceef1;border-radius:6px;padding:2px 9px;margin:2px;font-size:.85rem}
+  .flow{background:#f7f9fc;border:1px dashed #b9c6de;border-radius:10px;padding:12px 16px;margin:12px 0;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;white-space:pre-wrap;color:#37475f}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}nav.toc ol{columns:1}}
+  .tip{background:#fff8e6;border-left:5px solid #f2b705;border-radius:0 10px 10px 0;padding:12px 18px;margin:14px 0}
+  .tip .lbl{font-weight:800;color:#b57f00}
+  .demo{border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:8px 0 0;background:#fafbfc}
+  .demo button{margin:2px 4px 2px 0;padding:4px 12px;border:1px solid #b9c6de;border-radius:6px;background:#fff;cursor:default}
+  .demo input{padding:4px 8px;border:1px solid #b9c6de;border-radius:6px;margin:2px 0}
+
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="eyebrow">React 심화 · Chapter 08 · 학습 교안</div>
+  <h1>쇼핑몰 프로젝트</h1>
+  <p>React + TypeScript + Vite로 상품·회원·관리자 기능을 갖춘 쇼핑몰을 처음부터 끝까지 만들고 Vercel에 배포하는 종합 실전 프로젝트입니다.</p>
+  <div class="tags">
+    <span>🏷️ React Router</span>
+    <span>🏷️ TypeScript</span>
+    <span>🏷️ useState / useEffect</span>
+    <span>🏷️ JSON 데이터</span>
+    <span>🏷️ 폼 처리</span>
+    <span>🏷️ 로그인/권한</span>
+    <span>🏷️ Vercel 배포</span>
+  </div>
+</header>
+<div class="wrap">
+  <nav class="toc">
+    <h2>📚 학습 목차</h2>
+    <ol>
+      <li><a href="#m1">프로젝트 개요와 라우팅 구조</a></li>
+      <li><a href="#m2">전역 스타일과 반응형 설계 (App.css)</a></li>
+      <li><a href="#m3">레이아웃 컴포넌트 — Header와 Home</a></li>
+      <li><a href="#m4">상품 데이터와 상품 목록 (ProductList)</a></li>
+      <li><a href="#m5">상품 상세 정보 (ProductInfo)</a></li>
+      <li><a href="#m6">상품 등록 폼 (AddProduct)</a></li>
+      <li><a href="#m7">회원 데이터와 로그인 (SignIn)</a></li>
+      <li><a href="#m8">로그인 / 로그아웃 상태 관리</a></li>
+      <li><a href="#m9">회원 가입 구현 (SignUp)</a></li>
+      <li><a href="#m10">관리자 대시보드 (DashBoard)</a></li>
+      <li><a href="#m11">관리자 전용 접근 제어</a></li>
+      <li><a href="#m12">Vercel로 앱 배포하기</a></li>
+      <li><a href="#m13">상품 검색 기능 구현</a></li>
+    </ol>
+  </nav>
+
+  <section class="module" id="m1">
+    <h2><span class="num">1</span> 프로젝트 개요와 라우팅 구조</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>쇼핑몰 프로젝트의 요구사항과 전체 구조를 이해한다.</li>
+      <li><code>BrowserRouter</code>, <code>Routes</code>, <code>Route</code>로 페이지 라우팅을 구성한다.</li>
+      <li>동적 경로 파라미터(<code>/products/:id</code>)의 개념을 익힌다.</li>
+    </ul></div>
+
+    <div class="concept">
+      <h3 class="blk">📖 프로젝트 개요</h3>
+      <table>
+        <tr><th>항목</th><th>내용</th></tr>
+        <tr><td>프로젝트 이름</td><td>shopping</td></tr>
+        <tr><td>개발 환경</td><td>React + TypeScript + Vite</td></tr>
+        <tr><td>상품 기능</td><td>상품 목록 · 상품 정보 · 상품 등록</td></tr>
+        <tr><td>회원 기능</td><td>회원 가입 · 로그인 · 관리자 대시보드</td></tr>
+      </table>
+      <div class="tip"><span class="lbl">💡 정리</span> 상품과 회원이라는 두 축을 중심으로, 데이터(JSON) → 목록 → 상세 → 등록 → 인증 → 권한 → 배포 순으로 기능을 하나씩 쌓아 올립니다.</div>
+    </div>
+
+    <div class="concept">
+      <h3 class="blk">📖 완성 화면 미리보기</h3>
+      <p>홈 화면에는 공지 팝업과 메인 이미지가, 상품 목록에는 카드 형태의 상품들이 표시됩니다.</p>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div style="background:#2b2b2b;color:orange;padding:8px 4px;text-align:center;border-radius:6px;font-weight:bold;">Home &nbsp;&nbsp; 상품 목록 &nbsp;&nbsp; 상품 등록 &nbsp;&nbsp; 로그인</div>
+        <p style="text-align:center;color:#e91263;font-weight:bold;font-size:20px;">컴퓨터 기기 쇼핑몰</p>
+        <p style="text-align:center;color:#555;">최신 컴퓨터 기기와 액세서리를 한 곳에서 만나보세요!</p>
+      </div>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 앱의 라우팅 뼈대</div>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">function App() {
+
+  return (
+    &lt;&gt;
+      &lt;section className="app"&gt;
+        &lt;BrowserRouter&gt;
+          &lt;Header /&gt;
+          &lt;Routes&gt;
+            &lt;Route path="/" element={&lt;Home /&gt;} /&gt;
+            &lt;Route path="/products" element={&lt;ProductList /&gt;} /&gt;
+            &lt;Route path="/products/:id" element={&lt;ProductInfo /&gt;} /&gt;
+            &lt;Route path="/products/add" element={&lt;AddProduct /&gt;} /&gt;
+            &lt;Route path="/signin" element={&lt;SignIn /&gt;} /&gt;
+          &lt;/Routes&gt;
+        &lt;/BrowserRouter&gt;
+      &lt;/section&gt;
+    &lt;/&gt;
+  )
+}</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>&lt;Header /&gt;</code>는 <code>Routes</code> 바깥에 두어 모든 페이지에서 공통으로 보이게 하고, 페이지가 바뀌는 부분만 <code>Routes</code> 안에 배치합니다. <code>:id</code>는 URL에서 값을 받아오는 동적 파라미터입니다.</div>
+    </div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 1-1. 라우트 추가하기</h4>
+      <p>회원가입 페이지를 <code>/signup</code> 경로로 접근할 수 있도록 <code>Route</code>를 추가해 보세요. (컴포넌트 이름은 <code>SignUp</code>)</p>
+      <details><summary>정답 보기</summary>
+      <pre><code class="language-tsx">&lt;Route path="/signup" element={&lt;SignUp /&gt;} /&gt;</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m2">
+    <h2><span class="num">2</span> 전역 스타일과 반응형 설계 (App.css)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>프로젝트 전체에서 재사용할 공통 스타일을 정의한다.</li>
+      <li>Flexbox 기반 카드/폼 레이아웃을 작성한다.</li>
+      <li><code>@media</code> 쿼리로 768px·480px 이하 반응형을 구현한다.</li>
+    </ul></div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 전역 · 메인 · 공지 팝업 스타일</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 안전한 반응형 동작을 보장하기 위해 전역 규칙으로 추가 */
+/* 부모보다 이미지가 크면 부모 너비에 맞춰 축소되고,
+   작으면 원본 크기 그대로 유지.*/
+img{
+  max-width: 100%;
+  height: auto;
+}
+
+/* 메인 스타일 */
+.main{
+  text-align: center;
+  margin-top: 40px;
+}
+.main h2{
+  font-size: 28px;
+  color: #e91263;
+  margin: 20px;
+}
+.main-image{margin-top: 20px;}
+
+/* 공지 팝업 스타일 */
+.notice-popup{
+  position: fixed;
+  left: 300px;
+  top: 140px;
+  width: 320px;
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+.notice-popup h3{
+  color: #e91263;
+  font-size: 22px;
+}
+.notice-popup p{
+  margin-bottom: 20px;
+  color: #444;
+}
+.notice-popup button{
+  padding: 8px 24px;
+  border: none;
+  border-radius: 4px;
+  background-color: #e91263;
+  color: #eee;
+  font-size: 15px;
+  cursor: pointer;
+}</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — Header 스타일</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* Header 스타일 */
+.header{
+  height: 50px;
+  margin-bottom: 20px;
+  background-color: #333;
+  padding: 10px 0;
+  text-align: center;
+}
+.header a{
+  color: orange;
+  margin: 0 16px;
+  line-height: 50px;
+  text-decoration: none;
+}
+.header .header-user{
+  display: inline-flex;
+  align-items: center;
+  margin-left: 10px;
+  color: #fbff1c;
+}
+.header .logout-btn{
+  margin-left: 10px;
+  padding: 6px 12px;
+  border: 1px solid #ff9f1c;
+  border-radius: 4px;
+  background-color: transparent;
+  color: #ff9f1c;
+}
+.header .logout-btn:hover{
+  background-color: #ff9f1c;
+  color: #333;
+}</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 상품 목록 · 카드 스타일</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 상품 목록 스타일 */
+.product-list{
+  width: 80%;
+  margin: 20px auto;
+}
+.product-list h2{margin-bottom: 20px;}
+.card-container{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.card-container a{text-decoration: none;}
+.card{
+  width: 250px;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+.card-image{
+  width: 100%;
+  height: 200px;
+}
+.card-title{font-size: 18px; color: #333;}
+.card-text{font-size: 16px; color: #555}</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 상품 정보 스타일</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 상품 정보 스타일 */
+.product-info{
+  width: 80%;
+  max-width: 900px;
+  margin: 40px auto;
+}
+.product-info h3{
+  margin-bottom: 24px;
+  font-size: 28px;
+  color: #222;
+  border-bottom: 2px solid #e91263;
+  padding-bottom: 15px;
+}
+.product-details{
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 40px;
+}
+.product-details img{
+  width: 320px;
+  height: 320px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 16px;
+}
+.product-content{
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.product-content .price{
+  font-size: 24px;
+  color: #e91263;
+  font-weight: bold;
+  background-color: #fce4ec;
+  padding: 10px 16px;
+  border-radius: 8px;
+}
+.product-buttons{
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+.product-buttons .btn-list{
+  padding: 10px 24px;
+  border: 2px solid #555;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.product-buttons .btn-list:hover{
+  background-color: #555;
+  color: #fff;
+}
+.product-buttons .btn-cart{
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  background-color: #e91263;
+  color: #eee;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.product-buttons .btn-cart:hover{
+  background-color: #c2185b;
+}</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 상품 등록 폼 스타일</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 상품 등록 스타일 */
+.add-product{
+  width: 80%;
+  max-width: 600px;
+  margin: 40px auto;
+}
+.add-product h2{
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+.add-product form{
+  width: 60%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.add-product form &gt; div{
+  display: flex;
+  align-items: flex-start;
+}
+.add-product label{
+  width: 70px;
+  flex-shrink: 0; /* 라벨의 너비 고정 */
+  padding-top: 8px;
+  font-size: 16px;
+  color: #444;
+}
+.add-product input[type="text"],
+.add-product input[type="number"]{
+  margin: 4px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.add-product textarea{
+  width: 100%;
+  margin: 4px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+}
+.add-product input[type="file"]{
+  padding: 6px;
+}
+.add-product button{
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #e91263;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+.add-product button:hover{
+  background-color: #c2185b;
+}</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 로그인 · 회원가입 폼 스타일</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 로그인 스타일 */
+.signin{
+  width: 80%;
+  max-width: 600px;
+  margin: 40px auto;
+}
+.signin h2{ text-align: center; margin-bottom: 20px; color: #333; }
+.signin form{
+  width: 60%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.signin form &gt; div{ display: flex; align-items: flex-start; }
+.signin label{
+  width: 70px;
+  flex-shrink: 0; /* 라벨의 너비 고정 */
+  padding-top: 8px;
+  font-size: 16px;
+  color: #444;
+}
+.signin input[type="text"],
+.signin input[type="password"]{
+  margin: 4px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.signin button{
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #30ca11;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+.signin button:hover{ background-color: #1e9813; }
+.signin .error{ color: #e91263; margin-top: 10px; }
+
+/* 회원가입 스타일 */
+.signup{
+  width: 80%;
+  max-width: 600px;
+  margin: 40px auto;
+}
+.signup h2{ text-align: center; margin-bottom: 20px; color: #333; }
+.signup form{
+  width: 60%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.signup form &gt; div{ display: flex; align-items: flex-start; }
+.signup label{
+  width: 110px;
+  flex-shrink: 0; /* 라벨의 너비 고정 */
+  padding-top: 8px;
+  font-size: 16px;
+  color: #444;
+}
+.signup input[type="text"],
+.signup input[type="password"]{
+  margin: 4px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.signup button{
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #3915ef;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+.signup button:hover{ background-color: #0204a0; }
+
+/* 회원가입 링크 */
+.signup-link {
+  text-align: center;
+  margin-top: 15px;
+}
+.signup-link a {
+  color: #640aec;
+  text-decoration: none;
+}
+.signup-link a:hover {text-decoration: underline;}</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 관리자 대시보드 · 검색 스타일</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 관리자 DashBoard 스타일 */
+.order-table-wrap{
+  width: 90%;
+  margin: 0 auto;
+}
+.order-table{
+  width: 100%;
+  border-collapse: collapse;
+}
+.order-table th,
+.order-table td{
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ccc;
+}
+.order-table th{
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+/* 상품 검색 스타일 */
+.search-area{
+  margin-bottom: 20px;
+}
+.search-area input{
+  width: 100%;
+  max-width: 400px;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  font-size: 15px;
+}
+.no-result{
+  padding: 40px 0;
+  color: #777;
+  text-align: center;
+}</code></pre>
+    </div>
+
+    <div class="concept">
+      <h3 class="blk">📖 반응형 디자인 (@media)</h3>
+      <p>화면 폭이 768px, 480px 이하로 줄어들면 레이아웃을 세로로 쌓고 너비를 넓혀 모바일에서도 보기 좋게 만듭니다.</p>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 반응형: 768px / 480px 이하</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 반응형 디자인 : 768px 이하 */
+@media (max-width: 768px){
+  .notice-popup{
+    left: 50%;
+    top: 20px;
+    transform: translateX(-50%);
+    width: 80%;
+  }
+  .header nav{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 4px 12px;
+    padding: 8px 0;
+  }
+  .header{height: auto;}
+  .header .header-user{margin-left: 0;}
+  .product-list, .product-info,
+  .add-product, .signin, .signup{
+    width: 90%;
+  }
+  .product-details{
+    flex-direction: column;
+    align-items: center;
+  }
+  .product-details img{
+    width: 100%;
+    height: auto;
+    max-width: 320px;
+  }
+  .add-product form,
+  .signin form,
+  .signup form{
+    width: 90%;
+  }
+}
+
+/* 480px 이하 */
+@media (max-width: 480px){
+  .notice-popup{
+    top: 12px;
+    width: 90%;
+    padding: 16px;
+  }
+  .notice-popup h3{font-size: 18px;}
+  .notice-popup p{font-size: 14px;}
+  .header a{margin: 0 8px;}
+  .product-list .card-container{justify-content: center;}
+  .search-area input{max-width: 300px;}
+  .add-product form,
+  .signin form,
+  .signup form{
+    width: 100%;
+  }
+  .product-buttons{ flex-direction: column; }
+  .order-table th,
+  .order-table td{ padding: 8px;font-size: 14px; }
+}</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>transform: translateX(-50%)</code>와 <code>left: 50%</code>를 함께 쓰면 팝업이 화면 가로 중앙에 정확히 정렬됩니다. 반응형에서는 카드/폼의 <code>flex-direction</code>을 <code>column</code>으로 바꿔 세로 배치로 전환합니다.</div>
+    </div>
+  </section>
+
+  <section class="module" id="m3">
+    <h2><span class="num">3</span> 레이아웃 컴포넌트 — Header와 Home</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li><code>NavLink</code>로 내비게이션 메뉴를 만든다.</li>
+      <li><code>useState</code>와 조건부 렌더링(<code>&amp;&amp;</code>)으로 공지 팝업을 제어한다.</li>
+      <li>이미지 파일을 <code>import</code>하여 화면에 표시한다.</li>
+    </ul></div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 내비게이션 헤더</div>
+      <span class="fname">src/layouts/Header.tsx</span>
+      <pre><code class="language-tsx">const Header = () =&gt; {
+  return (
+    &lt;header className="header"&gt;
+      &lt;nav&gt;
+        &lt;NavLink to="/"&gt;Home&lt;/NavLink&gt;
+        &lt;NavLink to="/products"&gt;상품 목록&lt;/NavLink&gt;
+        &lt;NavLink to="/products/add"&gt;상품 등록&lt;/NavLink&gt;
+        &lt;NavLink to="/signin"&gt;로그인&lt;/NavLink&gt;
+      &lt;/nav&gt;
+    &lt;/header&gt;
+  )
+}
+
+export default Header</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 공지 팝업이 있는 홈 화면</div>
+      <span class="fname">src/layouts/Home.tsx</span>
+      <pre><code class="language-tsx">import mainImage from "../assets/hero.png"
+
+const Home = () =&gt; {
+  const [showNotice, setShowNotice] = useState(true);
+
+  // 공지 팝업 닫기 버튼 클릭 시 상태 변경
+  const handleCloseNotice = () =&gt; {
+    setShowNotice(false);
+  }
+
+  return(
+    &lt;div className="main"&gt;
+      {showNotice &amp;&amp; (
+        &lt;div className="notice-popup"&gt;
+          &lt;h3&gt;여름 특가 세일&lt;/h3&gt;
+          &lt;p&gt;전 상품 최대 50% 할인!&lt;/p&gt;
+          &lt;button onClick={handleCloseNotice}&gt;닫기&lt;/button&gt;
+        &lt;/div&gt;
+      )}
+      &lt;h2&gt;컴퓨터 기기 쇼핑몰&lt;/h2&gt;
+      &lt;p&gt;최신 컴퓨터 기기와 액세서리를 한 곳에서 만나보세요!&lt;/p&gt;
+      &lt;div className="main-image"&gt;
+        &lt;img src={mainImage} alt="메인 이미지" /&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default Home;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div style="border:1px solid #eee;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.15);padding:16px;max-width:280px;">
+          <p style="color:#e91263;font-weight:bold;font-size:18px;margin:0 0 8px;">여름 특가 세일</p>
+          <p style="color:#444;margin:0 0 12px;">전 상품 최대 50% 할인!</p>
+          <button style="background:#e91263;color:#eee;border:none;border-radius:4px;padding:8px 24px;">닫기</button>
+        </div>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>{showNotice &amp;&amp; (...)}</code>는 <code>showNotice</code>가 <code>true</code>일 때만 팝업을 그립니다. 닫기 버튼이 <code>false</code>로 바꾸면 팝업이 사라집니다.</div>
+    </div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 3-1. 팝업 다시 열기 버튼</h4>
+      <p>팝업이 닫힌 상태(<code>showNotice === false</code>)일 때만 "공지 다시 보기" 버튼을 보여 주고, 클릭하면 팝업을 다시 열도록 만들어 보세요.</p>
+      <details><summary>정답 보기</summary>
+      <pre><code class="language-tsx">{!showNotice &amp;&amp; (
+  &lt;button onClick={() =&gt; setShowNotice(true)}&gt;공지 다시 보기&lt;/button&gt;
+)}</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m4">
+    <h2><span class="num">4</span> 상품 데이터와 상품 목록 (ProductList)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>JSON 파일로 상품 데이터를 관리한다.</li>
+      <li>파일명 문자열과 실제 이미지 모듈을 <code>imageMap</code>으로 매핑한다.</li>
+      <li><code>map()</code>과 <code>Link</code>로 클릭 가능한 상품 카드 목록을 렌더링한다.</li>
+    </ul></div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 상품 데이터</div>
+      <span class="fname">src/data/products.json</span>
+      <pre><code class="language-json">[
+  {
+    "id": 1,
+    "name": "무선 마우스",
+    "price": 32000,
+    "description": "무선 마우스에 대한 설명입니다.",
+    "image": "mouse.png"
+  },
+  {
+    "id": 2,
+    "name": "무선 키보드",
+    "price": 45000,
+    "description": "무선 키보드에 대한 설명입니다.",
+    "image": "keyboard.png"
+  },
+  {
+    "id": 3,
+    "name": "USB 메모리",
+    "price": 15000,
+    "description": "USB 메모리에 대한 설명입니다.",
+    "image": "usb.png"
+  },
+  {
+    "id": 4,
+    "name": "모니터",
+    "price": 200000,
+    "description": "모니터에 대한 설명입니다.",
+    "image": "monitor.png"
+  }
+]</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 상품 목록 컴포넌트</div>
+      <span class="fname">src/products/ProductList.tsx</span>
+      <pre><code class="language-tsx">import { Link } from 'react-router-dom'
+import products from '../data/products.json'
+import mouse from '../assets/mouse.png'
+import keyboard from '../assets/keyboard.png'
+import monitor from '../assets/monitor.png'
+import usb from '../assets/usb.png'
+
+// 이미지 파일과 상품 데이터의 매핑을 위한 객체입니다.
+export const imageMap: Record&lt;string, string&gt; = {
+  'mouse.png': mouse,
+  'keyboard.png': keyboard,
+  'monitor.png': monitor,
+  'usb.png': usb,
+}
+
+const ProductList = () =&gt; {
+  return (
+    &lt;div className="product-list"&gt;
+      &lt;h2&gt;상품 목록&lt;/h2&gt;
+      &lt;div className='card-container'&gt;
+        {products.map((product: any) =&gt; (
+          &lt;Link to={`/products/${product.id}`}&gt;
+            &lt;div key={product.id} className="card"&gt;
+              &lt;img
+                src={imageMap[product.image]}
+                alt={product.name}
+                className="product-image"
+              /&gt;
+              &lt;div className='card-body'&gt;
+                &lt;h3 className='card-title'&gt;{product.name}&lt;/h3&gt;
+                &lt;p className='card-text'&gt;가격: {product.price}원&lt;/p&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/Link&gt;
+        ))}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <div style="border:1px solid #ccc;padding:10px;width:150px;text-align:center;"><div style="height:70px;background:#f0f0f0;border-radius:4px;"></div><h4 style="margin:8px 0 4px;">무선 마우스</h4><p style="color:#555;margin:0;">가격: 32000원</p></div>
+          <div style="border:1px solid #ccc;padding:10px;width:150px;text-align:center;"><div style="height:70px;background:#f0f0f0;border-radius:4px;"></div><h4 style="margin:8px 0 4px;">무선 키보드</h4><p style="color:#555;margin:0;">가격: 45000원</p></div>
+        </div>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> JSON에는 이미지 파일명만 저장하고, 실제 번들된 이미지 경로는 <code>imageMap</code>으로 연결합니다. <code>imageMap</code>은 상세 페이지에서도 재사용하므로 <code>export</code> 합니다.</div>
+    </div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 4-1. 상품 개수 표시</h4>
+      <p>상품 목록 제목 옆에 전체 상품 개수를 <code>상품 목록 (4개)</code> 형태로 표시해 보세요.</p>
+      <details><summary>정답 보기</summary>
+      <pre><code class="language-tsx">&lt;h2&gt;상품 목록 ({products.length}개)&lt;/h2&gt;</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m5">
+    <h2><span class="num">5</span> 상품 상세 정보 (ProductInfo)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li><code>useParams</code>로 URL 파라미터(<code>:id</code>)를 읽는다.</li>
+      <li><code>find()</code>로 배열에서 특정 상품을 찾는다.</li>
+      <li>존재하지 않는 상품에 대한 예외 처리를 한다.</li>
+    </ul></div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 상품 상세 컴포넌트</div>
+      <span class="fname">src/products/ProductInfo.tsx</span>
+      <pre><code class="language-tsx">import { useParams, useNavigate } from 'react-router-dom'
+import products from '../data/products.json'
+import {imageMap} from './ProductList'
+
+const ProductInfo = () =&gt; {
+  const { id } = useParams() // URL에서 상품 ID를 가져옵니다.
+  const navigate = useNavigate();
+
+  // products 배열에서 해당 ID를 가진 상품을 찾습니다.
+  // id는 문자열이므로 Number로 변환하여 비교합니다.
+  const product = products.find((p: any) =&gt; p.id === Number(id))
+
+  if (!product) {
+    return &lt;p&gt;상품을 찾을 수 없습니다.&lt;/p&gt;
+  }
+
+  return (
+    &lt;div className="product-info"&gt;
+      &lt;h2&gt;{product.name}&lt;/h2&gt;
+      &lt;div className='product-details'&gt;
+        &lt;img
+          src={imageMap[product.image]}
+          alt={product.name}
+          className="product-image"
+        /&gt;
+        &lt;div className="product-content"&gt;
+          &lt;p&gt;{product.description}&lt;/p&gt;
+          &lt;p className='price'&gt;가격: {product.price}원&lt;/p&gt;
+          &lt;div className="product-buttons"&gt;
+            &lt;button
+              className="btn-list"
+              onClick={() =&gt; navigate('/products')}
+            &gt;
+              목록으로
+            &lt;/button&gt;
+            &lt;button className="btn-cart"&gt;장바구니에 추가&lt;/button&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>useParams()</code>가 돌려주는 값은 항상 문자열이므로, 숫자형 <code>id</code>와 비교할 때는 <code>Number(id)</code>로 변환합니다. 상세 화면 하단의 "목록으로" 버튼은 <code>useNavigate()</code>로 목록 페이지로 이동시킵니다.</div>
+    </div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 5-1. 없는 상품 접근</h4>
+      <p>주소창에 <code>/products/999</code>를 입력하면 어떤 화면이 나올까요? 그 이유를 코드로 설명해 보세요.</p>
+      <details><summary>정답 보기</summary>
+      <p><code>find()</code>가 일치하는 상품을 못 찾아 <code>product</code>가 <code>undefined</code>가 되고, <code>if (!product)</code> 분기에서 "상품을 찾을 수 없습니다." 문구가 렌더링됩니다.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m6">
+    <h2><span class="num">6</span> 상품 등록 폼 (AddProduct)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>인터페이스로 폼 데이터 타입(<code>File | null</code> 포함)을 정의한다.</li>
+      <li>하나의 <code>handleChange</code>로 텍스트/파일 입력을 함께 처리한다.</li>
+      <li>제출 시 유효성 검사 후 <code>navigate</code>로 이동한다.</li>
+    </ul></div>
+
+    <div class="concept">
+      <h3 class="blk">📖 파일 입력 다루기</h3>
+      <p>파일을 선택하지 않으면 값은 <code>null</code>이고, 선택하면 <code>File</code> 객체가 입력됩니다. 그래서 <code>image</code> 필드의 타입을 <code>File | null</code>로 선언합니다.</p>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 상태 · 핸들러 정의</div>
+      <span class="fname">src/products/AddProduct.tsx</span>
+      <pre><code class="language-tsx">import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+
+/* 상품 추가를 위한 폼 데이터 인터페이스입니다.
+   interface File은 브라우저에서 제공하는 타입으로,
+   파일 입력에서 사용됩니다.*/
+interface FormData {
+  name: string
+  price: number
+  description: string
+  image: File | null
+}
+
+const AddProduct = () =&gt; {
+  // 상품 추가를 위한 폼 데이터를 관리 상태.
+  const [formData, setFormData] = useState&lt;FormData&gt;({
+    name: '',
+    price: 0,
+    description: '',
+    image: null
+  })
+
+  const navigate = useNavigate();
+
+  // 입력값 변경
+  const handleChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+    const { name, value, files } = e.target
+    // 파일 입력인 경우, 파일 객체를 상태에 저장합니다.
+    // 일반 텍스트 입력인 경우, 해당 값을 상태에 저장합니다.
+    if (name === 'image' &amp;&amp; files) {
+      setFormData({ ...formData, image: files[0] })
+    } else {
+      setFormData({ ...formData, [name]: value })
+    }
+  }
+
+  // 폼 제출
+  const handleSubmit = (e: React.FormEvent) =&gt; {
+    e.preventDefault();
+
+    // 입력값 검증
+    if (!formData.name || !formData.price || !formData.description) {
+      alert('모든 필드를 입력해주세요.');
+      return;
+    }
+
+    if (formData.price &lt;= 0) { //가격 검증
+      alert('가격은 0보다 커야 합니다.');
+      return;
+    }
+
+    navigate('/products'); // 상품 추가 후 목록 페이지로 이동
+  }</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 폼 렌더링</div>
+      <span class="fname">src/products/AddProduct.tsx</span>
+      <pre><code class="language-tsx">  return (
+    &lt;div className="add-product"&gt;
+      &lt;h2&gt;상품 등록&lt;/h2&gt;
+      &lt;form onSubmit={handleSubmit}&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="name"&gt;상품명&lt;/label&gt;
+          &lt;input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="상품명을 입력하세요."
+            value={formData.name}
+            onChange={handleChange}
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="price"&gt;가격&lt;/label&gt;
+          &lt;input
+            type="number"
+            id="price"
+            name="price"
+            placeholder="가격을 입력하세요."
+            value={formData.price}
+            onChange={handleChange}
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="description"&gt;설명&lt;/label&gt;
+          &lt;input
+            type="text"
+            id="description"
+            name="description"
+            placeholder="설명을 입력하세요."
+            value={formData.description}
+            onChange={handleChange}
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="image"&gt;이미지&lt;/label&gt;
+          &lt;input
+            type="file"
+            id="image"
+            name="image"
+            onChange={handleChange}
+          /&gt;
+        &lt;/div&gt;
+        &lt;button type='submit'&gt;등록&lt;/button&gt;
+      &lt;/form&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>[name]: value</code> 계산된 속성명(computed property)을 쓰면 입력창마다 핸들러를 따로 만들지 않고도 <code>name</code> 속성으로 어느 필드인지 구분해 상태를 갱신할 수 있습니다.</div>
+    </div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 6-1. 설명 입력을 textarea로</h4>
+      <p>설명 입력을 여러 줄 입력이 가능한 <code>textarea</code>로 바꿔 보세요. (CSS에 <code>.add-product textarea</code>가 이미 준비되어 있습니다.)</p>
+      <details><summary>정답 보기</summary>
+      <pre><code class="language-tsx">&lt;textarea
+  id="description"
+  name="description"
+  placeholder="설명을 입력하세요."
+  value={formData.description}
+  onChange={handleChange}
+/&gt;</code></pre>
+      <p>단, <code>textarea</code>의 이벤트 타입은 <code>React.ChangeEvent&lt;HTMLTextAreaElement&gt;</code>이므로 핸들러 타입을 함께 넓혀야 합니다.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m7">
+    <h2><span class="num">7</span> 회원 데이터와 로그인 (SignIn)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>회원 정보를 JSON으로 관리한다.</li>
+      <li>입력한 아이디/비밀번호를 <code>find()</code>로 대조해 로그인 성공 여부를 판단한다.</li>
+      <li><code>loginResult</code> 상태로 실패 메시지를 조건부 렌더링한다.</li>
+    </ul></div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 회원 데이터</div>
+      <span class="fname">src/data/users.json</span>
+      <pre><code class="language-json">[
+  {
+    "id": 1,
+    "username": "admin",
+    "password": "admin123",
+    "role": "admin"
+  },
+  {
+    "id": 2,
+    "username": "user1",
+    "password": "user123",
+    "role": "user"
+  },
+  {
+    "id": 3,
+    "username": "user2",
+    "password": "user123",
+    "role": "user"
+  }
+]</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 로그인 컴포넌트 (기본형)</div>
+      <span class="fname">src/users/SignIn.tsx</span>
+      <pre><code class="language-tsx">import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import users from '../data/users.json'
+
+// 로그인 폼 데이터 타입 정의
+interface SignInForm {
+  username: string
+  password: string
+}
+
+const SignIn = () =&gt; {
+  const [formData, setFormData] = useState&lt;SignInForm&gt;({
+    username: '',
+    password: '',
+  })
+  // 로그인 결과 상태 관리 (성공/실패 메시지 등)
+  const [loginResult, setLoginResult] = useState&lt;string&gt;('')
+
+  const navigate = useNavigate();
+
+  // 입력값 변경 핸들러 함수
+  const handleChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+    const { name, value } = e.target;
+    setFormData({...formData, [name]: value});
+  }
+
+  // 폼 제출 핸들러 함수
+  const handleSubmit = (e: React.FormEvent&lt;HTMLFormElement&gt;) =&gt; {
+    e.preventDefault();
+    const {username, password} = formData;
+
+    if(!username || !password){
+      alert("모든 항목을 입력해주세요");
+      return;
+    }
+    console.log("formData:", formData);
+
+    //로그인 일치 여부
+    const matched = users.find(user =&gt;
+      user.username === username &amp;&amp; user.password === password);
+
+    if(matched){
+      setLoginResult('success');
+      alert("로그인 되었습니다.");
+      navigate('/');
+    }else{
+      alert("아이디 또는 비말번호가 올바르지 않습니다.");
+      setLoginResult('fail');
+      return;
+    }
+  }
+
+  return (
+    &lt;div className='signin'&gt;
+      &lt;h2&gt;로그인&lt;/h2&gt;
+      &lt;form onSubmit={handleSubmit}&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="username"&gt;아이디&lt;/label&gt;
+          &lt;input
+            type="text"
+            id="username"
+            name="username"
+            placeholder="아이디를 입력하세요."
+            value={formData.username}
+            onChange={handleChange} /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="password"&gt;비밀번호&lt;/label&gt;
+          &lt;input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="비밀번호를 입력하세요."
+            value={formData.password}
+            onChange={handleChange} /&gt;
+        &lt;/div&gt;
+        &lt;button type="submit"&gt;로그인&lt;/button&gt;
+      &lt;/form&gt;
+
+      {loginResult === 'fail' &amp;&amp; &lt;p className="error"&gt;로그인 실패. 다시 시도해주세요.&lt;/p&gt;}
+    &lt;/div&gt;
+  )
+}
+
+export default SignIn</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div style="max-width:280px;">
+          <p style="text-align:center;font-weight:bold;">로그인</p>
+          <div style="margin:6px 0;">아이디 <input placeholder="아이디를 입력하세요" style="padding:6px;"></div>
+          <div style="margin:6px 0;">비밀번호 <input type="password" placeholder="비밀번호를 입력하세요" style="padding:6px;"></div>
+          <button style="width:100%;background:#30ca11;color:#fff;border:none;padding:8px;border-radius:4px;">로그인</button>
+        </div>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>find()</code>는 조건을 만족하는 첫 요소를 돌려주고, 없으면 <code>undefined</code>를 반환합니다. 반환값이 있으면 로그인 성공으로 처리합니다. (원본 슬라이드의 "비말번호" 오타는 그대로 옮겼습니다.)</div>
+    </div>
+  </section>
+
+  <section class="module" id="m8">
+    <h2><span class="num">8</span> 로그인 / 로그아웃 상태 관리</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>부모(App)가 로그인 상태를 소유하고 자식에게 props로 내려준다.</li>
+      <li>자식(SignIn)이 콜백(<code>onLogin</code>)으로 부모 상태를 변경한다.</li>
+      <li>로그인 여부에 따라 헤더 UI를 조건부로 바꾼다.</li>
+    </ul></div>
+
+    <div class="concept">
+      <h3 class="blk">📖 상태 끌어올리기(Lifting State Up)</h3>
+      <p>로그인 상태는 헤더와 여러 페이지가 함께 알아야 하므로, 공통 부모인 <code>App</code>이 상태를 가지고 있어야 합니다. 자식은 props로 상태를 받고, 콜백 함수로 상태 변경을 요청합니다.</p>
+      <div class="flow">App (isLoggedIn, userId)
+   │  onLogin(username)  ▲
+   ▼                     │
+SignIn ── 로그인 성공 시 콜백 호출 ──┘
+
+App ── isLoggedIn / userId / onLogout ──▶ Header</div>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 상태와 함수 정의</div>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">function App() {
+  // 로그인 상태 관리
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // 로그인한 사용자 ID 관리 (예: username)
+  const [userId, setUserId] = useState&lt;string | null&gt;(null);
+
+  // 로그인 상태 업데이트 함수
+  const handleLogin = (username: string) =&gt; {
+    setIsLoggedIn(true);
+    setUserId(username);
+  }
+
+  // 로그아웃 함수
+  const handleLogout = () =&gt; {
+    setIsLoggedIn(false);
+    setUserId(null);
+  }</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 상태를 props로 전달</div>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">  return (
+    &lt;&gt;
+      &lt;section className="app"&gt;
+        &lt;BrowserRouter&gt;
+          &lt;Header isLoggedIn={isLoggedIn} userId={userId} onLogout={handleLogout} /&gt;
+          &lt;Routes&gt;
+            &lt;Route path="/" element={&lt;Home /&gt;} /&gt;
+            &lt;Route path="/products" element={&lt;ProductList /&gt;} /&gt;
+            &lt;Route path="/products/:id" element={&lt;ProductInfo /&gt;} /&gt;
+            &lt;Route path="/products/add" element={&lt;AddProduct /&gt;} /&gt;
+            &lt;Route path="/signin" element={&lt;SignIn onLogin={handleLogin} /&gt;} /&gt;
+          &lt;/Routes&gt;
+        &lt;/BrowserRouter&gt;
+      &lt;/section&gt;
+    &lt;/&gt;
+  )
+}</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — Header: 로그인 여부에 따른 UI</div>
+      <span class="fname">src/layouts/Header.tsx</span>
+      <pre><code class="language-tsx">//Header 컴포넌트 Props 타입 정의
+interface HeaderProps{
+  isLoggedIn: boolean,
+  userId: string | null;
+  onLogout: () =&gt; void;
+}
+
+const Header = ({isLoggedIn, userId, onLogout}: HeaderProps) =&gt; {
+
+  const navigate = useNavigate();
+
+  return(
+    &lt;header className="header"&gt;
+      &lt;nav&gt;
+        &lt;NavLink to="/"&gt;Home&lt;/NavLink&gt;
+        &lt;NavLink to="/products"&gt;상품 목록&lt;/NavLink&gt;
+        &lt;NavLink to="/products/add"&gt;상품 등록&lt;/NavLink&gt;
+        {isLoggedIn ? (
+          &lt;div className="header-user"&gt;
+            &lt;span&gt;{userId}님&lt;/span&gt;
+            &lt;button
+              className="logout-btn"
+              onClick={() =&gt; {
+                onLogout();
+                navigate('/');
+              }}&gt;
+              로그아웃
+            &lt;/button&gt;
+          &lt;/div&gt;
+        ) : (
+          &lt;NavLink to="/signin"&gt;로그인&lt;/NavLink&gt;
+        )}
+      &lt;/nav&gt;
+    &lt;/header&gt;
+  )</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div style="background:#2b2b2b;color:orange;padding:8px;border-radius:6px;text-align:center;">Home &nbsp; 상품 목록 &nbsp; 상품 등록 &nbsp; <span style="color:#fbff1c;">user2님</span> <button style="background:transparent;border:1px solid #ff9f1c;color:#ff9f1c;border-radius:4px;padding:4px 10px;">로그아웃</button></div>
+      </div>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — SignIn: 성공 시 부모에 알림</div>
+      <span class="fname">src/users/SignIn.tsx</span>
+      <pre><code class="language-tsx">// 로그인 컴포넌트 Props 타입 정의
+interface SignInProps {
+  onLogin: (username: string) =&gt; void;
+}
+
+const SignIn = ({ onLogin }: SignInProps) =&gt; {
+  const [formData, setFormData] = useState&lt;SignInForm&gt;({
+    username: '',
+    password: '',
+  })
+  // 로그인 결과 상태 관리 (성공/실패 메시지 등)
+  const [loginResult, setLoginResult] = useState&lt;string&gt;('')
+
+  /* ... handleChange, handleSubmit ... */
+
+  //로그인 일치 여부
+  const matched = users.find(user =&gt;
+    user.username === username &amp;&amp; user.password === password);
+
+  if(matched){
+    setLoginResult('success');
+    onLogin(matched.username); // 로그인 성공시 부모 컴포넌트에 알림
+    alert("로그인 되었습니다.");
+    navigate('/');
+  }else{
+    alert("아이디 또는 비말번호가 올바르지 않습니다.");
+    setLoginResult('fail');
+    return;
+  }</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> 로그인이 성공하면 <code>onLogin(matched.username)</code>으로 부모 <code>App</code>에게 알립니다. 그러면 <code>App</code>의 <code>isLoggedIn</code>이 <code>true</code>가 되고, 헤더가 "○○님 / 로그아웃" 형태로 바뀝니다.</div>
+    </div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 8-1. 로그아웃 흐름 설명</h4>
+      <p>"로그아웃" 버튼을 누르면 어떤 함수들이 어떤 순서로 호출되어 헤더가 다시 "로그인" 링크로 돌아가는지 설명해 보세요.</p>
+      <details><summary>정답 보기</summary>
+      <p>버튼 <code>onClick</code> → <code>onLogout()</code>(=App의 <code>handleLogout</code>) 호출 → <code>setIsLoggedIn(false)</code>, <code>setUserId(null)</code> → App 리렌더 → Header에 <code>isLoggedIn=false</code> 전달 → 삼항 연산자가 <code>&lt;NavLink to="/signin"&gt;로그인&lt;/NavLink&gt;</code>을 렌더. 이후 <code>navigate('/')</code>로 홈으로 이동합니다.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m9">
+    <h2><span class="num">9</span> 회원 가입 구현 (SignUp)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>로그인 화면에 회원가입 링크를 추가한다.</li>
+      <li>가입 폼의 여러 필드를 하나의 상태로 관리한다.</li>
+      <li>비밀번호 확인 등 유효성 검사를 구현한다.</li>
+    </ul></div>
+
+    <div class="ex"><div class="lbl">💡 예제 — SignIn에 회원가입 링크 추가</div>
+      <span class="fname">src/users/SignIn.tsx</span>
+      <pre><code class="language-tsx">        &lt;button type="submit"&gt;로그인&lt;/button&gt;
+      &lt;/form&gt;
+      {/* 아직 계정이 없으신가요? 회원가입 링크 추가 가능 */}
+      &lt;p className='signup-link'&gt;
+        아직 계정이 없으신가요? &lt;Link to="/signup"&gt;회원가입&lt;/Link&gt;
+      &lt;/p&gt;
+
+      {/* 로그인 실패 메시지 */}
+      {loginResult === 'fail' &amp;&amp; &lt;p className="error"&gt;로그인 실패. 다시 시도해주세요.&lt;/p&gt;}
+    &lt;/div&gt;
+  )</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 회원가입 상태 · 핸들러</div>
+      <span class="fname">src/users/SignUp.tsx</span>
+      <pre><code class="language-tsx">// 회원 가입 폼 데이터 타입 정의
+interface SignUpFormData {
+  username: string;
+  password: string;
+  confirmPassword: string;
+  email: string;
+}
+
+const SignUp = () =&gt; {
+  const [formData, setFormData] = useState&lt;SignUpFormData&gt;({
+    username: '',
+    password: '',
+    confirmPassword: '',
+    email: '',
+  });
+
+  const navigate = useNavigate();
+
+  // 폼 입력값 변경 핸들러
+  const handleInputChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  }
+
+  // 폼 제출 핸들러
+  const handleSubmit = (e: React.FormEvent) =&gt; {
+    e.preventDefault();
+    // 입력값 추출
+    const { username, password, confirmPassword, email } = formData;
+
+    // 간단한 유효성 검사
+    if (!username || !password || !confirmPassword || !email) {
+      alert('모든 필드를 입력해주세요.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+    console.log('회원가입 시도:', formData);
+
+    alert('회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.');
+    navigate('/signin'); // 회원가입 성공 후 로그인 페이지로 이동
+  }</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 회원가입 폼 렌더링</div>
+      <span class="fname">src/users/SignUp.tsx</span>
+      <pre><code class="language-tsx">  return (
+    &lt;div className="signup"&gt;
+      &lt;h2&gt;회원가입&lt;/h2&gt;
+      &lt;form onSubmit={handleSubmit}&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="username"&gt;아이디:&lt;/label&gt;
+          &lt;input
+            type="text"
+            id="username"
+            name="username"
+            value={formData.username}
+            onChange={handleInputChange}
+            placeholder='아이디를 입력하세요.'
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="email"&gt;이메일:&lt;/label&gt;
+          &lt;input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            placeholder='이메일을 입력하세요.'
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="password"&gt;비밀번호:&lt;/label&gt;
+          &lt;input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleInputChange}
+            placeholder='비밀번호를 입력하세요.'
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="confirmPassword"&gt;비밀번호 확인:&lt;/label&gt;
+          &lt;input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleInputChange}
+            placeholder='비밀번호를 다시 입력하세요.'
+          /&gt;
+        &lt;/div&gt;
+        &lt;button type="submit"&gt;회원가입&lt;/button&gt;
+      &lt;/form&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> 이 프로젝트의 회원가입은 <code>console.log</code>와 <code>alert</code>로 흐름만 시연합니다. 실제 서비스라면 이 시점에 서버 API로 가입 요청을 보내고, 성공 응답을 받은 뒤 로그인 페이지로 이동시킵니다.</div>
+    </div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 9-1. 비밀번호 길이 검사</h4>
+      <p>비밀번호가 6자 미만이면 "비밀번호는 6자 이상이어야 합니다."를 알리고 제출을 막는 검사를 추가해 보세요.</p>
+      <details><summary>정답 보기</summary>
+      <pre><code class="language-tsx">if (password.length &lt; 6) {
+  alert('비밀번호는 6자 이상이어야 합니다.');
+  return;
+}</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m10">
+    <h2><span class="num">10</span> 관리자 대시보드 (DashBoard)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>주문 데이터를 JSON으로 관리한다.</li>
+      <li><code>map()</code>으로 표(table) 형태의 주문 내역을 렌더링한다.</li>
+      <li>권한(<code>userRole</code>)을 props로 받아 처리할 준비를 한다.</li>
+    </ul></div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 주문 데이터</div>
+      <span class="fname">src/data/orders.json</span>
+      <pre><code class="language-json">[
+  {
+    "id": 1,
+    "userId": "user1",
+    "productId": 1,
+    "quantity": 2,
+    "totalPrice": 64000,
+    "orderDate": "2023-08-01"
+  },
+  {
+    "id": 2,
+    "userId": "user2",
+    "productId": 3,
+    "quantity": 1,
+    "totalPrice": 15000,
+    "orderDate": "2023-08-02"
+  },
+  {
+    "id": 3,
+    "userId": "user1",
+    "productId": 2,
+    "quantity": 1,
+    "totalPrice": 40000,
+    "orderDate": "2023-08-03"
+  }
+]</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 대시보드 컴포넌트</div>
+      <span class="fname">src/users/DashBoard.tsx</span>
+      <pre><code class="language-tsx">import orders from "../data/orders.json";
+
+//DashBoard 컴포넌트 Props 타입 정의
+interface DashBoardProps{
+  userRole: string | null;
+}
+
+const DashBoard = ({userRole}: DashBoardProps) =&gt; {
+  const navigate = useNavigate();
+
+  // 관리자 권한이 아닌 경우 접근 제한
+  useEffect(() =&gt; {
+    if(userRole !== "admin"){
+      alert("관리자 전용 페이지입니다.");
+      navigate('/');
+    }
+  }, [userRole, navigate]);
+
+  if(userRole !== "admin") return null;
+
+  return(
+    &lt;div&gt;
+      &lt;h2&gt;관리자 DashBoard&lt;/h2&gt;
+      &lt;h3&gt;주문 내역&lt;/h3&gt;
+      &lt;div className="order-table-wrap"&gt;
+        &lt;table className="order-table"&gt;
+          &lt;thead&gt;
+            &lt;tr&gt;
+              &lt;th&gt;주문 ID&lt;/th&gt;
+              &lt;th&gt;사용자 ID&lt;/th&gt;
+              &lt;th&gt;상품명&lt;/th&gt;
+              &lt;th&gt;수량&lt;/th&gt;
+              &lt;th&gt;총액&lt;/th&gt;
+            &lt;/tr&gt;
+          &lt;/thead&gt;
+          &lt;tbody&gt;
+            {orders.map((order) =&gt; (
+              &lt;tr key={order.id}&gt;
+                &lt;td&gt;{order.id}&lt;/td&gt;
+                &lt;td&gt;{order.userId}&lt;/td&gt;
+                &lt;td&gt;{order.productId}&lt;/td&gt;
+                &lt;td&gt;{order.quantity}&lt;/td&gt;
+                &lt;td&gt;{order.totalPrice}&lt;/td&gt;
+              &lt;/tr&gt;
+            ))}
+          &lt;/tbody&gt;
+        &lt;/table&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <table style="border-collapse:collapse;width:100%;">
+          <tr style="background:#f2f2f2;"><th style="padding:8px;border-bottom:1px solid #ccc;text-align:left;">주문 ID</th><th style="padding:8px;border-bottom:1px solid #ccc;text-align:left;">사용자 ID</th><th style="padding:8px;border-bottom:1px solid #ccc;text-align:left;">상품명</th><th style="padding:8px;border-bottom:1px solid #ccc;text-align:left;">수량</th><th style="padding:8px;border-bottom:1px solid #ccc;text-align:left;">총액</th></tr>
+          <tr><td style="padding:8px;border-bottom:1px solid #ccc;">1</td><td style="padding:8px;border-bottom:1px solid #ccc;">user1</td><td style="padding:8px;border-bottom:1px solid #ccc;">1</td><td style="padding:8px;border-bottom:1px solid #ccc;">2</td><td style="padding:8px;border-bottom:1px solid #ccc;">64000</td></tr>
+          <tr><td style="padding:8px;border-bottom:1px solid #ccc;">2</td><td style="padding:8px;border-bottom:1px solid #ccc;">user2</td><td style="padding:8px;border-bottom:1px solid #ccc;">3</td><td style="padding:8px;border-bottom:1px solid #ccc;">1</td><td style="padding:8px;border-bottom:1px solid #ccc;">15000</td></tr>
+        </table>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>useEffect</code>는 화면이 그려진 뒤 실행되어 권한을 검사합니다. 관리자가 아니면 alert 후 홈으로 보내고, 동시에 <code>if(userRole !== "admin") return null</code>로 표가 잠깐이라도 노출되지 않게 막습니다.</div>
+    </div>
+  </section>
+
+  <section class="module" id="m11">
+    <h2><span class="num">11</span> 관리자 전용 접근 제어</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>로그인 시 사용자 권한(<code>role</code>)까지 함께 저장한다.</li>
+      <li>관리자에게만 "관리자" 메뉴와 상품 등록을 허용한다.</li>
+      <li>메뉴 클릭 단계에서 권한을 검사해 접근을 막는다.</li>
+    </ul></div>
+
+    <div class="ex"><div class="lbl">💡 예제 — App: 권한 상태 추가</div>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">function App() {
+  // 로그인 상태 관리
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // 로그인한 사용자 ID 관리 (예: username)
+  const [userId, setUserId] = useState&lt;string | null&gt;(null);
+
+  // 로그인한 사용자 권한 관리
+  const [userRole, setUserRole] = useState&lt;string | null&gt;(null);
+
+  // 로그인 상태 업데이트 함수
+  const handleLogin = (username: string, role: string) =&gt; {
+    setIsLoggedIn(true);   // 로그인 상태를 true로 설정
+    setUserId(username);   // 로그인한 사용자 ID 저장
+    setUserRole(role);     // 로그인한 사용자 권한 저장
+  }
+
+  // 로그아웃 함수
+  const handleLogout = () =&gt; {
+    setIsLoggedIn(false);
+    setUserId(null);
+    setUserRole(null);
+  }</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — App: 라우트에 권한 전달</div>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">    &lt;section className="app"&gt;
+      &lt;BrowserRouter&gt;
+        &lt;Header
+          isLoggedIn={isLoggedIn}
+          userId={userId}
+          userRole={userRole}
+          onLogout={handleLogout}
+        /&gt;
+        &lt;Routes&gt;
+          &lt;Route path='/' element={&lt;Home /&gt;} /&gt;
+          &lt;Route path='/products' element={&lt;ProductList /&gt;} /&gt;
+          &lt;Route path='/products/:id' element={&lt;ProductInfo /&gt;} /&gt;
+          &lt;Route path='/products/add' element={&lt;AddProduct /&gt;} /&gt;
+          &lt;Route path='/signin' element={&lt;SignIn onLogin={handleLogin} /&gt;} /&gt;
+          &lt;Route path='/signup' element={&lt;SignUp /&gt;} /&gt;
+          &lt;Route path='/dashboard' element={&lt;DashBoard userRole={userRole} /&gt;} /&gt;
+        &lt;/Routes&gt;
+      &lt;/BrowserRouter&gt;
+    &lt;/section&gt;</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — Header: 관리자 메뉴와 등록 제한</div>
+      <span class="fname">src/layouts/Header.tsx</span>
+      <pre><code class="language-tsx">//Header 컴포넌트 Props 타입 정의
+interface HeaderProps{
+  isLoggedIn: boolean,
+  userId: string | null;
+  userRole: string | null;
+  onLogout: () =&gt; void;
+}
+
+const Header = ({isLoggedIn, userId, userRole,
+  onLogout}: HeaderProps) =&gt; {
+
+  const navigate = useNavigate();
+
+  return(
+    &lt;header className="header"&gt;
+      &lt;nav&gt;
+        &lt;NavLink to="/"&gt;Home&lt;/NavLink&gt;
+        &lt;NavLink to="/products"&gt;상품 목록&lt;/NavLink&gt;
+        &lt;NavLink to="/products/add" onClick={(e) =&gt; {
+          if(userRole !== "admin"){
+            e.preventDefault();
+            alert("관리자 전용 메뉴입니다.");
+          }
+        }}&gt;상품 등록&lt;/NavLink&gt;
+        {userRole === "admin" &amp;&amp;
+          &lt;NavLink to="/dashboard"&gt;관리자&lt;/NavLink&gt;}
+        {isLoggedIn ? (
+          &lt;div className="header-user"&gt;
+            &lt;span&gt;{userId}님&lt;/span&gt;
+            &lt;button
+              className="logout-btn"
+              onClick={() =&gt; {
+                onLogout();
+                navigate('/');
+              }}&gt;
+              로그아웃
+            &lt;/button&gt;
+          &lt;/div&gt;
+        ) : (
+          &lt;NavLink to="/signin"&gt;로그인&lt;/NavLink&gt;
+        )}
+      &lt;/nav&gt;
+    &lt;/header&gt;
+  )</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div style="background:#2b2b2b;color:orange;padding:8px;border-radius:6px;text-align:center;">Home &nbsp; 상품 목록 &nbsp; 상품 등록 &nbsp; 관리자 &nbsp; <span style="color:#fbff1c;">admin님</span> <button style="background:transparent;border:1px solid #ff9f1c;color:#ff9f1c;border-radius:4px;padding:4px 10px;">로그아웃</button></div>
+        <p style="color:#777;font-size:13px;margin-top:6px;">일반 사용자가 "상품 등록"을 누르면 → "관리자 전용 메뉴입니다." 알림 후 이동 차단</p>
+      </div>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — SignIn: 권한까지 전달</div>
+      <span class="fname">src/users/SignIn.tsx</span>
+      <pre><code class="language-tsx">// 로그인 컴포넌트 Props 타입 정의
+interface SignInProps {
+  onLogin: (username: string, role: string) =&gt; void;
+}
+
+const SignIn = ({ onLogin }: SignInProps) =&gt; {
+  /* ... */
+
+  //로그인 일치 여부
+  const matched = users.find(user =&gt;
+    user.username === username &amp;&amp; user.password === password);
+
+  if(matched){
+    setLoginResult('success');
+    onLogin(matched.username, matched.role); // 부모 컴포넌트에 알림
+    alert("로그인 되었습니다.");
+
+    navigate('/');
+  }else{
+    alert("아이디 또는 비밀번호가 올바르지 않습니다.");
+    setLoginResult('fail');
+    return;
+  }
+}</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> 접근 제어를 UI(메뉴 숨김), 이벤트(클릭 차단), 페이지(useEffect 검사) 세 겹으로 두었습니다. 다만 이는 프론트엔드 보호일 뿐이며, 실제 보안은 반드시 서버에서도 권한을 검증해야 합니다.</div>
+    </div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 11-1. 일반 사용자로 대시보드 직접 접근</h4>
+      <p>일반 사용자(user1)로 로그인한 뒤 주소창에 <code>/dashboard</code>를 직접 입력하면 어떻게 동작하나요?</p>
+      <details><summary>정답 보기</summary>
+      <p><code>DashBoard</code>의 <code>useEffect</code>가 <code>userRole !== "admin"</code>을 감지해 "관리자 전용 페이지입니다." 알림을 띄우고 <code>navigate('/')</code>로 홈으로 되돌립니다. 또한 <code>return null</code> 덕분에 주문 표가 렌더링되지 않습니다.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m12">
+    <h2><span class="num">12</span> Vercel로 앱 배포하기</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>Vercel의 개념과 Git 연동 자동 배포를 이해한다.</li>
+      <li>GitHub 저장소를 가져와 Vite 프로젝트를 배포한다.</li>
+      <li>배포된 URL로 실제 서비스에 접속한다.</li>
+    </ul></div>
+
+    <div class="concept">
+      <h3 class="blk">📖 Vercel이란?</h3>
+      <p>Vercel은 프론트엔드 개발자가 웹 애플리케이션을 서버 관리 없이 쉽고 빠르게 배포·호스팅할 수 있도록 지원하는 클라우드 플랫폼입니다.</p>
+      <ul>
+        <li><b>Git 연동 자동 배포</b>: GitHub, GitLab 등과 연동되어 코드를 <code>push</code>하면 실시간으로 배포됩니다.</li>
+        <li>가입은 구글 로그인 등으로 간단히 진행할 수 있습니다.</li>
+      </ul>
+      <div class="flow">GitHub 저장소  ──push──▶  Vercel  ──자동 빌드/배포──▶  https://내앱.vercel.app</div>
+    </div>
+
+    <div class="concept">
+      <h3 class="blk">📖 배포 절차</h3>
+      <table>
+        <tr><th>단계</th><th>내용</th></tr>
+        <tr><td>1. 프로젝트 가져오기</td><td>Vercel 대시보드 → "Import Project"로 Git 저장소 추가</td></tr>
+        <tr><td>2. 저장소 선택</td><td>GitHub 계정에서 <code>shopping-sudo</code> 저장소 Import</td></tr>
+        <tr><td>3. 설정 확인</td><td>Application Preset을 <b>Vite</b>로, Root Directory는 <code>./</code> 확인</td></tr>
+        <tr><td>4. 배포(Deploy)</td><td>Deploy 버튼 클릭 → 빌드 후 자동 배포 (약 7초)</td></tr>
+        <tr><td>5. 접속</td><td>발급된 도메인으로 접속</td></tr>
+      </table>
+      <div class="out"><span class="rt">배포 결과</span>
+        <p>Status: <b style="color:#2ecc71;">● Ready (Production)</b></p>
+        <p>주소: <a href="https://shopping-sudo.vercel.app/">https://shopping-sudo.vercel.app/</a></p>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> Vite 프로젝트는 Vercel이 프리셋을 자동 인식하므로 별도 빌드 설정이 거의 필요 없습니다. 이후 <code>main</code> 브랜치에 <code>push</code>할 때마다 자동으로 재배포됩니다.</div>
+    </div>
+  </section>
+
+  <section class="module" id="m13">
+    <h2><span class="num">13</span> 상품 검색 기능 구현</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>검색어 상태를 <code>useState</code>로 관리한다.</li>
+      <li><code>filter()</code>와 <code>includes()</code>로 실시간 검색을 구현한다.</li>
+      <li>검색 결과가 없을 때의 안내 UI를 처리한다.</li>
+    </ul></div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 검색 상태와 필터링</div>
+      <span class="fname">src/products/ProductList.tsx</span>
+      <pre><code class="language-tsx">const ProductList = () =&gt; {
+  // 검색어 상태를 관리하기 위한 useState 훅
+  const [keyword, setKeyword] = useState('');
+
+  // 상품명에 검색어가 포함된 상품만 필터링
+  const filteredProducts = products.filter((product) =&gt;
+    product.name.toLowerCase().includes(keyword.toLowerCase())
+  );
+
+  return(
+    &lt;div className="product-list"&gt;
+      {/* 검색 영역 */}
+      &lt;div className="search-area"&gt;
+        &lt;input
+          type="text"
+          placeholder="상품명을 검색하세요"
+          value={keyword}
+          onChange={(e) =&gt; setKeyword(e.target.value)}
+        /&gt;
+      &lt;/div&gt;</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 필터 결과 렌더링</div>
+      <span class="fname">src/products/ProductList.tsx</span>
+      <pre><code class="language-tsx">      {filteredProducts.length === 0 ? (
+        &lt;p className="no-result"&gt;검색 결과가 없습니다.&lt;/p&gt;
+      ) : (
+        &lt;div className="card-container"&gt;
+          {filteredProducts.map((product: any) =&gt; (
+            &lt;Link to={`/products/${product.id}`} key={product.id}&gt;
+              &lt;div className="card"&gt;
+                &lt;img
+                  src={imageMap[product.image]}
+                  alt={product.name}
+                  className="card-image"
+                /&gt;
+                &lt;div className="card-body"&gt;
+                  &lt;h3 className="card-title"&gt;{product.name}&lt;/h3&gt;
+                  &lt;p className="card-text"&gt;가격: {product.price}원&lt;/p&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/Link&gt;
+          ))}
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  )}</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div style="max-width:340px;">
+          <input value="무선" readonly style="width:100%;padding:8px 14px;border:1px solid #ccc;border-radius:20px;">
+          <div style="display:flex;gap:12px;margin-top:10px;">
+            <div style="border:1px solid #ccc;padding:10px;width:120px;text-align:center;"><h4 style="margin:4px 0;">무선마우스</h4><p style="color:#555;margin:0;">32000원</p></div>
+            <div style="border:1px solid #ccc;padding:10px;width:120px;text-align:center;"><h4 style="margin:4px 0;">무선키보드</h4><p style="color:#555;margin:0;">40000원</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> 입력할 때마다 <code>setKeyword</code>로 상태가 바뀌고 컴포넌트가 리렌더되면서 <code>filteredProducts</code>가 다시 계산됩니다. 양쪽을 <code>toLowerCase()</code>로 맞춰 대소문자 구분 없이 검색합니다.</div>
+    </div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 13-1. 설명까지 검색 대상에 포함</h4>
+      <p>상품명뿐 아니라 상품 설명(<code>description</code>)에 검색어가 포함돼도 결과에 나오도록 필터 조건을 확장해 보세요.</p>
+      <details><summary>정답 보기</summary>
+      <pre><code class="language-tsx">const filteredProducts = products.filter((product) =&gt;
+  product.name.toLowerCase().includes(keyword.toLowerCase()) ||
+  product.description.toLowerCase().includes(keyword.toLowerCase())
+);</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <footer>8강. 쇼핑몰 프로젝트 · 학습 교안<br>모듈별 학습목표 · 개념 · 예제 · 실습문제 구성</footer>
+</div>
+
+<script>
+(()=>{var wn=Object.create;var Ce=Object.defineProperty;var On=Object.getOwnPropertyDescriptor;var Rn=Object.getOwnPropertyNames;var xn=Object.getPrototypeOf,Mn=Object.prototype.hasOwnProperty;var vn=(e,n)=>()=>{try{return n||e((n={exports:{}}).exports,n),n.exports}catch(t){throw n=0,t}};var kn=(e,n,t,s)=>{if(n&&typeof n=="object"||typeof n=="function")for(let g of Rn(n))!Mn.call(e,g)&&g!==t&&Ce(e,g,{get:()=>n[g],enumerable:!(s=On(n,g))||s.enumerable});return e};var In=(e,n,t)=>(t=e!=null?wn(xn(e)):{},kn(n||!e||!e.__esModule?Ce(t,"default",{value:e,enumerable:!0}):t,e));var Ve=vn((Lt,Je)=>{function $e(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(n=>{let t=e[n],s=typeof t;(s==="object"||s==="function")&&!Object.isFrozen(t)&&$e(t)}),e}var de=class{constructor(n){n.data===void 0&&(n.data={}),this.data=n.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function He(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function K(e,...n){let t=Object.create(null);for(let s in e)t[s]=e[s];return n.forEach(function(s){for(let g in s)t[g]=s[g]}),t}var Cn="</span>",Le=e=>!!e.scope,Ln=(e,{prefix:n})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let t=e.split(".");return[`${n}${t.shift()}`,...t.map((s,g)=>`${s}${"_".repeat(g+1)}`)].join(" ")}return`${n}${e}`},_e=class{constructor(n,t){this.buffer="",this.classPrefix=t.classPrefix,n.walk(this)}addText(n){this.buffer+=He(n)}openNode(n){if(!Le(n))return;let t=Ln(n.scope,{prefix:this.classPrefix});this.span(t)}closeNode(n){Le(n)&&(this.buffer+=Cn)}value(){return this.buffer}span(n){this.buffer+=`<span class="${n}">`}},De=(e={})=>{let n={children:[]};return Object.assign(n,e),n},Ne=class e{constructor(){this.rootNode=De(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(n){this.top.children.push(n)}openNode(n){let t=De({scope:n});this.add(t),this.stack.push(t)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(n){return this.constructor._walk(n,this.rootNode)}static _walk(n,t){return typeof t=="string"?n.addText(t):t.children&&(n.openNode(t),t.children.forEach(s=>this._walk(n,s)),n.closeNode(t)),n}static _collapse(n){typeof n!="string"&&n.children&&(n.children.every(t=>typeof t=="string")?n.children=[n.children.join("")]:n.children.forEach(t=>{e._collapse(t)}))}},Se=class extends Ne{constructor(n){super(),this.options=n}addText(n){n!==""&&this.add(n)}startScope(n){this.openNode(n)}endScope(){this.closeNode()}__addSublanguage(n,t){let s=n.root;t&&(s.scope=`language:${t}`),this.add(s)}toHTML(){return new _e(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function re(e){return e?typeof e=="string"?e:e.source:null}function Ge(e){return j("(?=",e,")")}function Dn(e){return j("(?:",e,")*")}function Bn(e){return j("(?:",e,")?")}function j(...e){return e.map(t=>re(t)).join("")}function Un(e){let n=e[e.length-1];return typeof n=="object"&&n.constructor===Object?(e.splice(e.length-1,1),n):{}}function ye(...e){return"("+(Un(e).capture?"":"?:")+e.map(s=>re(s)).join("|")+")"}function Fe(e){return new RegExp(e.toString()+"|").exec("").length-1}function Pn(e,n){let t=e&&e.exec(n);return t&&t.index===0}var zn=/\[(?:[^\\\]]|\\.)*\]|\(\??|\\([1-9][0-9]*)|\\./;function Te(e,{joinWith:n}){let t=0;return e.map(s=>{t+=1;let g=t,E=re(s),a="";for(;E.length>0;){let i=zn.exec(E);if(!i){a+=E;break}a+=E.substring(0,i.index),E=E.substring(i.index+i[0].length),i[0][0]==="\\"&&i[1]?a+="\\"+String(Number(i[1])+g):(a+=i[0],i[0]==="("&&t++)}return a}).map(s=>`(${s})`).join(n)}var $n=/\b\B/,Ke="[a-zA-Z]\\w*",we="[a-zA-Z_]\\w*",Ze="\\b\\d+(\\.\\d+)?",We="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Xe="\\b(0b[01]+)",Hn="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",Gn=(e={})=>{let n=/^#![ ]*\//;return e.binary&&(e.begin=j(n,/.*\b/,e.binary,/\b.*/)),K({scope:"meta",begin:n,end:/$/,relevance:0,"on:begin":(t,s)=>{t.index!==0&&s.ignoreMatch()}},e)},ae={begin:"\\\\[\\s\\S]",relevance:0},Fn={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[ae]},Kn={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[ae]},Zn={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},fe=function(e,n,t={}){let s=K({scope:"comment",begin:e,end:n,contains:[]},t);s.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let g=ye("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return s.contains.push({begin:j(/[ ]+/,"(",g,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),s},Wn=fe("//","$"),Xn=fe("/\\*","\\*/"),Yn=fe("#","$"),jn={scope:"number",begin:Ze,relevance:0},qn={scope:"number",begin:We,relevance:0},Qn={scope:"number",begin:Xe,relevance:0},Jn={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[ae,{begin:/\[/,end:/\]/,relevance:0,contains:[ae]}]},Vn={scope:"title",begin:Ke,relevance:0},et={scope:"title",begin:we,relevance:0},nt={begin:"\\.\\s*"+we,relevance:0},tt=function(e){return Object.assign(e,{"on:begin":(n,t)=>{t.data._beginMatch=n[1]},"on:end":(n,t)=>{t.data._beginMatch!==n[1]&&t.ignoreMatch()}})},ue=Object.freeze({__proto__:null,APOS_STRING_MODE:Fn,BACKSLASH_ESCAPE:ae,BINARY_NUMBER_MODE:Qn,BINARY_NUMBER_RE:Xe,COMMENT:fe,C_BLOCK_COMMENT_MODE:Xn,C_LINE_COMMENT_MODE:Wn,C_NUMBER_MODE:qn,C_NUMBER_RE:We,END_SAME_AS_BEGIN:tt,HASH_COMMENT_MODE:Yn,IDENT_RE:Ke,MATCH_NOTHING_RE:$n,METHOD_GUARD:nt,NUMBER_MODE:jn,NUMBER_RE:Ze,PHRASAL_WORDS_MODE:Zn,QUOTE_STRING_MODE:Kn,REGEXP_MODE:Jn,RE_STARTERS_RE:Hn,SHEBANG:Gn,TITLE_MODE:Vn,UNDERSCORE_IDENT_RE:we,UNDERSCORE_TITLE_MODE:et});function it(e,n){e.input[e.index-1]==="."&&n.ignoreMatch()}function st(e,n){e.className!==void 0&&(e.scope=e.className,delete e.className)}function rt(e,n){n&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=it,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function at(e,n){Array.isArray(e.illegal)&&(e.illegal=ye(...e.illegal))}function ot(e,n){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function ct(e,n){e.relevance===void 0&&(e.relevance=1)}var lt=(e,n)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let t=Object.assign({},e);Object.keys(e).forEach(s=>{delete e[s]}),e.keywords=t.keywords,e.begin=j(t.beforeMatch,Ge(t.begin)),e.starts={relevance:0,contains:[Object.assign(t,{endsParent:!0})]},e.relevance=0,delete t.beforeMatch},ut=["of","and","for","in","not","or","if","then","parent","list","value"],dt="keyword";function Ye(e,n,t=dt){let s=Object.create(null);return typeof e=="string"?g(t,e.split(" ")):Array.isArray(e)?g(t,e):Object.keys(e).forEach(function(E){Object.assign(s,Ye(e[E],n,E))}),s;function g(E,a){n&&(a=a.map(i=>i.toLowerCase())),a.forEach(function(i){let l=i.split("|");s[l[0]]=[E,gt(l[0],l[1])]})}}function gt(e,n){return n?Number(n):ft(e)?0:1}function ft(e){return ut.includes(e.toLowerCase())}var Be={},Y=e=>{console.error(e)},Ue=(e,...n)=>{console.log(`WARN: ${e}`,...n)},J=(e,n)=>{Be[`${e}/${n}`]||(console.log(`Deprecated as of ${e}. ${n}`),Be[`${e}/${n}`]=!0)},ge=new Error;function je(e,n,{key:t}){let s=0,g=e[t],E={},a={};for(let i=1;i<=n.length;i++)a[i+s]=g[i],E[i+s]=!0,s+=Fe(n[i-1]);e[t]=a,e[t]._emit=E,e[t]._multi=!0}function bt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw Y("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),ge;if(typeof e.beginScope!="object"||e.beginScope===null)throw Y("beginScope must be object"),ge;je(e,e.begin,{key:"beginScope"}),e.begin=Te(e.begin,{joinWith:""})}}function pt(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw Y("skip, excludeEnd, returnEnd not compatible with endScope: {}"),ge;if(typeof e.endScope!="object"||e.endScope===null)throw Y("endScope must be object"),ge;je(e,e.end,{key:"endScope"}),e.end=Te(e.end,{joinWith:""})}}function ht(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function Et(e){ht(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),bt(e),pt(e)}function mt(e){function n(a,i){return new RegExp(re(a),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(i?"g":""))}class t{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(i,l){l.position=this.position++,this.matchIndexes[this.matchAt]=l,this.regexes.push([l,i]),this.matchAt+=Fe(i)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let i=this.regexes.map(l=>l[1]);this.matcherRe=n(Te(i,{joinWith:"|"}),!0),this.lastIndex=0}exec(i){this.matcherRe.lastIndex=this.lastIndex;let l=this.matcherRe.exec(i);if(!l)return null;let f=l.findIndex((w,S)=>S>0&&w!==void 0),m=this.matchIndexes[f];return l.splice(0,f),Object.assign(l,m)}}class s{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(i){if(this.multiRegexes[i])return this.multiRegexes[i];let l=new t;return this.rules.slice(i).forEach(([f,m])=>l.addRule(f,m)),l.compile(),this.multiRegexes[i]=l,l}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(i,l){this.rules.push([i,l]),l.type==="begin"&&this.count++}exec(i){let l=this.getMatcher(this.regexIndex);l.lastIndex=this.lastIndex;let f=l.exec(i);if(this.resumingScanAtSamePosition()&&!(f&&f.index===this.lastIndex)){let m=this.getMatcher(0);m.lastIndex=this.lastIndex+1,f=m.exec(i)}return f&&(this.regexIndex+=f.position+1,this.regexIndex===this.count&&this.considerAll()),f}}function g(a){let i=new s;return a.contains.forEach(l=>i.addRule(l.begin,{rule:l,type:"begin"})),a.terminatorEnd&&i.addRule(a.terminatorEnd,{type:"end"}),a.illegal&&i.addRule(a.illegal,{type:"illegal"}),i}function E(a,i){let l=a;if(a.isCompiled)return l;[st,ot,Et,lt].forEach(m=>m(a,i)),e.compilerExtensions.forEach(m=>m(a,i)),a.__beforeBegin=null,[rt,at,ct].forEach(m=>m(a,i)),a.isCompiled=!0;let f=null;return typeof a.keywords=="object"&&a.keywords.$pattern&&(a.keywords=Object.assign({},a.keywords),f=a.keywords.$pattern,delete a.keywords.$pattern),f=f||/\w+/,a.keywords&&(a.keywords=Ye(a.keywords,e.case_insensitive)),l.keywordPatternRe=n(f,!0),i&&(a.begin||(a.begin=/\B|\b/),l.beginRe=n(l.begin),!a.end&&!a.endsWithParent&&(a.end=/\B|\b/),a.end&&(l.endRe=n(l.end)),l.terminatorEnd=re(l.end)||"",a.endsWithParent&&i.terminatorEnd&&(l.terminatorEnd+=(a.end?"|":"")+i.terminatorEnd)),a.illegal&&(l.illegalRe=n(a.illegal)),a.contains||(a.contains=[]),a.contains=[].concat(...a.contains.map(function(m){return _t(m==="self"?a:m)})),a.contains.forEach(function(m){E(m,l)}),a.starts&&E(a.starts,i),l.matcher=g(l),l}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=K(e.classNameAliases||{}),E(e)}function qe(e){return e?e.endsWithParent||qe(e.starts):!1}function _t(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(n){return K(e,{variants:null},n)})),e.cachedVariants?e.cachedVariants:qe(e)?K(e,{starts:e.starts?K(e.starts):null}):Object.isFrozen(e)?K(e):e}var Nt="11.9.0",Ae=class extends Error{constructor(n,t){super(n),this.name="HTMLInjectionError",this.html=t}},me=He,Pe=K,ze=Symbol("nomatch"),St=7,Qe=function(e){let n=Object.create(null),t=Object.create(null),s=[],g=!0,E="Could not find the language '{}', did you forget to load/include a language module?",a={disableAutodetect:!0,name:"Plain text",contains:[]},i={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:Se};function l(r){return i.noHighlightRe.test(r)}function f(r){let o=r.className+" ";o+=r.parentNode?r.parentNode.className:"";let d=i.languageDetectRe.exec(o);if(d){let h=D(d[1]);return h||(Ue(E.replace("{}",d[1])),Ue("Falling back to no-highlight mode for this block.",r)),h?d[1]:"no-highlight"}return o.split(/\s+/).find(h=>l(h)||D(h))}function m(r,o,d){let h="",_="";typeof o=="object"?(h=r,d=o.ignoreIllegals,_=o.language):(J("10.7.0","highlight(lang, code, ...args) has been deprecated."),J("10.7.0",`Please use highlight(code, options) instead.
+https://github.com/highlightjs/highlight.js/issues/2277`),_=r,h=o),d===void 0&&(d=!0);let T={code:h,language:_};F("before:highlight",T);let v=T.result?T.result:w(T.language,T.code,d);return v.code=T.code,F("after:highlight",v),v}function w(r,o,d,h){let _=Object.create(null);function T(c,u){return c.keywords[u]}function v(){if(!b.keywords){O.addText(A);return}let c=0;b.keywordPatternRe.lastIndex=0;let u=b.keywordPatternRe.exec(A),p="";for(;u;){p+=A.substring(c,u.index);let N=$.case_insensitive?u[0].toLowerCase():u[0],R=T(b,N);if(R){let[G,yn]=R;if(O.addText(p),p="",_[N]=(_[N]||0)+1,_[N]<=St&&(le+=yn),G.startsWith("_"))p+=u[0];else{let Tn=$.classNameAliases[G]||G;z(u[0],Tn)}}else p+=u[0];c=b.keywordPatternRe.lastIndex,u=b.keywordPatternRe.exec(A)}p+=A.substring(c),O.addText(p)}function oe(){if(A==="")return;let c=null;if(typeof b.subLanguage=="string"){if(!n[b.subLanguage]){O.addText(A);return}c=w(b.subLanguage,A,!0,Ie[b.subLanguage]),Ie[b.subLanguage]=c._top}else c=y(A,b.subLanguage.length?b.subLanguage:null);b.relevance>0&&(le+=c.relevance),O.__addSublanguage(c._emitter,c.language)}function I(){b.subLanguage!=null?oe():v(),A=""}function z(c,u){c!==""&&(O.startScope(u),O.addText(c),O.endScope())}function xe(c,u){let p=1,N=u.length-1;for(;p<=N;){if(!c._emit[p]){p++;continue}let R=$.classNameAliases[c[p]]||c[p],G=u[p];R?z(G,R):(A=G,v(),A=""),p++}}function Me(c,u){return c.scope&&typeof c.scope=="string"&&O.openNode($.classNameAliases[c.scope]||c.scope),c.beginScope&&(c.beginScope._wrap?(z(A,$.classNameAliases[c.beginScope._wrap]||c.beginScope._wrap),A=""):c.beginScope._multi&&(xe(c.beginScope,u),A="")),b=Object.create(c,{parent:{value:b}}),b}function ve(c,u,p){let N=Pn(c.endRe,p);if(N){if(c["on:end"]){let R=new de(c);c["on:end"](u,R),R.isMatchIgnored&&(N=!1)}if(N){for(;c.endsParent&&c.parent;)c=c.parent;return c}}if(c.endsWithParent)return ve(c.parent,u,p)}function mn(c){return b.matcher.regexIndex===0?(A+=c[0],1):(Ee=!0,0)}function _n(c){let u=c[0],p=c.rule,N=new de(p),R=[p.__beforeBegin,p["on:begin"]];for(let G of R)if(G&&(G(c,N),N.isMatchIgnored))return mn(u);return p.skip?A+=u:(p.excludeBegin&&(A+=u),I(),!p.returnBegin&&!p.excludeBegin&&(A=u)),Me(p,c),p.returnBegin?0:u.length}function Nn(c){let u=c[0],p=o.substring(c.index),N=ve(b,c,p);if(!N)return ze;let R=b;b.endScope&&b.endScope._wrap?(I(),z(u,b.endScope._wrap)):b.endScope&&b.endScope._multi?(I(),xe(b.endScope,c)):R.skip?A+=u:(R.returnEnd||R.excludeEnd||(A+=u),I(),R.excludeEnd&&(A=u));do b.scope&&O.closeNode(),!b.skip&&!b.subLanguage&&(le+=b.relevance),b=b.parent;while(b!==N.parent);return N.starts&&Me(N.starts,c),R.returnEnd?0:u.length}function Sn(){let c=[];for(let u=b;u!==$;u=u.parent)u.scope&&c.unshift(u.scope);c.forEach(u=>O.openNode(u))}let ce={};function ke(c,u){let p=u&&u[0];if(A+=c,p==null)return I(),0;if(ce.type==="begin"&&u.type==="end"&&ce.index===u.index&&p===""){if(A+=o.slice(u.index,u.index+1),!g){let N=new Error(`0 width match regex (${r})`);throw N.languageName=r,N.badRule=ce.rule,N}return 1}if(ce=u,u.type==="begin")return _n(u);if(u.type==="illegal"&&!d){let N=new Error('Illegal lexeme "'+p+'" for mode "'+(b.scope||"<unnamed>")+'"');throw N.mode=b,N}else if(u.type==="end"){let N=Nn(u);if(N!==ze)return N}if(u.type==="illegal"&&p==="")return 1;if(he>1e5&&he>u.index*3)throw new Error("potential infinite loop, way more iterations than matches");return A+=p,p.length}let $=D(r);if(!$)throw Y(E.replace("{}",r)),new Error('Unknown language: "'+r+'"');let An=mt($),pe="",b=h||An,Ie={},O=new i.__emitter(i);Sn();let A="",le=0,X=0,he=0,Ee=!1;try{if($.__emitTokens)$.__emitTokens(o,O);else{for(b.matcher.considerAll();;){he++,Ee?Ee=!1:b.matcher.considerAll(),b.matcher.lastIndex=X;let c=b.matcher.exec(o);if(!c)break;let u=o.substring(X,c.index),p=ke(u,c);X=c.index+p}ke(o.substring(X))}return O.finalize(),pe=O.toHTML(),{language:r,value:pe,relevance:le,illegal:!1,_emitter:O,_top:b}}catch(c){if(c.message&&c.message.includes("Illegal"))return{language:r,value:me(o),illegal:!0,relevance:0,_illegalBy:{message:c.message,index:X,context:o.slice(X-100,X+100),mode:c.mode,resultSoFar:pe},_emitter:O};if(g)return{language:r,value:me(o),illegal:!1,relevance:0,errorRaised:c,_emitter:O,_top:b};throw c}}function S(r){let o={value:me(r),illegal:!1,relevance:0,_top:a,_emitter:new i.__emitter(i)};return o._emitter.addText(r),o}function y(r,o){o=o||i.languages||Object.keys(n);let d=S(r),h=o.filter(D).filter(Q).map(I=>w(I,r,!1));h.unshift(d);let _=h.sort((I,z)=>{if(I.relevance!==z.relevance)return z.relevance-I.relevance;if(I.language&&z.language){if(D(I.language).supersetOf===z.language)return 1;if(D(z.language).supersetOf===I.language)return-1}return 0}),[T,v]=_,oe=T;return oe.secondBest=v,oe}function C(r,o,d){let h=o&&t[o]||d;r.classList.add("hljs"),r.classList.add(`language-${h}`)}function x(r){let o=null,d=f(r);if(l(d))return;if(F("before:highlightElement",{el:r,language:d}),r.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",r);return}if(r.children.length>0&&(i.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("https://github.com/highlightjs/highlight.js/wiki/security"),console.warn("The element with unescaped HTML:"),console.warn(r)),i.throwUnescapedHTML))throw new Ae("One of your code blocks includes unescaped HTML.",r.innerHTML);o=r;let h=o.textContent,_=d?m(h,{language:d,ignoreIllegals:!0}):y(h);r.innerHTML=_.value,r.dataset.highlighted="yes",C(r,d,_.language),r.result={language:_.language,re:_.relevance,relevance:_.relevance},_.secondBest&&(r.secondBest={language:_.secondBest.language,relevance:_.secondBest.relevance}),F("after:highlightElement",{el:r,result:_,text:h})}function M(r){i=Pe(i,r)}let ee=()=>{L(),J("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function B(){L(),J("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let P=!1;function L(){if(document.readyState==="loading"){P=!0;return}document.querySelectorAll(i.cssSelector).forEach(x)}function H(){P&&L()}typeof window<"u"&&window.addEventListener&&window.addEventListener("DOMContentLoaded",H,!1);function k(r,o){let d=null;try{d=o(e)}catch(h){if(Y("Language definition for '{}' could not be registered.".replace("{}",r)),g)Y(h);else throw h;d=a}d.name||(d.name=r),n[r]=d,d.rawDefinition=o.bind(null,e),d.aliases&&q(d.aliases,{languageName:r})}function ne(r){delete n[r];for(let o of Object.keys(t))t[o]===r&&delete t[o]}function Z(){return Object.keys(n)}function D(r){return r=(r||"").toLowerCase(),n[r]||n[t[r]]}function q(r,{languageName:o}){typeof r=="string"&&(r=[r]),r.forEach(d=>{t[d.toLowerCase()]=o})}function Q(r){let o=D(r);return o&&!o.disableAutodetect}function te(r){r["before:highlightBlock"]&&!r["before:highlightElement"]&&(r["before:highlightElement"]=o=>{r["before:highlightBlock"](Object.assign({block:o.el},o))}),r["after:highlightBlock"]&&!r["after:highlightElement"]&&(r["after:highlightElement"]=o=>{r["after:highlightBlock"](Object.assign({block:o.el},o))})}function ie(r){te(r),s.push(r)}function se(r){let o=s.indexOf(r);o!==-1&&s.splice(o,1)}function F(r,o){let d=r;s.forEach(function(h){h[d]&&h[d](o)})}function W(r){return J("10.7.0","highlightBlock will be removed entirely in v12.0"),J("10.7.0","Please use highlightElement now."),x(r)}Object.assign(e,{highlight:m,highlightAuto:y,highlightAll:L,highlightElement:x,highlightBlock:W,configure:M,initHighlighting:ee,initHighlightingOnLoad:B,registerLanguage:k,unregisterLanguage:ne,listLanguages:Z,getLanguage:D,registerAliases:q,autoDetection:Q,inherit:Pe,addPlugin:ie,removePlugin:se}),e.debugMode=function(){g=!1},e.safeMode=function(){g=!0},e.versionString=Nt,e.regex={concat:j,lookahead:Ge,either:ye,optional:Bn,anyNumberOfTimes:Dn};for(let r in ue)typeof ue[r]=="object"&&$e(ue[r]);return Object.assign(e,ue),e},V=Qe({});V.newInstance=()=>Qe({});Je.exports=V;V.HighlightJS=V;V.default=V});var en=In(Ve(),1);var U=en.default;var nn="[A-Za-z$_][0-9A-Za-z$_]*",At=["as","in","of","if","for","while","finally","var","new","function","do","return","void","else","break","catch","instanceof","with","throw","case","default","try","switch","continue","typeof","delete","let","yield","const","class","debugger","async","await","static","import","from","export","extends"],yt=["true","false","null","undefined","NaN","Infinity"],tn=["Object","Function","Boolean","Symbol","Math","Date","Number","BigInt","String","RegExp","Array","Float32Array","Float64Array","Int8Array","Uint8Array","Uint8ClampedArray","Int16Array","Int32Array","Uint16Array","Uint32Array","BigInt64Array","BigUint64Array","Set","Map","WeakSet","WeakMap","ArrayBuffer","SharedArrayBuffer","Atomics","DataView","JSON","Promise","Generator","GeneratorFunction","AsyncFunction","Reflect","Proxy","Intl","WebAssembly"],sn=["Error","EvalError","InternalError","RangeError","ReferenceError","SyntaxError","TypeError","URIError"],rn=["setInterval","setTimeout","clearInterval","clearTimeout","require","exports","eval","isFinite","isNaN","parseFloat","parseInt","decodeURI","decodeURIComponent","encodeURI","encodeURIComponent","escape","unescape"],Tt=["arguments","this","super","console","window","document","localStorage","sessionStorage","module","global"],wt=[].concat(rn,tn,sn);function Oe(e){let n=e.regex,t=(o,{after:d})=>{let h="</"+o[0].slice(1);return o.input.indexOf(h,d)!==-1},s=nn,g={begin:"<>",end:"</>"},E=/<[A-Za-z0-9\\._:-]+\s*\/>/,a={begin:/<[A-Za-z0-9\\._:-]+/,end:/\/[A-Za-z0-9\\._:-]+>|\/>/,isTrulyOpeningTag:(o,d)=>{let h=o[0].length+o.index,_=o.input[h];if(_==="<"||_===","){d.ignoreMatch();return}_===">"&&(t(o,{after:h})||d.ignoreMatch());let T,v=o.input.substring(h);if(T=v.match(/^\s*=/)){d.ignoreMatch();return}if((T=v.match(/^\s+extends\s+/))&&T.index===0){d.ignoreMatch();return}}},i={$pattern:nn,keyword:At,literal:yt,built_in:wt,"variable.language":Tt},l="[0-9](_?[0-9])*",f=`\\.(${l})`,m="0|[1-9](_?[0-9])*|0[0-7]*[89][0-9]*",w={className:"number",variants:[{begin:`(\\b(${m})((${f})|\\.)?|(${f}))[eE][+-]?(${l})\\b`},{begin:`\\b(${m})\\b((${f})\\b|\\.)?|(${f})\\b`},{begin:"\\b(0|[1-9](_?[0-9])*)n\\b"},{begin:"\\b0[xX][0-9a-fA-F](_?[0-9a-fA-F])*n?\\b"},{begin:"\\b0[bB][0-1](_?[0-1])*n?\\b"},{begin:"\\b0[oO][0-7](_?[0-7])*n?\\b"},{begin:"\\b0[0-7]+n?\\b"}],relevance:0},S={className:"subst",begin:"\\$\\{",end:"\\}",keywords:i,contains:[]},y={begin:"html`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"xml"}},C={begin:"css`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"css"}},x={begin:"gql`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"graphql"}},M={className:"string",begin:"`",end:"`",contains:[e.BACKSLASH_ESCAPE,S]},B={className:"comment",variants:[e.COMMENT(/\/\*\*(?!\/)/,"\\*/",{relevance:0,contains:[{begin:"(?=@[A-Za-z]+)",relevance:0,contains:[{className:"doctag",begin:"@[A-Za-z]+"},{className:"type",begin:"\\{",end:"\\}",excludeEnd:!0,excludeBegin:!0,relevance:0},{className:"variable",begin:s+"(?=\\s*(-)|$)",endsParent:!0,relevance:0},{begin:/(?=[^\n])\s/,relevance:0}]}]}),e.C_BLOCK_COMMENT_MODE,e.C_LINE_COMMENT_MODE]},P=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,{match:/\$\d+/},w];S.contains=P.concat({begin:/\{/,end:/\}/,keywords:i,contains:["self"].concat(P)});let L=[].concat(B,S.contains),H=L.concat([{begin:/\(/,end:/\)/,keywords:i,contains:["self"].concat(L)}]),k={className:"params",begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H},ne={variants:[{match:[/class/,/\s+/,s,/\s+/,/extends/,/\s+/,n.concat(s,"(",n.concat(/\./,s),")*")],scope:{1:"keyword",3:"title.class",5:"keyword",7:"title.class.inherited"}},{match:[/class/,/\s+/,s],scope:{1:"keyword",3:"title.class"}}]},Z={relevance:0,match:n.either(/\bJSON/,/\b[A-Z][a-z]+([A-Z][a-z]*|\d)*/,/\b[A-Z]{2,}([A-Z][a-z]+|\d)+([A-Z][a-z]*)*/,/\b[A-Z]{2,}[a-z]+([A-Z][a-z]+|\d)*([A-Z][a-z]*)*/),className:"title.class",keywords:{_:[...tn,...sn]}},D={label:"use_strict",className:"meta",relevance:10,begin:/^\s*['"]use (strict|asm)['"]/},q={variants:[{match:[/function/,/\s+/,s,/(?=\s*\()/]},{match:[/function/,/\s*(?=\()/]}],className:{1:"keyword",3:"title.function"},label:"func.def",contains:[k],illegal:/%/},Q={relevance:0,match:/\b[A-Z][A-Z_0-9]+\b/,className:"variable.constant"};function te(o){return n.concat("(?!",o.join("|"),")")}let ie={match:n.concat(/\b/,te([...rn,"super","import"]),s,n.lookahead(/\(/)),className:"title.function",relevance:0},se={begin:n.concat(/\./,n.lookahead(n.concat(s,/(?![0-9A-Za-z$_(])/))),end:s,excludeBegin:!0,keywords:"prototype",className:"property",relevance:0},F={match:[/get|set/,/\s+/,s,/(?=\()/],className:{1:"keyword",3:"title.function"},contains:[{begin:/\(\)/},k]},W="(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|"+e.UNDERSCORE_IDENT_RE+")\\s*=>",r={match:[/const|var|let/,/\s+/,s,/\s*/,/=\s*/,/(async\s*)?/,n.lookahead(W)],keywords:"async",className:{1:"keyword",3:"title.function"},contains:[k]};return{name:"JavaScript",aliases:["js","jsx","mjs","cjs"],keywords:i,exports:{PARAMS_CONTAINS:H,CLASS_REFERENCE:Z},illegal:/#(?![$_A-z])/,contains:[e.SHEBANG({label:"shebang",binary:"node",relevance:5}),D,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,B,{match:/\$\d+/},w,Z,{className:"attr",begin:s+n.lookahead(":"),relevance:0},r,{begin:"("+e.RE_STARTERS_RE+"|\\b(case|return|throw)\\b)\\s*",keywords:"return throw case",relevance:0,contains:[B,e.REGEXP_MODE,{className:"function",begin:W,returnBegin:!0,end:"\\s*=>",contains:[{className:"params",variants:[{begin:e.UNDERSCORE_IDENT_RE,relevance:0},{className:null,begin:/\(\s*\)/,skip:!0},{begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H}]}]},{begin:/,/,relevance:0},{match:/\s+/,relevance:0},{variants:[{begin:g.begin,end:g.end},{match:E},{begin:a.begin,"on:begin":a.isTrulyOpeningTag,end:a.end}],subLanguage:"xml",contains:[{begin:a.begin,end:a.end,skip:!0,contains:["self"]}]}]},q,{beginKeywords:"while if switch catch for"},{begin:"\\b(?!function)"+e.UNDERSCORE_IDENT_RE+"\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)\\s*\\{",returnBegin:!0,label:"func.def",contains:[k,e.inherit(e.TITLE_MODE,{begin:s,className:"title.function"})]},{match:/\.\.\./,relevance:0},se,{match:"\\$"+s,relevance:0},{match:[/\bconstructor(?=\s*\()/],className:{1:"title.function"},contains:[k]},ie,Q,ne,F,{match:/\$[(.]/}]}}var be="[A-Za-z$_][0-9A-Za-z$_]*",an=["as","in","of","if","for","while","finally","var","new","function","do","return","void","else","break","catch","instanceof","with","throw","case","default","try","switch","continue","typeof","delete","let","yield","const","class","debugger","async","await","static","import","from","export","extends"],on=["true","false","null","undefined","NaN","Infinity"],cn=["Object","Function","Boolean","Symbol","Math","Date","Number","BigInt","String","RegExp","Array","Float32Array","Float64Array","Int8Array","Uint8Array","Uint8ClampedArray","Int16Array","Int32Array","Uint16Array","Uint32Array","BigInt64Array","BigUint64Array","Set","Map","WeakSet","WeakMap","ArrayBuffer","SharedArrayBuffer","Atomics","DataView","JSON","Promise","Generator","GeneratorFunction","AsyncFunction","Reflect","Proxy","Intl","WebAssembly"],ln=["Error","EvalError","InternalError","RangeError","ReferenceError","SyntaxError","TypeError","URIError"],un=["setInterval","setTimeout","clearInterval","clearTimeout","require","exports","eval","isFinite","isNaN","parseFloat","parseInt","decodeURI","decodeURIComponent","encodeURI","encodeURIComponent","escape","unescape"],dn=["arguments","this","super","console","window","document","localStorage","sessionStorage","module","global"],gn=[].concat(un,cn,ln);function Ot(e){let n=e.regex,t=(o,{after:d})=>{let h="</"+o[0].slice(1);return o.input.indexOf(h,d)!==-1},s=be,g={begin:"<>",end:"</>"},E=/<[A-Za-z0-9\\._:-]+\s*\/>/,a={begin:/<[A-Za-z0-9\\._:-]+/,end:/\/[A-Za-z0-9\\._:-]+>|\/>/,isTrulyOpeningTag:(o,d)=>{let h=o[0].length+o.index,_=o.input[h];if(_==="<"||_===","){d.ignoreMatch();return}_===">"&&(t(o,{after:h})||d.ignoreMatch());let T,v=o.input.substring(h);if(T=v.match(/^\s*=/)){d.ignoreMatch();return}if((T=v.match(/^\s+extends\s+/))&&T.index===0){d.ignoreMatch();return}}},i={$pattern:be,keyword:an,literal:on,built_in:gn,"variable.language":dn},l="[0-9](_?[0-9])*",f=`\\.(${l})`,m="0|[1-9](_?[0-9])*|0[0-7]*[89][0-9]*",w={className:"number",variants:[{begin:`(\\b(${m})((${f})|\\.)?|(${f}))[eE][+-]?(${l})\\b`},{begin:`\\b(${m})\\b((${f})\\b|\\.)?|(${f})\\b`},{begin:"\\b(0|[1-9](_?[0-9])*)n\\b"},{begin:"\\b0[xX][0-9a-fA-F](_?[0-9a-fA-F])*n?\\b"},{begin:"\\b0[bB][0-1](_?[0-1])*n?\\b"},{begin:"\\b0[oO][0-7](_?[0-7])*n?\\b"},{begin:"\\b0[0-7]+n?\\b"}],relevance:0},S={className:"subst",begin:"\\$\\{",end:"\\}",keywords:i,contains:[]},y={begin:"html`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"xml"}},C={begin:"css`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"css"}},x={begin:"gql`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"graphql"}},M={className:"string",begin:"`",end:"`",contains:[e.BACKSLASH_ESCAPE,S]},B={className:"comment",variants:[e.COMMENT(/\/\*\*(?!\/)/,"\\*/",{relevance:0,contains:[{begin:"(?=@[A-Za-z]+)",relevance:0,contains:[{className:"doctag",begin:"@[A-Za-z]+"},{className:"type",begin:"\\{",end:"\\}",excludeEnd:!0,excludeBegin:!0,relevance:0},{className:"variable",begin:s+"(?=\\s*(-)|$)",endsParent:!0,relevance:0},{begin:/(?=[^\n])\s/,relevance:0}]}]}),e.C_BLOCK_COMMENT_MODE,e.C_LINE_COMMENT_MODE]},P=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,{match:/\$\d+/},w];S.contains=P.concat({begin:/\{/,end:/\}/,keywords:i,contains:["self"].concat(P)});let L=[].concat(B,S.contains),H=L.concat([{begin:/\(/,end:/\)/,keywords:i,contains:["self"].concat(L)}]),k={className:"params",begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H},ne={variants:[{match:[/class/,/\s+/,s,/\s+/,/extends/,/\s+/,n.concat(s,"(",n.concat(/\./,s),")*")],scope:{1:"keyword",3:"title.class",5:"keyword",7:"title.class.inherited"}},{match:[/class/,/\s+/,s],scope:{1:"keyword",3:"title.class"}}]},Z={relevance:0,match:n.either(/\bJSON/,/\b[A-Z][a-z]+([A-Z][a-z]*|\d)*/,/\b[A-Z]{2,}([A-Z][a-z]+|\d)+([A-Z][a-z]*)*/,/\b[A-Z]{2,}[a-z]+([A-Z][a-z]+|\d)*([A-Z][a-z]*)*/),className:"title.class",keywords:{_:[...cn,...ln]}},D={label:"use_strict",className:"meta",relevance:10,begin:/^\s*['"]use (strict|asm)['"]/},q={variants:[{match:[/function/,/\s+/,s,/(?=\s*\()/]},{match:[/function/,/\s*(?=\()/]}],className:{1:"keyword",3:"title.function"},label:"func.def",contains:[k],illegal:/%/},Q={relevance:0,match:/\b[A-Z][A-Z_0-9]+\b/,className:"variable.constant"};function te(o){return n.concat("(?!",o.join("|"),")")}let ie={match:n.concat(/\b/,te([...un,"super","import"]),s,n.lookahead(/\(/)),className:"title.function",relevance:0},se={begin:n.concat(/\./,n.lookahead(n.concat(s,/(?![0-9A-Za-z$_(])/))),end:s,excludeBegin:!0,keywords:"prototype",className:"property",relevance:0},F={match:[/get|set/,/\s+/,s,/(?=\()/],className:{1:"keyword",3:"title.function"},contains:[{begin:/\(\)/},k]},W="(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|"+e.UNDERSCORE_IDENT_RE+")\\s*=>",r={match:[/const|var|let/,/\s+/,s,/\s*/,/=\s*/,/(async\s*)?/,n.lookahead(W)],keywords:"async",className:{1:"keyword",3:"title.function"},contains:[k]};return{name:"JavaScript",aliases:["js","jsx","mjs","cjs"],keywords:i,exports:{PARAMS_CONTAINS:H,CLASS_REFERENCE:Z},illegal:/#(?![$_A-z])/,contains:[e.SHEBANG({label:"shebang",binary:"node",relevance:5}),D,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,B,{match:/\$\d+/},w,Z,{className:"attr",begin:s+n.lookahead(":"),relevance:0},r,{begin:"("+e.RE_STARTERS_RE+"|\\b(case|return|throw)\\b)\\s*",keywords:"return throw case",relevance:0,contains:[B,e.REGEXP_MODE,{className:"function",begin:W,returnBegin:!0,end:"\\s*=>",contains:[{className:"params",variants:[{begin:e.UNDERSCORE_IDENT_RE,relevance:0},{className:null,begin:/\(\s*\)/,skip:!0},{begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H}]}]},{begin:/,/,relevance:0},{match:/\s+/,relevance:0},{variants:[{begin:g.begin,end:g.end},{match:E},{begin:a.begin,"on:begin":a.isTrulyOpeningTag,end:a.end}],subLanguage:"xml",contains:[{begin:a.begin,end:a.end,skip:!0,contains:["self"]}]}]},q,{beginKeywords:"while if switch catch for"},{begin:"\\b(?!function)"+e.UNDERSCORE_IDENT_RE+"\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)\\s*\\{",returnBegin:!0,label:"func.def",contains:[k,e.inherit(e.TITLE_MODE,{begin:s,className:"title.function"})]},{match:/\.\.\./,relevance:0},se,{match:"\\$"+s,relevance:0},{match:[/\bconstructor(?=\s*\()/],className:{1:"title.function"},contains:[k]},ie,Q,ne,F,{match:/\$[(.]/}]}}function Re(e){let n=Ot(e),t=be,s=["any","void","number","boolean","string","object","never","symbol","bigint","unknown"],g={beginKeywords:"namespace",end:/\{/,excludeEnd:!0,contains:[n.exports.CLASS_REFERENCE]},E={beginKeywords:"interface",end:/\{/,excludeEnd:!0,keywords:{keyword:"interface extends",built_in:s},contains:[n.exports.CLASS_REFERENCE]},a={className:"meta",relevance:10,begin:/^\s*['"]use strict['"]/},i=["type","namespace","interface","public","private","protected","implements","declare","abstract","readonly","enum","override"],l={$pattern:be,keyword:an.concat(i),literal:on,built_in:gn.concat(s),"variable.language":dn},f={className:"meta",begin:"@"+t},m=(S,y,C)=>{let x=S.contains.findIndex(M=>M.label===y);if(x===-1)throw new Error("can not find mode to replace");S.contains.splice(x,1,C)};Object.assign(n.keywords,l),n.exports.PARAMS_CONTAINS.push(f),n.contains=n.contains.concat([f,g,E]),m(n,"shebang",e.SHEBANG()),m(n,"use_strict",a);let w=n.contains.find(S=>S.label==="func.def");return w.relevance=0,Object.assign(n,{name:"TypeScript",aliases:["ts","tsx","mts","cts"]}),n}function fn(e){let n=e.regex,t=n.concat(/[\p{L}_]/u,n.optional(/[\p{L}0-9_.-]*:/u),/[\p{L}0-9_.-]*/u),s=/[\p{L}0-9._:-]+/u,g={className:"symbol",begin:/&[a-z]+;|&#[0-9]+;|&#x[a-f0-9]+;/},E={begin:/\s/,contains:[{className:"keyword",begin:/#?[a-z_][a-z1-9_-]+/,illegal:/\n/}]},a=e.inherit(E,{begin:/\(/,end:/\)/}),i=e.inherit(e.APOS_STRING_MODE,{className:"string"}),l=e.inherit(e.QUOTE_STRING_MODE,{className:"string"}),f={endsWithParent:!0,illegal:/</,relevance:0,contains:[{className:"attr",begin:s,relevance:0},{begin:/=\s*/,relevance:0,contains:[{className:"string",endsParent:!0,variants:[{begin:/"/,end:/"/,contains:[g]},{begin:/'/,end:/'/,contains:[g]},{begin:/[^\s"'=<>`]+/}]}]}]};return{name:"HTML, XML",aliases:["html","xhtml","rss","atom","xjb","xsd","xsl","plist","wsf","svg"],case_insensitive:!0,unicodeRegex:!0,contains:[{className:"meta",begin:/<![a-z]/,end:/>/,relevance:10,contains:[E,l,i,a,{begin:/\[/,end:/\]/,contains:[{className:"meta",begin:/<![a-z]/,end:/>/,contains:[E,a,l,i]}]}]},e.COMMENT(/<!--/,/-->/,{relevance:10}),{begin:/<!\[CDATA\[/,end:/\]\]>/,relevance:10},g,{className:"meta",end:/\?>/,variants:[{begin:/<\?xml/,relevance:10,contains:[l]},{begin:/<\?[a-z][a-z0-9]+/}]},{className:"tag",begin:/<style(?=\s|>)/,end:/>/,keywords:{name:"style"},contains:[f],starts:{end:/<\/style>/,returnEnd:!0,subLanguage:["css","xml"]}},{className:"tag",begin:/<script(?=\s|>)/,end:/>/,keywords:{name:"script"},contains:[f],starts:{end:/<\/script>/,returnEnd:!0,subLanguage:["javascript","handlebars","xml"]}},{className:"tag",begin:/<>|<\/>/},{className:"tag",begin:n.concat(/</,n.lookahead(n.concat(t,n.either(/\/>/,/>/,/\s/)))),end:/\/?>/,contains:[{className:"name",begin:t,relevance:0,starts:f}]},{className:"tag",begin:n.concat(/<\//,n.lookahead(n.concat(t,/>/))),contains:[{className:"name",begin:t,relevance:0},{begin:/>/,relevance:0,endsParent:!0}]}]}}var Rt=e=>({IMPORTANT:{scope:"meta",begin:"!important"},BLOCK_COMMENT:e.C_BLOCK_COMMENT_MODE,HEXCOLOR:{scope:"number",begin:/#(([0-9a-fA-F]{3,4})|(([0-9a-fA-F]{2}){3,4}))\b/},FUNCTION_DISPATCH:{className:"built_in",begin:/[\w-]+(?=\()/},ATTRIBUTE_SELECTOR_MODE:{scope:"selector-attr",begin:/\[/,end:/\]/,illegal:"$",contains:[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE]},CSS_NUMBER_MODE:{scope:"number",begin:e.NUMBER_RE+"(%|em|ex|ch|rem|vw|vh|vmin|vmax|cm|mm|in|pt|pc|px|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?",relevance:0},CSS_VARIABLE:{className:"attr",begin:/--[A-Za-z_][A-Za-z0-9_-]*/}}),xt=["a","abbr","address","article","aside","audio","b","blockquote","body","button","canvas","caption","cite","code","dd","del","details","dfn","div","dl","dt","em","fieldset","figcaption","figure","footer","form","h1","h2","h3","h4","h5","h6","header","hgroup","html","i","iframe","img","input","ins","kbd","label","legend","li","main","mark","menu","nav","object","ol","p","q","quote","samp","section","span","strong","summary","sup","table","tbody","td","textarea","tfoot","th","thead","time","tr","ul","var","video"],Mt=["any-hover","any-pointer","aspect-ratio","color","color-gamut","color-index","device-aspect-ratio","device-height","device-width","display-mode","forced-colors","grid","height","hover","inverted-colors","monochrome","orientation","overflow-block","overflow-inline","pointer","prefers-color-scheme","prefers-contrast","prefers-reduced-motion","prefers-reduced-transparency","resolution","scan","scripting","update","width","min-width","max-width","min-height","max-height"],vt=["active","any-link","blank","checked","current","default","defined","dir","disabled","drop","empty","enabled","first","first-child","first-of-type","fullscreen","future","focus","focus-visible","focus-within","has","host","host-context","hover","indeterminate","in-range","invalid","is","lang","last-child","last-of-type","left","link","local-link","not","nth-child","nth-col","nth-last-child","nth-last-col","nth-last-of-type","nth-of-type","only-child","only-of-type","optional","out-of-range","past","placeholder-shown","read-only","read-write","required","right","root","scope","target","target-within","user-invalid","valid","visited","where"],kt=["after","backdrop","before","cue","cue-region","first-letter","first-line","grammar-error","marker","part","placeholder","selection","slotted","spelling-error"],It=["align-content","align-items","align-self","all","animation","animation-delay","animation-direction","animation-duration","animation-fill-mode","animation-iteration-count","animation-name","animation-play-state","animation-timing-function","backface-visibility","background","background-attachment","background-blend-mode","background-clip","background-color","background-image","background-origin","background-position","background-repeat","background-size","block-size","border","border-block","border-block-color","border-block-end","border-block-end-color","border-block-end-style","border-block-end-width","border-block-start","border-block-start-color","border-block-start-style","border-block-start-width","border-block-style","border-block-width","border-bottom","border-bottom-color","border-bottom-left-radius","border-bottom-right-radius","border-bottom-style","border-bottom-width","border-collapse","border-color","border-image","border-image-outset","border-image-repeat","border-image-slice","border-image-source","border-image-width","border-inline","border-inline-color","border-inline-end","border-inline-end-color","border-inline-end-style","border-inline-end-width","border-inline-start","border-inline-start-color","border-inline-start-style","border-inline-start-width","border-inline-style","border-inline-width","border-left","border-left-color","border-left-style","border-left-width","border-radius","border-right","border-right-color","border-right-style","border-right-width","border-spacing","border-style","border-top","border-top-color","border-top-left-radius","border-top-right-radius","border-top-style","border-top-width","border-width","bottom","box-decoration-break","box-shadow","box-sizing","break-after","break-before","break-inside","caption-side","caret-color","clear","clip","clip-path","clip-rule","color","column-count","column-fill","column-gap","column-rule","column-rule-color","column-rule-style","column-rule-width","column-span","column-width","columns","contain","content","content-visibility","counter-increment","counter-reset","cue","cue-after","cue-before","cursor","direction","display","empty-cells","filter","flex","flex-basis","flex-direction","flex-flow","flex-grow","flex-shrink","flex-wrap","float","flow","font","font-display","font-family","font-feature-settings","font-kerning","font-language-override","font-size","font-size-adjust","font-smoothing","font-stretch","font-style","font-synthesis","font-variant","font-variant-caps","font-variant-east-asian","font-variant-ligatures","font-variant-numeric","font-variant-position","font-variation-settings","font-weight","gap","glyph-orientation-vertical","grid","grid-area","grid-auto-columns","grid-auto-flow","grid-auto-rows","grid-column","grid-column-end","grid-column-start","grid-gap","grid-row","grid-row-end","grid-row-start","grid-template","grid-template-areas","grid-template-columns","grid-template-rows","hanging-punctuation","height","hyphens","icon","image-orientation","image-rendering","image-resolution","ime-mode","inline-size","isolation","justify-content","left","letter-spacing","line-break","line-height","list-style","list-style-image","list-style-position","list-style-type","margin","margin-block","margin-block-end","margin-block-start","margin-bottom","margin-inline","margin-inline-end","margin-inline-start","margin-left","margin-right","margin-top","marks","mask","mask-border","mask-border-mode","mask-border-outset","mask-border-repeat","mask-border-slice","mask-border-source","mask-border-width","mask-clip","mask-composite","mask-image","mask-mode","mask-origin","mask-position","mask-repeat","mask-size","mask-type","max-block-size","max-height","max-inline-size","max-width","min-block-size","min-height","min-inline-size","min-width","mix-blend-mode","nav-down","nav-index","nav-left","nav-right","nav-up","none","normal","object-fit","object-position","opacity","order","orphans","outline","outline-color","outline-offset","outline-style","outline-width","overflow","overflow-wrap","overflow-x","overflow-y","padding","padding-block","padding-block-end","padding-block-start","padding-bottom","padding-inline","padding-inline-end","padding-inline-start","padding-left","padding-right","padding-top","page-break-after","page-break-before","page-break-inside","pause","pause-after","pause-before","perspective","perspective-origin","pointer-events","position","quotes","resize","rest","rest-after","rest-before","right","row-gap","scroll-margin","scroll-margin-block","scroll-margin-block-end","scroll-margin-block-start","scroll-margin-bottom","scroll-margin-inline","scroll-margin-inline-end","scroll-margin-inline-start","scroll-margin-left","scroll-margin-right","scroll-margin-top","scroll-padding","scroll-padding-block","scroll-padding-block-end","scroll-padding-block-start","scroll-padding-bottom","scroll-padding-inline","scroll-padding-inline-end","scroll-padding-inline-start","scroll-padding-left","scroll-padding-right","scroll-padding-top","scroll-snap-align","scroll-snap-stop","scroll-snap-type","scrollbar-color","scrollbar-gutter","scrollbar-width","shape-image-threshold","shape-margin","shape-outside","speak","speak-as","src","tab-size","table-layout","text-align","text-align-all","text-align-last","text-combine-upright","text-decoration","text-decoration-color","text-decoration-line","text-decoration-style","text-emphasis","text-emphasis-color","text-emphasis-position","text-emphasis-style","text-indent","text-justify","text-orientation","text-overflow","text-rendering","text-shadow","text-transform","text-underline-position","top","transform","transform-box","transform-origin","transform-style","transition","transition-delay","transition-duration","transition-property","transition-timing-function","unicode-bidi","vertical-align","visibility","voice-balance","voice-duration","voice-family","voice-pitch","voice-range","voice-rate","voice-stress","voice-volume","white-space","widows","width","will-change","word-break","word-spacing","word-wrap","writing-mode","z-index"].reverse();function bn(e){let n=e.regex,t=Rt(e),s={begin:/-(webkit|moz|ms|o)-(?=[a-z])/},g="and or not only",E=/@-?\w[\w]*(-\w+)*/,a="[a-zA-Z-][a-zA-Z0-9_-]*",i=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE];return{name:"CSS",case_insensitive:!0,illegal:/[=|'\$]/,keywords:{keyframePosition:"from to"},classNameAliases:{keyframePosition:"selector-tag"},contains:[t.BLOCK_COMMENT,s,t.CSS_NUMBER_MODE,{className:"selector-id",begin:/#[A-Za-z0-9_-]+/,relevance:0},{className:"selector-class",begin:"\\."+a,relevance:0},t.ATTRIBUTE_SELECTOR_MODE,{className:"selector-pseudo",variants:[{begin:":("+vt.join("|")+")"},{begin:":(:)?("+kt.join("|")+")"}]},t.CSS_VARIABLE,{className:"attribute",begin:"\\b("+It.join("|")+")\\b"},{begin:/:/,end:/[;}{]/,contains:[t.BLOCK_COMMENT,t.HEXCOLOR,t.IMPORTANT,t.CSS_NUMBER_MODE,...i,{begin:/(url|data-uri)\(/,end:/\)/,relevance:0,keywords:{built_in:"url data-uri"},contains:[...i,{className:"string",begin:/[^)]/,endsWithParent:!0,excludeEnd:!0}]},t.FUNCTION_DISPATCH]},{begin:n.lookahead(/@/),end:"[{;]",relevance:0,illegal:/:/,contains:[{className:"keyword",begin:E},{begin:/\s/,endsWithParent:!0,excludeEnd:!0,relevance:0,keywords:{$pattern:/[a-z-]+/,keyword:g,attribute:Mt.join(" ")},contains:[{begin:/[a-z-]+(?=:)/,className:"attribute"},...i,t.CSS_NUMBER_MODE]}]},{className:"selector-tag",begin:"\\b("+xt.join("|")+")\\b"}]}}function pn(e){let n={className:"attr",begin:/"(\\.|[^\\"\r\n])*"(?=\s*:)/,relevance:1.01},t={match:/[{}[\],:]/,className:"punctuation",relevance:0},s=["true","false","null"],g={scope:"literal",beginKeywords:s.join(" ")};return{name:"JSON",keywords:{literal:s},contains:[n,t,e.QUOTE_STRING_MODE,g,e.C_NUMBER_MODE,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE],illegal:"\\S"}}function hn(e){let n=e.regex,t={},s={begin:/\$\{/,end:/\}/,contains:["self",{begin:/:-/,contains:[t]}]};Object.assign(t,{className:"variable",variants:[{begin:n.concat(/\$[\w\d#@][\w\d_]*/,"(?![\\w\\d])(?![$])")},s]});let g={className:"subst",begin:/\$\(/,end:/\)/,contains:[e.BACKSLASH_ESCAPE]},E={begin:/<<-?\s*(?=\w+)/,starts:{contains:[e.END_SAME_AS_BEGIN({begin:/(\w+)/,end:/(\w+)/,className:"string"})]}},a={className:"string",begin:/"/,end:/"/,contains:[e.BACKSLASH_ESCAPE,t,g]};g.contains.push(a);let i={match:/\\"/},l={className:"string",begin:/'/,end:/'/},f={match:/\\'/},m={begin:/\$?\(\(/,end:/\)\)/,contains:[{begin:/\d+#[0-9a-f]+/,className:"number"},e.NUMBER_MODE,t]},w=["fish","bash","zsh","sh","csh","ksh","tcsh","dash","scsh"],S=e.SHEBANG({binary:`(${w.join("|")})`,relevance:10}),y={className:"function",begin:/\w[\w\d_]*\s*\(\s*\)\s*\{/,returnBegin:!0,contains:[e.inherit(e.TITLE_MODE,{begin:/\w[\w\d_]*/})],relevance:0},C=["if","then","else","elif","fi","for","while","until","in","do","done","case","esac","function","select"],x=["true","false"],M={match:/(\/[a-z._-]+)+/},ee=["break","cd","continue","eval","exec","exit","export","getopts","hash","pwd","readonly","return","shift","test","times","trap","umask","unset"],B=["alias","bind","builtin","caller","command","declare","echo","enable","help","let","local","logout","mapfile","printf","read","readarray","source","type","typeset","ulimit","unalias"],P=["autoload","bg","bindkey","bye","cap","chdir","clone","comparguments","compcall","compctl","compdescribe","compfiles","compgroups","compquote","comptags","comptry","compvalues","dirs","disable","disown","echotc","echoti","emulate","fc","fg","float","functions","getcap","getln","history","integer","jobs","kill","limit","log","noglob","popd","print","pushd","pushln","rehash","sched","setcap","setopt","stat","suspend","ttyctl","unfunction","unhash","unlimit","unsetopt","vared","wait","whence","where","which","zcompile","zformat","zftp","zle","zmodload","zparseopts","zprof","zpty","zregexparse","zsocket","zstyle","ztcp"],L=["chcon","chgrp","chown","chmod","cp","dd","df","dir","dircolors","ln","ls","mkdir","mkfifo","mknod","mktemp","mv","realpath","rm","rmdir","shred","sync","touch","truncate","vdir","b2sum","base32","base64","cat","cksum","comm","csplit","cut","expand","fmt","fold","head","join","md5sum","nl","numfmt","od","paste","ptx","pr","sha1sum","sha224sum","sha256sum","sha384sum","sha512sum","shuf","sort","split","sum","tac","tail","tr","tsort","unexpand","uniq","wc","arch","basename","chroot","date","dirname","du","echo","env","expr","factor","groups","hostid","id","link","logname","nice","nohup","nproc","pathchk","pinky","printenv","printf","pwd","readlink","runcon","seq","sleep","stat","stdbuf","stty","tee","test","timeout","tty","uname","unlink","uptime","users","who","whoami","yes"];return{name:"Bash",aliases:["sh"],keywords:{$pattern:/\b[a-z][a-z0-9._-]+\b/,keyword:C,literal:x,built_in:[...ee,...B,"set","shopt",...P,...L]},contains:[S,e.SHEBANG(),y,m,e.HASH_COMMENT_MODE,E,M,a,i,l,f,t]}}function En(e){let n=e.regex,t={begin:/<\/?[A-Za-z_]/,end:">",subLanguage:"xml",relevance:0},s={begin:"^[-\\*]{3,}",end:"$"},g={className:"code",variants:[{begin:"(`{3,})[^`](.|\\n)*?\\1`*[ ]*"},{begin:"(~{3,})[^~](.|\\n)*?\\1~*[ ]*"},{begin:"```",end:"```+[ ]*$"},{begin:"~~~",end:"~~~+[ ]*$"},{begin:"`.+?`"},{begin:"(?=^( {4}|\\t))",contains:[{begin:"^( {4}|\\t)",end:"(\\n)$"}],relevance:0}]},E={className:"bullet",begin:"^[ 	]*([*+-]|(\\d+\\.))(?=\\s+)",end:"\\s+",excludeEnd:!0},a={begin:/^\[[^\n]+\]:/,returnBegin:!0,contains:[{className:"symbol",begin:/\[/,end:/\]/,excludeBegin:!0,excludeEnd:!0},{className:"link",begin:/:\s*/,end:/$/,excludeBegin:!0}]},i=/[A-Za-z][A-Za-z0-9+.-]*/,l={variants:[{begin:/\[.+?\]\[.*?\]/,relevance:0},{begin:/\[.+?\]\(((data|javascript|mailto):|(?:http|ftp)s?:\/\/).*?\)/,relevance:2},{begin:n.concat(/\[.+?\]\(/,i,/:\/\/.*?\)/),relevance:2},{begin:/\[.+?\]\([./?&#].*?\)/,relevance:1},{begin:/\[.*?\]\(.*?\)/,relevance:0}],returnBegin:!0,contains:[{match:/\[(?=\])/},{className:"string",relevance:0,begin:"\\[",end:"\\]",excludeBegin:!0,returnEnd:!0},{className:"link",relevance:0,begin:"\\]\\(",end:"\\)",excludeBegin:!0,excludeEnd:!0},{className:"symbol",relevance:0,begin:"\\]\\[",end:"\\]",excludeBegin:!0,excludeEnd:!0}]},f={className:"strong",contains:[],variants:[{begin:/_{2}(?!\s)/,end:/_{2}/},{begin:/\*{2}(?!\s)/,end:/\*{2}/}]},m={className:"emphasis",contains:[],variants:[{begin:/\*(?![*\s])/,end:/\*/},{begin:/_(?![_\s])/,end:/_/,relevance:0}]},w=e.inherit(f,{contains:[]}),S=e.inherit(m,{contains:[]});f.contains.push(S),m.contains.push(w);let y=[t,l];return[f,m,w,S].forEach(M=>{M.contains=M.contains.concat(y)}),y=y.concat(f,m),{name:"Markdown",aliases:["md","mkdown","mkd"],contains:[{className:"section",variants:[{begin:"^#{1,6}",end:"$",contains:y},{begin:"(?=^.+?\\n[=-]{2,}$)",contains:[{begin:"^[=-]*$"},{begin:"^",end:"\\n",contains:y}]}]},t,E,f,m,{className:"quote",begin:"^>\\s+",contains:y,end:"$"},g,s,l,a]}}U.registerLanguage("javascript",Oe);U.registerLanguage("typescript",Re);U.registerLanguage("tsx",Re);U.registerLanguage("jsx",Oe);U.registerLanguage("xml",fn);U.registerLanguage("css",bn);U.registerLanguage("json",pn);U.registerLanguage("bash",hn);U.registerLanguage("markdown",En);window.hljs=U;})();
+
+</script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>
