@@ -180,9 +180,8 @@ hue-6-2: #e6c07b
       <li><a href="#m7">Props에 타입 지정하기</a></li>
       <li><a href="#m8">useState와 이벤트 객체 타입</a></li>
       <li><a href="#m9">할 일 관리 앱 만들기</a></li>
-      <li><a href="#m10">useEffect 훅 — Clock 구현</a></li>
-      <li><a href="#m11">React Router 주요 Hook</a></li>
-      <li><a href="#m12">비동기 처리 — axios로 할 일 CRUD</a></li>
+      <li><a href="#m10">React Router 주요 Hook</a></li>
+      <li><a href="#m11">비동기 처리 — axios로 할 일 CRUD</a></li>
     </ol>
   </nav>
 
@@ -785,7 +784,7 @@ createRoot(document.getElementById('root')!).render(
     &lt;&gt;
       &lt;section id="center"&gt;
         &lt;h2&gt;TypeScript 기반 React 프로젝트&lt;/h2&gt;
-        &lt;Greet name="React" /&gt;
+        &lt;Greet name="도경수" age={33} /&gt;
       &lt;/section&gt;
     &lt;/&gt;
   )
@@ -802,6 +801,22 @@ const Greet = ({name, age}: {name: string, age: number}) =&gt; {
 }
 
 export default Greet</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — interface Props의 타입 정의</div>
+      <span class="fname">src/Greet2.tsx</span>
+      <pre><code class="language-tsx">// Props의 타입 정의
+interface GreetProps {
+  name: string;
+  age: number;
+}
+
+// Props의 타입 정의
+const Greet2 = ({name, age}: GreetProps) =&gt; {
+  return &lt;h2&gt;이름: {name}, 나이: {age}&lt;/h2&gt;
+}
+
+export default Greet2</code></pre>
     </div>
 
     <div class="ex"><div class="lbl">💡 예제 — 객체·함수 Props 전달(App.tsx)</div>
@@ -857,7 +872,16 @@ export default Player;</code></pre>
 
     <div class="ex"><div class="lbl">💡 예제 — type 별칭으로 Props 타입 분리</div>
       <span class="fname">src/Player2.tsx</span>
-      <pre><code class="language-tsx">// type - 객체의 구조를 정의하는 타입
+      <pre><code class="language-tsx">// interface - 객체의 구조를 정의하는 타입
+/*interface PlayerProps {
+  player: {
+    name: string
+    age: number
+  }
+  clickHandler: () =&gt; void
+}*/
+
+// type - 객체의 구조를 정의하는 타입
 type PlayerProps = {
   player: {
     name: string
@@ -957,34 +981,76 @@ const Player2 = ({ player, clickHandler }: PlayerProps) =&gt; {
     </div>
 
     <div class="ex"><div class="lbl">💡 예제 — useState&lt;string[]&gt; 배열 상태(음료 목록)</div>
-      <span class="fname">src/DrinkList.tsx</span>
-      <pre><code class="language-tsx">const DrinkList = () =&gt; {
-  const [drinks, setDrinks] = useState&lt;string[]&gt;(["사이다", "허브차", "주스"]);
+      <span class="fname">src/Drink.tsx</span>
+      <pre><code class="language-tsx">const Drink = () =&gt; {
+  const [drinks, setDrinks] = useState&lt;string[]&gt;([]);
+  const [inputValue, setInputValue] = useState&lt;string&gt;("");
 
-  // 음료 추가 이벤트 핸들러
+  // 입력값 변경 핸들러
+  const handleInputChange = (e:React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+    setInputValue(e.target.value)
+  }
+
+  // 음료 추가 함수
   const addDrink = () =&gt; {
-    const newDrink = prompt("추가할 음료를 입력하세요:");
-    if (newDrink) {
-      setDrinks([...drinks, newDrink]);
+    if(inputValue.trim() === ""){
+      alert("음료 이름을 입력하세요.");
+      return;
     }
-  };
+    // 추가한 음료를 기존 배열에 추가
+    setDrinks([...drinks, inputValue]);
+    setInputValue(""); //입력값 초기화
+  }
 
   return (
     &lt;div&gt;
-      &lt;h3&gt;음료 목록&lt;/h3&gt;
+      &lt;h2&gt;Drink List&lt;/h2&gt;
+      &lt;input 
+        type="text" 
+        placeholder='음료 이름을 입력하세요'
+        value={inputValue}
+        onChange={handleInputChange}
+      /&gt;
+      &lt;button onClick={addDrink}&gt;음료 추가&lt;/button&gt;
+      {/* &lt;p&gt;입력값: {inputValue}&lt;/p&gt; */}
+
+      {/* 음료 출력 */}
+      &lt;DrinkList drinks={drinks} /&gt;
+
+      {/* &lt;ul&gt;
+        {drinks.map((drink, index) =&gt; (
+          &lt;li key={index}&gt;{drink}&lt;/li&gt;
+        ))}
+      &lt;/ul&gt; */}
+    &lt;/div&gt;
+  )
+}
+
+export default Drink</code></pre>
+      <span class="fname">src/DrinkList.tsx</span>
+      <pre><code class="language-tsx">interface DrinkListProps {
+  drinks: string[];
+}
+
+const DrinkList = ({drinks}: DrinkListProps) =&gt; {
+
+  return(
+    &lt;div&gt;
       &lt;ul&gt;
         {drinks.map((drink, index) =&gt; (
           &lt;li key={index}&gt;{drink}&lt;/li&gt;
         ))}
       &lt;/ul&gt;
-      &lt;button onClick={addDrink}&gt;음료 추가&lt;/button&gt;
     &lt;/div&gt;
   )
-}</code></pre>
+}
+
+export default DrinkList;</code></pre>
       <div class="out"><span class="rt">브라우저 출력</span>
-        <p><b>음료 목록</b></p>
-        <p>사이다 · 허브차 · 주스</p>
-        <div class="demo"><button>음료 추가</button></div>
+        <p><b>Drink List</b></p>
+        <div class="demo"><input type="text" placeholder="음료 이름을 입력하세요" style="padding:6px"> <button>음료 추가</button></div>
+        <ul><li>사이다</li><li>허브차</li></ul>
+        <p class="muted">입력한 음료가 목록에 하나씩 추가됩니다. 빈 값이면 "음료 이름을 입력하세요." 경고가 나옵니다.</p>
       </div>
     </div>
 
@@ -1146,71 +1212,9 @@ export default TodoList</code></pre>
     </div>
   </section>
 
-  <!-- ================= MODULE 12 ================= -->
-  <section class="module" id="m10">
-    <h2><span class="num">10</span> useEffect 훅 — Clock 구현</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div>
-      <ul>
-        <li><code>useEffect</code>와 <code>setInterval</code>로 실시간 시계를 만든다.</li>
-        <li>정리(cleanup) 함수로 타이머를 해제한다.</li>
-        <li>스타일 객체에서 <code>as const</code>가 필요한 이유를 이해한다.</li>
-      </ul>
-    </div>
-
-    <div class="ex"><div class="lbl">💡 예제 — 스타일 객체와 as const</div>
-      <span class="fname">src/Clock.tsx</span>
-      <pre><code class="language-tsx">/*
-  flexDirection이 string으로 추론되어 React의
-  FlexDirection 타입과 호환되지 않는 문제입니다.
-  as const를 추가해 리터럴 타입으로 고정하면 해결됩니다.
-*/
-const style = {
-  container:{
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100vh',
-  },
-  heading: {
-    fontSize: '2rem',
-    marginBottom: '1rem',
-    color: 'navy',
-  },
-} as const; // 스타일 객체 정의</code></pre>
-    </div>
-
-    <div class="ex"><div class="lbl">💡 예제 — Clock 컴포넌트</div>
-      <span class="fname">src/Clock.tsx</span>
-      <pre><code class="language-tsx">const Clock = () =&gt; {
-  const [time, setTime] = useState(new Date());
-
-  useEffect(() =&gt; {
-    const timer = setInterval(() =&gt; {
-      setTime(new Date());
-    }, 1000);
-
-    return () =&gt; clearInterval(timer);
-  }, []);
-
-  return (
-    &lt;div style={style.container}&gt;
-      &lt;h2 style={style.heading}&gt;Current Time&lt;/h2&gt;
-      &lt;p&gt;{time.toLocaleTimeString()}&lt;/p&gt;
-    &lt;/div&gt;
-  );
-}</code></pre>
-      <div class="out"><span class="rt">브라우저 출력</span>
-        <p style="color:navy;font-size:1.4rem"><b>Current Time</b></p>
-        <p>오전 11:31:33</p>
-      </div>
-      <div class="tip"><span class="lbl">💡 정리</span> <code>useEffect</code>가 반환하는 함수는 컴포넌트가 언마운트될 때 실행됩니다. 여기서 <code>clearInterval</code>로 타이머를 정리하지 않으면 메모리 누수가 발생합니다.</div>
-    </div>
-  </section>
-
   <!-- ================= MODULE 13 ================= -->
-  <section class="module" id="m11">
-    <h2><span class="num">11</span> React Router 주요 Hook</h2>
+  <section class="module" id="m10">
+    <h2><span class="num">10</span> React Router 주요 Hook</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li>React Router의 대표 Hook 4가지의 역할을 안다.</li>
@@ -1249,8 +1253,8 @@ navigate('/dashboard');</code></pre>
   </section>
 
   <!-- ================= MODULE 14 ================= -->
-  <section class="module" id="m12">
-    <h2><span class="num">12</span> 비동기 처리 — axios로 할 일 CRUD</h2>
+  <section class="module" id="m11">
+    <h2><span class="num">11</span> 비동기 처리 — axios로 할 일 CRUD</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li><code>async/await</code>와 <code>Promise(.then)</code> 방식을 비교한다.</li>
@@ -1510,7 +1514,7 @@ const AddTodo = () =&gt; {
     </div>
 
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 12-1. 삭제(DELETE) 기능 추가</h4>
+      <h4>실습 11-1. 삭제(DELETE) 기능 추가</h4>
       <p>목록의 각 항목에 "삭제" 버튼을 추가하고, 클릭 시 axios로 DELETE 요청을 보낸 뒤 화면 상태에서도 해당 항목을 제거하는 함수를 작성하세요. (jsonplaceholder는 실제로 삭제하지 않지만 요청은 성공으로 응답합니다.)</p>
       <details><summary>정답 보기</summary>
         <pre><code class="language-tsx">const deleteTodo = async (id: number) =&gt; {
