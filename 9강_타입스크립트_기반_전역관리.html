@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>9강. 타입스크립트 기반 전역관리</title>
+<style>
+/* highlight.js atom-one-dark theme (inlined) */
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*
+
+Atom One Dark by Daniel Gamage
+Original One Dark Syntax theme from https://github.com/atom/one-dark-syntax
+
+base:    #282c34
+mono-1:  #abb2bf
+mono-2:  #818896
+mono-3:  #5c6370
+hue-1:   #56b6c2
+hue-2:   #61aeee
+hue-3:   #c678dd
+hue-4:   #98c379
+hue-5:   #e06c75
+hue-5-2: #be5046
+hue-6:   #d19a66
+hue-6-2: #e6c07b
+
+*/
+.hljs {
+  color: #abb2bf;
+  background: #282c34
+}
+.hljs-comment,
+.hljs-quote {
+  color: #5c6370;
+  font-style: italic
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #c678dd
+}
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+  color: #e06c75
+}
+.hljs-literal {
+  color: #56b6c2
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #98c379
+}
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: #d19a66
+}
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #61aeee
+}
+.hljs-built_in,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: #e6c07b
+}
+.hljs-emphasis {
+  font-style: italic
+}
+.hljs-strong {
+  font-weight: bold
+}
+.hljs-link {
+  text-decoration: underline
+}
+</style>
+<style>
+  :root{--bg:#f4f6f9;--card:#fff;--ink:#1f2933;--muted:#52606d;--line:#e4e7eb;--accent:#2965f1;--accent2:#1b3a8f;--code-bg:#282c34;--goal:#eafaf1;--goal-line:#27ae60;--ex:#eef4ff;--ex-line:#5b8def;--lab:#eef7ff;--lab-line:#2965f1;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Malgun Gothic","맑은 고딕",-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.75;}
+  header.hero{background:linear-gradient(135deg,#2965f1,#1b3a8f 60%,#153e75);color:#fff;padding:52px 24px;text-align:center;}
+  header.hero .eyebrow{letter-spacing:3px;font-size:.78rem;opacity:.92;text-transform:uppercase}
+  header.hero h1{margin:12px 0 8px;font-size:1.9rem}header.hero p{margin:0;opacity:.94}
+  header.hero .tags{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  header.hero .tags span{background:rgba(255,255,255,.18);border-radius:999px;padding:5px 13px;font-size:.82rem}
+  .wrap{max-width:920px;margin:0 auto;padding:32px 20px 80px}
+  nav.toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 26px;margin-bottom:34px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  nav.toc h2{margin:0 0 12px;font-size:1.05rem;color:var(--accent2)}
+  nav.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+  nav.toc a{color:var(--ink);text-decoration:none}nav.toc a:hover{color:var(--accent);text-decoration:underline}
+  section.module{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px 30px;margin-bottom:26px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  section.module > h2{margin:0 0 6px;font-size:1.4rem;color:var(--accent2);display:flex;align-items:center;gap:12px;}
+  section.module > h2 .num{background:var(--accent);color:#fff;font-size:.95rem;font-weight:800;padding:4px 12px;border-radius:10px;min-width:38px;text-align:center;}
+  h3.blk{font-size:1.02rem;margin:22px 0 8px;font-weight:800}
+  .goal{background:var(--goal);border-left:5px solid var(--goal-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:14px 0}
+  .goal .lbl{font-weight:800;color:#1e874b}.goal ul{margin:8px 0 0}
+  .concept h3.blk{color:var(--ink);border-left:4px solid var(--accent);padding-left:10px}
+  .ex{background:var(--ex);border-left:5px solid var(--ex-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .ex .lbl{font-weight:800;color:#2f5fc7}
+  .lab{background:var(--lab);border-left:5px solid var(--lab-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .lab .lbl{font-weight:800;color:#1b4fc0}.lab h4{margin:6px 0 6px;font-size:.98rem}
+  ul{margin:8px 0}li{margin:5px 0}.muted{color:var(--muted)}
+  code{background:#eceef1;padding:2px 6px;border-radius:5px;font-size:.92em;font-family:Consolas,"D2Coding",monospace}
+  pre{background:var(--code-bg);border-radius:10px;padding:0;overflow-x:auto;margin:10px 0}
+  pre code{display:block;padding:16px 18px;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;line-height:1.6;background:var(--code-bg);color:#abb2bf;border-radius:10px;white-space:pre}
+  pre code.hljs{background:var(--code-bg);padding:16px 18px}
+  .fname{display:inline-block;background:#1b3a8f;color:#fff;font-family:Consolas,"D2Coding",monospace;font-size:.8rem;font-weight:700;padding:4px 12px;border-radius:8px 8px 0 0;margin:10px 0 -8px}
+  .fname + pre{border-top-left-radius:0}
+  .out{background:#fff;color:var(--ink);border:1px solid var(--line);border-left:4px solid #27ae60;border-radius:8px;padding:12px 16px;margin:8px 0 0}
+  .out .rt{font-size:.72rem;letter-spacing:1px;color:#27ae60;font-weight:800;text-transform:uppercase;display:block;margin-bottom:6px}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:.93rem}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:#eef2fb;color:var(--accent2)}td.c,th.c{text-align:center}
+  td code,th code{background:#eef1f5}
+  details{margin-top:10px;background:#fff;border:1px solid #cfe0ff;border-radius:8px;padding:8px 14px}
+  details summary{cursor:pointer;font-weight:700;color:#1b4fc0}details pre{margin-top:10px}
+  footer{text-align:center;color:var(--muted);font-size:.85rem;padding:30px 20px}
+  .pill{display:inline-block;background:#eceef1;border-radius:6px;padding:2px 9px;margin:2px;font-size:.85rem}
+  .flow{background:#f7f9fc;border:1px dashed #b9c6de;border-radius:10px;padding:12px 16px;margin:12px 0;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;white-space:pre-wrap;color:#37475f}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}nav.toc ol{columns:1}}
+  .tip{background:#fff8e6;border-left:5px solid #f2b705;border-radius:0 10px 10px 0;padding:12px 18px;margin:14px 0}
+  .tip .lbl{font-weight:800;color:#b57f00}
+  .demo{border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:8px 0 0;background:#fafbfc}
+  .demo button{margin:2px 4px 2px 0;padding:4px 12px;border:1px solid #b9c6de;border-radius:6px;background:#fff;cursor:default}
+  .demo input{padding:4px 8px;border:1px solid #b9c6de;border-radius:6px;margin:2px 0}
+
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="eyebrow">React 심화 · Chapter 09 · 학습 교안</div>
+  <h1>타입스크립트 기반 전역관리</h1>
+  <p>7강에서 배운 useReducer · useContext · Redux Toolkit을 TypeScript로 다시 작성하고, 현업에서 많이 쓰는 Zustand까지 비교합니다. State · Action · Context 값에 타입을 지정해, 전역 상태를 실수 없이 공유하고 변경하는 방법을 익힙니다.</p>
+  <div class="tags">
+    <span>🏷️ TypeScript</span>
+    <span>🏷️ useReducer</span>
+    <span>🏷️ interface</span>
+    <span>🏷️ Union 타입</span>
+    <span>🏷️ 타입 좁히기</span>
+    <span>🏷️ useContext</span>
+    <span>🏷️ 커스텀 훅</span>
+    <span>🏷️ Redux Toolkit</span>
+    <span>🏷️ PayloadAction</span>
+    <span>🏷️ Zustand</span>
+  </div>
+</header>
+<div class="wrap">
+  <nav class="toc">
+    <h2>📚 학습 목차</h2>
+    <ol>
+      <li><a href="#m1">useReducer() — TypeScript로 상태 관리</a></li>
+      <li><a href="#m2">useContext() — TypeScript로 전역 데이터 공유</a></li>
+      <li><a href="#m3">Redux Toolkit — TypeScript로 전역 상태 관리</a></li>
+      <li><a href="#m4">Zustand — 가볍게 전역 상태 관리</a></li>
+    </ol>
+  </nav>
+
+  <!-- ================= MODULE 1 ================= -->
+  <section class="module" id="m1">
+    <h2><span class="num">1</span> useReducer() — TypeScript로 상태 관리</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li>State와 Action의 타입을 interface와 Union 타입으로 정의할 수 있다.</li>
+        <li>타입이 지정된 리듀서 함수 <code>(state, action) =&gt; 새 state</code>를 작성할 수 있다.</li>
+        <li>잘못된 dispatch를 TypeScript가 미리 잡아 주는 이유를 이해한다.</li>
+      </ul>
+    </div>
+
+    <div class="concept">
+      <h3 class="blk">📖 useReducer에 타입을 붙이는 3단계</h3>
+      <table>
+        <tr><th>단계</th><th>무엇을</th><th>방법</th></tr>
+        <tr><td>1</td><td>State 타입</td><td><code>interface BankState { balance: number; ... }</code></td></tr>
+        <tr><td>2</td><td>Action 타입</td><td>Union 타입으로 가능한 액션을 모두 나열 <code>{ type: "DEPOSIT"; amount: number } | { type: "RESET" }</code></td></tr>
+        <tr><td>3</td><td>리듀서 함수</td><td><code>(state: BankState, action: BankAction): BankState</code></td></tr>
+      </table>
+      <p>리듀서에 타입만 지정하면 <code>useReducer(bankReducer, initialState)</code>의 <code>state</code>와 <code>dispatch</code> 타입은 <b>자동으로 추론</b>됩니다. <code>switch (action.type)</code> 안에서는 각 case에 맞게 action의 타입이 좁혀지므로(<b>타입 좁히기</b>), <code>DEPOSIT</code>에서는 <code>action.amount</code>를 쓸 수 있고 <code>RESET</code>에서는 쓸 수 없습니다.</p>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 타입이 지정된 은행 리듀서</div>
+      <span class="fname">src/bankReducer.ts</span>
+      <pre><code class="language-typescript">// 1. State 타입 : 상태의 모양
+export interface BankState {
+  balance: number;
+  history: string[];
+}
+
+// 2. Action 타입 : Union으로 가능한 액션을 모두 나열
+export type BankAction =
+  | { type: "DEPOSIT"; amount: number }
+  | { type: "WITHDRAW"; amount: number }
+  | { type: "RESET" };
+
+// 초기값도 BankState 타입을 따름
+export const initialState: BankState = {
+  balance: 0,
+  history: [],
+};
+
+// 3. 리듀서 : (현재 상태, 액션) =&gt; 새 상태
+export function bankReducer(state: BankState, action: BankAction): BankState {
+  switch (action.type) {
+    case "DEPOSIT":
+      // 이 case 안에서 action은 { type: "DEPOSIT"; amount: number }로 좁혀짐
+      return {
+        balance: state.balance + action.amount,
+        history: [...state.history, `입금 ${action.amount.toLocaleString()}원`],
+      };
+    case "WITHDRAW":
+      if (action.amount &gt; state.balance) {
+        alert("잔액이 부족합니다.");
+        return state;
+      }
+      return {
+        balance: state.balance - action.amount,
+        history: [...state.history, `출금 ${action.amount.toLocaleString()}원`],
+      };
+    case "RESET":
+      // RESET에는 amount가 없으므로 action.amount를 쓰면 타입 오류
+      return initialState;
+    default:
+      return state;
+  }
+}</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — Bank 컴포넌트에서 dispatch</div>
+      <span class="fname">src/Bank.tsx</span>
+      <pre><code class="language-tsx">import { useReducer, useState } from "react";
+import { bankReducer, initialState } from "./bankReducer";
+
+const Bank = () =&gt; {
+  // state는 BankState, dispatch는 BankAction만 받도록 자동으로 타입이 정해짐
+  const [state, dispatch] = useReducer(bankReducer, initialState);
+  const [amount, setAmount] = useState&lt;number&gt;(0);
+
+  const handleChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+    setAmount(Number(e.target.value) || 0);
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;TypeScript 은행&lt;/h2&gt;
+      &lt;h3&gt;잔액: {state.balance.toLocaleString()}원&lt;/h3&gt;
+
+      &lt;input type="number" value={amount} step={1000} onChange={handleChange} /&gt;
+      &lt;button onClick={() =&gt; dispatch({ type: "DEPOSIT", amount })}&gt;입금&lt;/button&gt;
+      &lt;button onClick={() =&gt; dispatch({ type: "WITHDRAW", amount })}&gt;출금&lt;/button&gt;
+      &lt;button onClick={() =&gt; dispatch({ type: "RESET" })}&gt;초기화&lt;/button&gt;
+
+      {/* dispatch({ type: "DEPOSIT" })       → amount 누락 오류
+          dispatch({ type: "TRANSFER", ... }) → 없는 액션 오류 */}
+
+      &lt;ul&gt;
+        {state.history.map((item, index) =&gt; (
+          &lt;li key={index}&gt;{item}&lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default Bank;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p><b>TypeScript 은행</b></p>
+        <p><b>잔액: 25,000원</b></p>
+        <div class="demo"><input type="number" value="5000" style="padding:6px;width:100px"> <button>입금</button> <button>출금</button> <button>초기화</button></div>
+        <ul><li>입금 30,000원</li><li>출금 5,000원</li></ul>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> Action을 Union 타입으로 정의하면 <code>dispatch({ type: "DEPOSIT" })</code>처럼 amount를 빼먹거나, <code>"TRANSFER"</code>처럼 없는 액션을 보내면 <b>실행 전에 에디터에서 빨간 줄</b>로 알려 줍니다. JavaScript의 useReducer(7강)와 동작은 같고, 실수를 미리 막아 주는 점이 다릅니다.</div>
+    </div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 1-1. 카운터 리듀서에 타입 지정하기</h4>
+      <p><code>count</code> 하나를 가진 State와 <code>INCREMENT</code> · <code>DECREMENT</code> · <code>SET</code>(value: number) 세 가지 Action을 타입으로 정의하고, <code>useReducer</code>로 카운터를 만드세요.</p>
+      <details><summary>정답 보기</summary>
+        <pre><code class="language-tsx">import { useReducer } from "react";
+
+interface CounterState {
+  count: number;
+}
+
+type CounterAction =
+  | { type: "INCREMENT" }
+  | { type: "DECREMENT" }
+  | { type: "SET"; value: number };
+
+function counterReducer(state: CounterState, action: CounterAction): CounterState {
+  switch (action.type) {
+    case "INCREMENT":
+      return { count: state.count + 1 };
+    case "DECREMENT":
+      return { count: state.count - 1 };
+    case "SET":
+      return { count: action.value };
+    default:
+      return state;
+  }
+}
+
+const Counter = () =&gt; {
+  const [state, dispatch] = useReducer(counterReducer, { count: 0 });
+
+  return (
+    &lt;div&gt;
+      &lt;p&gt;Count: {state.count}&lt;/p&gt;
+      &lt;button onClick={() =&gt; dispatch({ type: "INCREMENT" })}&gt;+1&lt;/button&gt;
+      &lt;button onClick={() =&gt; dispatch({ type: "DECREMENT" })}&gt;-1&lt;/button&gt;
+      &lt;button onClick={() =&gt; dispatch({ type: "SET", value: 0 })}&gt;0으로&lt;/button&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default Counter;</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 2 ================= -->
+  <section class="module" id="m2">
+    <h2><span class="num">2</span> useContext() — TypeScript로 전역 데이터 공유</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li><code>createContext&lt;타입 | null&gt;(null)</code>로 Context 값의 타입을 지정할 수 있다.</li>
+        <li>Provider의 <code>children</code>을 <code>ReactNode</code> 타입으로 받을 수 있다.</li>
+        <li>커스텀 훅에서 null 검사를 처리해 안전하게 Context를 꺼내 쓸 수 있다.</li>
+        <li>useReducer(단원 1)와 Context를 결합해 장바구니 전역 상태를 만들 수 있다.</li>
+      </ul>
+    </div>
+
+    <div class="concept">
+      <h3 class="blk">📖 Context에 타입을 붙이는 방법</h3>
+      <table>
+        <tr><th>단계</th><th>JavaScript (7강)</th><th>TypeScript</th></tr>
+        <tr><td>값의 타입</td><td>-</td><td><code>interface CartContextType { cart: CartItem[]; ... }</code></td></tr>
+        <tr><td>만들기</td><td><code>createContext()</code></td><td><code>createContext&lt;CartContextType | null&gt;(null)</code></td></tr>
+        <tr><td>공급하기</td><td><code>({ children })</code></td><td><code>({ children }: { children: ReactNode })</code></td></tr>
+        <tr><td>꺼내 쓰기</td><td><code>useContext(CartContext)</code></td><td><code>useCart()</code> 안에서 null 검사 후 반환</td></tr>
+      </table>
+      <p>Provider 밖에서 <code>useContext</code>를 호출하면 값이 없으므로 기본값을 <code>null</code>로 둡니다. 그러면 꺼낸 값의 타입이 <code>CartContextType | null</code>이 되어 매번 null 검사가 필요한데, <b>커스텀 훅에서 한 번만 검사</b>하면 사용하는 컴포넌트는 항상 <code>CartContextType</code>으로 받을 수 있습니다.</p>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 장바구니 Context (타입 정의 · 리듀서 · Provider · 커스텀 훅)</div>
+      <div class="flow">
+App
+ └ CartProvider   → cart, dispatch, totalCount, totalPrice 제공
+    ├ Header      → totalCount
+    ├ ProductList → dispatch (ADD)
+    └ Cart        → cart, dispatch, totalPrice
+      </div>
+      <span class="fname">src/CartContext.tsx</span>
+      <pre><code class="language-tsx">import { createContext, useContext, useReducer } from "react";
+import type { ReactNode } from "react";
+
+// 1. 데이터 타입
+export interface Product {
+  id: number;
+  name: string;
+  price: number;
+}
+
+export interface CartItem extends Product {
+  qty: number; // Product의 속성 + 수량
+}
+
+type CartAction =
+  | { type: "ADD"; product: Product }
+  | { type: "DECREASE"; id: number }
+  | { type: "REMOVE"; id: number }
+  | { type: "CLEAR" };
+
+// 2. Context에 담을 값의 타입
+interface CartContextType {
+  cart: CartItem[];
+  dispatch: React.Dispatch&lt;CartAction&gt;;
+  totalCount: number;
+  totalPrice: number;
+}
+
+function cartReducer(state: CartItem[], action: CartAction): CartItem[] {
+  switch (action.type) {
+    case "ADD": {
+      const found = state.find((item) =&gt; item.id === action.product.id);
+      if (found) {
+        return state.map((item) =&gt;
+          item.id === action.product.id ? { ...item, qty: item.qty + 1 } : item
+        );
+      }
+      return [...state, { ...action.product, qty: 1 }];
+    }
+    case "DECREASE":
+      return state
+        .map((item) =&gt; (item.id === action.id ? { ...item, qty: item.qty - 1 } : item))
+        .filter((item) =&gt; item.qty &gt; 0);
+    case "REMOVE":
+      return state.filter((item) =&gt; item.id !== action.id);
+    case "CLEAR":
+      return [];
+    default:
+      return state;
+  }
+}
+
+// 3. Context 생성 : Provider 밖에서는 값이 없으므로 null 허용
+const CartContext = createContext&lt;CartContextType | null&gt;(null);
+
+// 4. Provider : children의 타입은 ReactNode
+export function CartProvider({ children }: { children: ReactNode }) {
+  const [cart, dispatch] = useReducer(cartReducer, []);
+
+  const totalCount = cart.reduce((sum, item) =&gt; sum + item.qty, 0);
+  const totalPrice = cart.reduce((sum, item) =&gt; sum + item.price * item.qty, 0);
+
+  return (
+    &lt;CartContext.Provider value={{ cart, dispatch, totalCount, totalPrice }}&gt;
+      {children}
+    &lt;/CartContext.Provider&gt;
+  );
+}
+
+// 5. 커스텀 훅 : null 검사를 한 곳에서 처리 → 사용하는 쪽은 CartContextType으로 받음
+export function useCart(): CartContextType {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error("useCart는 CartProvider 안에서만 사용할 수 있습니다.");
+  }
+  return context;
+}</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — Provider로 감싸고 컴포넌트에서 꺼내 쓰기</div>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">import { CartProvider } from "./CartContext";
+import Header from "./Header";
+import ProductList from "./ProductList";
+import Cart from "./Cart";
+
+function App() {
+  return (
+    &lt;CartProvider&gt;
+      &lt;Header /&gt;
+      &lt;ProductList /&gt;
+      &lt;Cart /&gt;
+    &lt;/CartProvider&gt;
+  );
+}
+
+export default App;</code></pre>
+      <span class="fname">src/Header.tsx</span>
+      <pre><code class="language-tsx">import { useCart } from "./CartContext";
+
+const Header = () =&gt; {
+  const { totalCount } = useCart(); // totalCount: number
+
+  return (
+    &lt;header className="cart-header"&gt;
+      &lt;h2&gt;SPACE SHOP&lt;/h2&gt;
+      &lt;span&gt;🛒 장바구니 ({totalCount})&lt;/span&gt;
+    &lt;/header&gt;
+  );
+};
+
+export default Header;</code></pre>
+      <span class="fname">src/ProductList.tsx</span>
+      <pre><code class="language-tsx">import { useCart } from "./CartContext";
+import type { Product } from "./CartContext";
+
+const products: Product[] = [
+  { id: 1, name: "무선마우스", price: 32000 },
+  { id: 2, name: "키보드", price: 40000 },
+  { id: 3, name: "모니터", price: 120000 },
+];
+
+const ProductList = () =&gt; {
+  const { dispatch } = useCart();
+
+  return (
+    &lt;ul className="product-list"&gt;
+      {products.map((product) =&gt; (
+        &lt;li key={product.id}&gt;
+          {product.name} - {product.price.toLocaleString()}원
+          &lt;button onClick={() =&gt; dispatch({ type: "ADD", product })}&gt;담기&lt;/button&gt;
+        &lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+};
+
+export default ProductList;</code></pre>
+      <span class="fname">src/Cart.tsx</span>
+      <pre><code class="language-tsx">import { useCart } from "./CartContext";
+
+const Cart = () =&gt; {
+  const { cart, dispatch, totalPrice } = useCart(); // cart: CartItem[]
+
+  if (cart.length === 0) return &lt;p&gt;장바구니가 비어 있습니다.&lt;/p&gt;;
+
+  return (
+    &lt;div className="cart"&gt;
+      &lt;h3&gt;장바구니&lt;/h3&gt;
+      &lt;ul&gt;
+        {cart.map((item) =&gt; (
+          &lt;li key={item.id}&gt;
+            {item.name} × {item.qty}
+            &lt;button onClick={() =&gt; dispatch({ type: "ADD", product: item })}&gt;+&lt;/button&gt;
+            &lt;button onClick={() =&gt; dispatch({ type: "DECREASE", id: item.id })}&gt;-&lt;/button&gt;
+            &lt;button onClick={() =&gt; dispatch({ type: "REMOVE", id: item.id })}&gt;삭제&lt;/button&gt;
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+      &lt;p&gt;총액: {totalPrice.toLocaleString()}원&lt;/p&gt;
+      &lt;button onClick={() =&gt; dispatch({ type: "CLEAR" })}&gt;비우기&lt;/button&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default Cart;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;background:#333;color:#fff;padding:8px 12px;border-radius:6px"><strong>SPACE SHOP</strong><span>🛒 장바구니 (3)</span></div>
+        <ul style="margin:10px 0">
+          <li>무선마우스 - 32,000원 <button>담기</button></li>
+          <li>키보드 - 40,000원 <button>담기</button></li>
+          <li>모니터 - 120,000원 <button>담기</button></li>
+        </ul>
+        <div style="border:1px solid #ccc;padding:10px;border-radius:6px">
+          <strong>장바구니</strong>
+          <ul style="margin:6px 0">
+            <li>무선마우스 × 2 <button>+</button> <button>-</button> <button>삭제</button></li>
+            <li>키보드 × 1 <button>+</button> <button>-</button> <button>삭제</button></li>
+          </ul>
+          <p>총액: 104,000원</p>
+          <button>비우기</button>
+        </div>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>CartItem extends Product</code>처럼 interface를 확장하면 상품 정보에 수량만 더한 타입을 간단히 만들 수 있습니다. dispatch의 타입은 <code>React.Dispatch&lt;CartAction&gt;</code>이므로, 컴포넌트에서 잘못된 액션을 보내면 TypeScript가 바로 알려 줍니다.</div>
+    </div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 2-1. 테마 Context에 타입 지정하기</h4>
+      <p><code>"light" | "dark"</code> 두 값만 가지는 <code>theme</code>과 <code>toggleTheme</code> 함수를 Context로 공유하세요. <code>ThemeProvider</code>와 <code>useTheme()</code> 커스텀 훅을 만들고, 버튼을 누르면 테마가 바뀌게 합니다.</p>
+      <details><summary>정답 보기</summary>
+        <pre><code class="language-tsx">import { createContext, useContext, useState } from "react";
+import type { ReactNode } from "react";
+
+type Theme = "light" | "dark";
+
+interface ThemeContextType {
+  theme: Theme;
+  toggleTheme: () =&gt; void;
+}
+
+const ThemeContext = createContext&lt;ThemeContextType | null&gt;(null);
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState&lt;Theme&gt;("light");
+  const toggleTheme = () =&gt; setTheme((prev) =&gt; (prev === "light" ? "dark" : "light"));
+
+  return (
+    &lt;ThemeContext.Provider value={{ theme, toggleTheme }}&gt;
+      {children}
+    &lt;/ThemeContext.Provider&gt;
+  );
+}
+
+export function useTheme(): ThemeContextType {
+  const context = useContext(ThemeContext);
+  if (!context) throw new Error("useTheme는 ThemeProvider 안에서만 사용할 수 있습니다.");
+  return context;
+}
+
+export const ThemeButton = () =&gt; {
+  const { theme, toggleTheme } = useTheme();
+  return (
+    &lt;div&gt;
+      &lt;p&gt;현재 테마: {theme}&lt;/p&gt;
+      &lt;button onClick={toggleTheme}&gt;테마 변경&lt;/button&gt;
+    &lt;/div&gt;
+  );
+};</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 3 ================= -->
+  <section class="module" id="m3">
+    <h2><span class="num">3</span> Redux Toolkit — TypeScript로 전역 상태 관리</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li>slice의 State를 interface로 정의하고, payload 타입을 <code>PayloadAction&lt;T&gt;</code>로 지정할 수 있다.</li>
+        <li>store에서 <code>RootState</code>와 <code>AppDispatch</code> 타입을 뽑아낼 수 있다.</li>
+        <li>타입이 지정된 훅 <code>useAppSelector</code> · <code>useAppDispatch</code>를 만들어 사용할 수 있다.</li>
+        <li>Context로 만든 장바구니를 slice · selector로 옮겨 RTK 방식으로 관리할 수 있다.</li>
+      </ul>
+    </div>
+
+    <div class="concept">
+      <h3 class="blk">📖 RTK에 타입을 붙이는 4단계</h3>
+      <p>7강에서 만든 Counter를 TypeScript로 바꿉니다. 설치는 7강과 같습니다(<code>npm install @reduxjs/toolkit react-redux</code>). Redux Toolkit은 TypeScript로 만들어져 있어서 별도의 타입 패키지가 필요 없습니다.</p>
+      <table>
+        <tr><th>단계</th><th>파일</th><th>JavaScript (7강)</th><th>TypeScript</th></tr>
+        <tr><td>1</td><td>counterSlice.ts</td><td><code>initialState = { count: 0 }</code></td><td><code>interface CounterState</code>로 State 타입 지정</td></tr>
+        <tr><td>2</td><td>counterSlice.ts</td><td><code>(state, action)</code></td><td><code>action: PayloadAction&lt;number&gt;</code></td></tr>
+        <tr><td>3</td><td>store/index.ts</td><td>-</td><td><code>RootState</code>, <code>AppDispatch</code> 타입 export</td></tr>
+        <tr><td>4</td><td>store/hooks.ts</td><td><code>useSelector</code>, <code>useDispatch</code></td><td><code>useAppSelector</code>, <code>useAppDispatch</code></td></tr>
+      </table>
+      <div class="flow">
+src/
+ ├ store/
+ │   ├ counterSlice.ts   ← State 타입 · PayloadAction
+ │   ├ index.ts          ← configureStore · RootState · AppDispatch
+ │   └ hooks.ts          ← useAppSelector · useAppDispatch
+ ├ apps/
+ │   └ Counter.tsx
+ ├ App.tsx
+ └ main.tsx              ← Provider
+      </div>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — slice · store · 타입 지정 훅</div>
+      <span class="fname">src/store/counterSlice.ts</span>
+      <pre><code class="language-typescript">import { createSlice } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit'
+
+// 1. State 타입
+interface CounterState {
+  count: number
+}
+
+const initialState: CounterState = {
+  count: 0,
+}
+
+const counterSlice = createSlice({
+  name: 'counter',
+  initialState,
+  reducers: {
+    increment: (state) =&gt; {
+      state.count += 1
+    },
+    decrement: (state) =&gt; {
+      state.count -= 1
+    },
+    reset: (state) =&gt; {
+      state.count = 0
+    },
+    // 2. payload가 있는 액션 : PayloadAction&lt;payload의 타입&gt;
+    incrementByAmount: (state, action: PayloadAction&lt;number&gt;) =&gt; {
+      state.count += action.payload
+    },
+  },
+})
+
+export const { increment, decrement, reset, incrementByAmount } = counterSlice.actions
+export default counterSlice.reducer</code></pre>
+      <span class="fname">src/store/index.ts</span>
+      <pre><code class="language-typescript">import { configureStore } from '@reduxjs/toolkit'
+import counterReducer from './counterSlice'
+
+export const store = configureStore({
+  reducer: {
+    counter: counterReducer,
+  },
+})
+
+// 3. store에서 타입을 자동으로 뽑아냄
+// RootState   : 전체 state의 타입 → { counter: CounterState }
+// AppDispatch : store의 dispatch 타입
+export type RootState = ReturnType&lt;typeof store.getState&gt;
+export type AppDispatch = typeof store.dispatch</code></pre>
+      <span class="fname">src/store/hooks.ts</span>
+      <pre><code class="language-typescript">import { useDispatch, useSelector } from 'react-redux'
+import type { RootState, AppDispatch } from './index'
+
+// 4. 타입이 지정된 훅 : 컴포넌트에서는 이 훅을 사용
+//    매번 (state: RootState) 타입을 쓰지 않아도 됨
+export const useAppDispatch = useDispatch.withTypes&lt;AppDispatch&gt;()
+export const useAppSelector = useSelector.withTypes&lt;RootState&gt;()</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>RootState</code>는 store에 등록한 reducer에서 <b>자동으로 계산</b>되므로, slice를 추가해도 따로 고칠 필요가 없습니다. 컴포넌트에서는 react-redux의 <code>useSelector</code> 대신 <code>useAppSelector</code>를 쓰면 <code>state</code>의 타입을 매번 적지 않아도 됩니다.</div>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — Provider 연결과 Counter 컴포넌트</div>
+      <span class="fname">src/main.tsx</span>
+      <pre><code class="language-tsx">import { createRoot } from 'react-dom/client'
+import { Provider } from 'react-redux'
+import { store } from './store/index'
+import App from './App'
+
+createRoot(document.getElementById('root')!).render(
+  &lt;Provider store={store}&gt;
+    &lt;App /&gt;
+  &lt;/Provider&gt;
+)</code></pre>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">import Counter from './apps/Counter'
+
+function App() {
+  return &lt;Counter /&gt;
+}
+
+export default App</code></pre>
+      <span class="fname">src/apps/Counter.tsx</span>
+      <pre><code class="language-tsx">import { useState } from 'react'
+import { useAppSelector, useAppDispatch } from '../store/hooks'
+import { increment, decrement, reset, incrementByAmount } from '../store/counterSlice'
+
+const Counter = () =&gt; {
+  // state의 타입이 RootState로 추론됨 → state.counter.count 자동완성
+  const count = useAppSelector((state) =&gt; state.counter.count)
+  const dispatch = useAppDispatch()
+  const [amount, setAmount] = useState&lt;number&gt;(0)
+
+  const handleChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+    setAmount(Number(e.target.value) || 0)
+  }
+
+  return (
+    &lt;div className="redux-app"&gt;
+      &lt;h2&gt;Counter&lt;/h2&gt;
+      &lt;p&gt;Count: {count}&lt;/p&gt;
+      &lt;button onClick={() =&gt; dispatch(increment())}&gt;증가&lt;/button&gt;
+      &lt;button onClick={() =&gt; dispatch(decrement())}&gt;감소&lt;/button&gt;
+      &lt;button onClick={() =&gt; dispatch(reset())}&gt;초기화&lt;/button&gt;
+      &lt;div&gt;
+        &lt;input type="number" value={amount} onChange={handleChange} /&gt;
+        {/* incrementByAmount("10")처럼 문자열을 넣으면 타입 오류 */}
+        &lt;button onClick={() =&gt; dispatch(incrementByAmount(amount))}&gt;입력값만큼 증가&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default Counter</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p><b>Counter</b></p>
+        <p>Count: 13</p>
+        <div class="demo"><button>증가</button> <button>감소</button> <button>초기화</button></div>
+        <div class="demo"><input type="number" value="10" style="padding:6px;width:80px"> <button>입력값만큼 증가</button></div>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>incrementByAmount</code>는 <code>PayloadAction&lt;number&gt;</code>로 정의했기 때문에 <code>incrementByAmount("10")</code>처럼 문자열을 넣으면 실행 전에 타입 오류가 납니다. <code>document.getElementById('root')!</code>의 <code>!</code>는 "null이 아니다"라고 알려 주는 Non-null 단언입니다.</div>
+    </div>
+
+    <div class="concept">
+      <h3 class="blk">📖 장바구니를 RTK로 옮기기 — Context 방식과 비교</h3>
+      <p>단원 2의 장바구니(Context + useReducer)를 Redux Toolkit으로 바꿉니다. 데이터 타입(<code>Product</code>, <code>CartItem</code>)과 화면은 그대로 두고, <b>상태를 보관하고 바꾸는 곳만</b> slice로 옮깁니다.</p>
+      <table>
+        <tr><th>구분</th><th>Context + useReducer (단원 2)</th><th>Redux Toolkit</th></tr>
+        <tr><td>액션 타입</td><td><code>type CartAction = { type: "ADD"; ... } | ...</code> 직접 작성</td><td><code>PayloadAction&lt;Product&gt;</code> — 액션 생성자가 자동으로 만들어짐</td></tr>
+        <tr><td>상태 변경</td><td><code>map</code> · <code>filter</code>로 새 배열 반환</td><td><code>found.qty += 1</code>처럼 직접 수정 (immer가 불변성 처리)</td></tr>
+        <tr><td>공급</td><td><code>&lt;CartProvider&gt;</code></td><td><code>&lt;Provider store={store}&gt;</code> (main.tsx)</td></tr>
+        <tr><td>꺼내 쓰기</td><td><code>useCart()</code></td><td><code>useAppSelector(selectTotalCount)</code></td></tr>
+        <tr><td>변경 요청</td><td><code>dispatch({ type: "ADD", product })</code></td><td><code>dispatch(addItem(product))</code></td></tr>
+        <tr><td>파생 값</td><td>Provider 안에서 <code>reduce()</code></td><td>selector 함수에서 <code>reduce()</code></td></tr>
+      </table>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 장바구니 slice와 store 등록</div>
+      <span class="fname">src/store/cartSlice.ts</span>
+      <pre><code class="language-typescript">import { createSlice } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit'
+import type { RootState } from './index'
+
+// 1. 데이터 타입 (단원 2와 같음)
+export interface Product {
+  id: number
+  name: string
+  price: number
+}
+
+export interface CartItem extends Product {
+  qty: number
+}
+
+interface CartState {
+  items: CartItem[]
+}
+
+const initialState: CartState = {
+  items: [],
+}
+
+const cartSlice = createSlice({
+  name: 'cart',
+  initialState,
+  reducers: {
+    // 2. 액션마다 payload 타입 지정
+    //    RTK는 내부에서 immer를 사용하므로 state를 직접 고치는 문법을 써도 불변성이 지켜짐
+    addItem: (state, action: PayloadAction&lt;Product&gt;) =&gt; {
+      const found = state.items.find((item) =&gt; item.id === action.payload.id)
+      if (found) {
+        found.qty += 1
+      } else {
+        state.items.push({ ...action.payload, qty: 1 })
+      }
+    },
+    decreaseItem: (state, action: PayloadAction&lt;number&gt;) =&gt; {
+      const found = state.items.find((item) =&gt; item.id === action.payload)
+      if (!found) return
+      found.qty -= 1
+      if (found.qty === 0) {
+        state.items = state.items.filter((item) =&gt; item.id !== action.payload)
+      }
+    },
+    removeItem: (state, action: PayloadAction&lt;number&gt;) =&gt; {
+      state.items = state.items.filter((item) =&gt; item.id !== action.payload)
+    },
+    clearCart: (state) =&gt; {
+      state.items = []
+    },
+  },
+})
+
+export const { addItem, decreaseItem, removeItem, clearCart } = cartSlice.actions
+export default cartSlice.reducer
+
+// 3. selector : state에서 계산한 값을 꺼내는 함수 (파생 값)
+export const selectCartItems = (state: RootState) =&gt; state.cart.items
+export const selectTotalCount = (state: RootState) =&gt;
+  state.cart.items.reduce((sum, item) =&gt; sum + item.qty, 0)
+export const selectTotalPrice = (state: RootState) =&gt;
+  state.cart.items.reduce((sum, item) =&gt; sum + item.price * item.qty, 0)</code></pre>
+      <span class="fname">src/store/index.ts</span>
+      <pre><code class="language-typescript">import { configureStore } from '@reduxjs/toolkit'
+import counterReducer from './counterSlice'
+import cartReducer from './cartSlice'
+
+export const store = configureStore({
+  reducer: {
+    counter: counterReducer,
+    cart: cartReducer, // 장바구니 slice 등록
+  },
+})
+
+export type RootState = ReturnType&lt;typeof store.getState&gt;
+export type AppDispatch = typeof store.dispatch</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 컴포넌트에서 장바구니 사용하기</div>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">import Header from './apps/Header'
+import ProductList from './apps/ProductList'
+import Cart from './apps/Cart'
+
+// Provider는 main.tsx에서 이미 감싸고 있으므로 따로 필요 없음
+function App() {
+  return (
+    &lt;&gt;
+      &lt;Header /&gt;
+      &lt;ProductList /&gt;
+      &lt;Cart /&gt;
+    &lt;/&gt;
+  )
+}
+
+export default App</code></pre>
+      <span class="fname">src/apps/Header.tsx</span>
+      <pre><code class="language-tsx">import { useAppSelector } from '../store/hooks'
+import { selectTotalCount } from '../store/cartSlice'
+
+const Header = () =&gt; {
+  const totalCount = useAppSelector(selectTotalCount) // number
+
+  return (
+    &lt;header className="cart-header"&gt;
+      &lt;h2&gt;SPACE SHOP&lt;/h2&gt;
+      &lt;span&gt;🛒 장바구니 ({totalCount})&lt;/span&gt;
+    &lt;/header&gt;
+  )
+}
+
+export default Header</code></pre>
+      <span class="fname">src/apps/ProductList.tsx</span>
+      <pre><code class="language-tsx">import { useAppDispatch } from '../store/hooks'
+import { addItem } from '../store/cartSlice'
+import type { Product } from '../store/cartSlice'
+
+const products: Product[] = [
+  { id: 1, name: '무선마우스', price: 32000 },
+  { id: 2, name: '키보드', price: 40000 },
+  { id: 3, name: '모니터', price: 120000 },
+]
+
+const ProductList = () =&gt; {
+  const dispatch = useAppDispatch()
+
+  return (
+    &lt;ul className="product-list"&gt;
+      {products.map((product) =&gt; (
+        &lt;li key={product.id}&gt;
+          {product.name} - {product.price.toLocaleString()}원
+          &lt;button onClick={() =&gt; dispatch(addItem(product))}&gt;담기&lt;/button&gt;
+        &lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  )
+}
+
+export default ProductList</code></pre>
+      <span class="fname">src/apps/Cart.tsx</span>
+      <pre><code class="language-tsx">import { useAppSelector, useAppDispatch } from '../store/hooks'
+import {
+  addItem,
+  decreaseItem,
+  removeItem,
+  clearCart,
+  selectCartItems,
+  selectTotalPrice,
+} from '../store/cartSlice'
+
+const Cart = () =&gt; {
+  const cart = useAppSelector(selectCartItems) // CartItem[]
+  const totalPrice = useAppSelector(selectTotalPrice)
+  const dispatch = useAppDispatch()
+
+  if (cart.length === 0) return &lt;p&gt;장바구니가 비어 있습니다.&lt;/p&gt;
+
+  return (
+    &lt;div className="cart"&gt;
+      &lt;h3&gt;장바구니&lt;/h3&gt;
+      &lt;ul&gt;
+        {cart.map((item) =&gt; (
+          &lt;li key={item.id}&gt;
+            {item.name} × {item.qty}
+            &lt;button onClick={() =&gt; dispatch(addItem(item))}&gt;+&lt;/button&gt;
+            &lt;button onClick={() =&gt; dispatch(decreaseItem(item.id))}&gt;-&lt;/button&gt;
+            &lt;button onClick={() =&gt; dispatch(removeItem(item.id))}&gt;삭제&lt;/button&gt;
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+      &lt;p&gt;총액: {totalPrice.toLocaleString()}원&lt;/p&gt;
+      &lt;button onClick={() =&gt; dispatch(clearCart())}&gt;비우기&lt;/button&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default Cart</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;background:#333;color:#fff;padding:8px 12px;border-radius:6px"><strong>SPACE SHOP</strong><span>🛒 장바구니 (3)</span></div>
+        <ul style="margin:10px 0">
+          <li>무선마우스 - 32,000원 <button>담기</button></li>
+          <li>키보드 - 40,000원 <button>담기</button></li>
+          <li>모니터 - 120,000원 <button>담기</button></li>
+        </ul>
+        <div style="border:1px solid #ccc;padding:10px;border-radius:6px">
+          <strong>장바구니</strong>
+          <ul style="margin:6px 0">
+            <li>무선마우스 × 2 <button>+</button> <button>-</button> <button>삭제</button></li>
+            <li>키보드 × 1 <button>+</button> <button>-</button> <button>삭제</button></li>
+          </ul>
+          <p>총액: 104,000원</p>
+          <button>비우기</button>
+        </div>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> 화면 결과는 단원 2와 똑같습니다. 컴포넌트는 <code>useCart()</code> 대신 <code>useAppSelector</code> · <code>useAppDispatch</code>로 바뀌었을 뿐이고, <code>Product</code> · <code>CartItem</code> 타입은 그대로 재사용합니다. 새 slice를 store에 등록하면 <code>RootState</code>에 <code>cart</code>가 자동으로 추가되어, selector에서 <code>state.cart.items</code>가 자동완성됩니다.</div>
+    </div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 3-1. 은행 slice에 타입 지정하기</h4>
+      <p><code>balance</code>(number)를 가진 <code>BankState</code>와, 금액을 payload로 받는 <code>deposit</code> · <code>withdraw</code> 액션을 가진 <code>bankSlice</code>를 TypeScript로 만드세요. 잔액보다 큰 금액은 출금되지 않게 합니다.</p>
+      <details><summary>정답 보기</summary>
+        <pre><code class="language-typescript">import { createSlice } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit'
+
+interface BankState {
+  balance: number
+}
+
+const initialState: BankState = { balance: 0 }
+
+const bankSlice = createSlice({
+  name: 'bank',
+  initialState,
+  reducers: {
+    deposit: (state, action: PayloadAction&lt;number&gt;) =&gt; {
+      state.balance += action.payload
+    },
+    withdraw: (state, action: PayloadAction&lt;number&gt;) =&gt; {
+      if (action.payload &lt;= state.balance) {
+        state.balance -= action.payload
+      }
+    },
+  },
+})
+
+export const { deposit, withdraw } = bankSlice.actions
+export default bankSlice.reducer
+
+// store/index.ts에 등록
+// reducer: { counter: counterReducer, bank: bankReducer }
+
+// 컴포넌트에서 사용
+// const balance = useAppSelector((state) =&gt; state.bank.balance)
+// dispatch(deposit(10000))</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 4 ================= -->
+  <section class="module" id="m4">
+    <h2><span class="num">4</span> Zustand — 가볍게 전역 상태 관리</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li>현업에서 Context · Redux Toolkit · Zustand를 어떤 상황에 쓰는지 구분할 수 있다.</li>
+        <li><code>create&lt;타입&gt;()</code>로 타입이 지정된 Zustand store를 만들 수 있다.</li>
+        <li>selector로 필요한 값만 구독해 장바구니를 Provider 없이 공유할 수 있다.</li>
+      </ul>
+    </div>
+
+    <div class="concept">
+      <h3 class="blk">📖 Zustand란? — Context · RTK와 비교</h3>
+      <p><b>Zustand</b>는 독일어로 "상태"라는 뜻의 가벼운 전역 상태 관리 라이브러리입니다(약 1KB). <b>Provider가 필요 없고</b>, store 하나에 상태와 변경 함수를 함께 적기 때문에 코드가 짧습니다. 최근 새 프로젝트에서 RTK 대신 많이 선택됩니다.</p>
+      <table>
+        <tr><th>구분</th><th>Context + useReducer</th><th>Redux Toolkit</th><th>Zustand</th></tr>
+        <tr><td>설치</td><td>필요 없음 (React 내장)</td><td><code>@reduxjs/toolkit</code>, <code>react-redux</code></td><td><code>zustand</code></td></tr>
+        <tr><td>Provider</td><td>필요</td><td>필요 (<code>&lt;Provider store&gt;</code>)</td><td><b>필요 없음</b></td></tr>
+        <tr><td>만드는 파일</td><td>Context · reducer · Provider · 커스텀 훅</td><td>slice · store · hooks</td><td><b>store 파일 하나</b></td></tr>
+        <tr><td>변경 방법</td><td><code>dispatch({ type: "ADD", ... })</code></td><td><code>dispatch(addItem(product))</code></td><td><code>addItem(product)</code> 함수 호출</td></tr>
+        <tr><td>리렌더링</td><td>값이 바뀌면 사용하는 컴포넌트 전체</td><td>selector로 선택한 값만</td><td>selector로 선택한 값만</td></tr>
+        <tr><td>현업에서 주로</td><td>로그인 정보 · 테마 등 자주 안 바뀌는 값</td><td>대규모 · 기존 서비스</td><td>새 프로젝트의 전역 상태</td></tr>
+      </table>
+      <div class="tip"><span class="lbl">💡 설치</span> <code>npm install zustand</code> — Zustand는 TypeScript로 만들어져 있어 별도의 타입 패키지가 필요 없습니다.</div>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 장바구니 store 만들기</div>
+      <p>단원 2 · 3과 같은 장바구니입니다. 상태(<code>items</code>)와 변경 함수(<code>addItem</code> 등)를 <code>CartStore</code> 타입 하나에 정의합니다.</p>
+      <span class="fname">src/store/useCartStore.ts</span>
+      <pre><code class="language-typescript">import { create } from 'zustand'
+
+// 1. 데이터 타입 (단원 2 · 3과 같음)
+export interface Product {
+  id: number
+  name: string
+  price: number
+}
+
+export interface CartItem extends Product {
+  qty: number
+}
+
+// 2. store 타입 : 상태 + 상태를 바꾸는 함수를 한 곳에 정의
+interface CartStore {
+  items: CartItem[]
+  addItem: (product: Product) =&gt; void
+  decreaseItem: (id: number) =&gt; void
+  removeItem: (id: number) =&gt; void
+  clearCart: () =&gt; void
+}
+
+// 3. store 생성 : create&lt;타입&gt;()((set) =&gt; ({ ... }))
+//    set(함수) : 이전 state를 받아 바꿀 부분만 반환
+export const useCartStore = create&lt;CartStore&gt;()((set) =&gt; ({
+  items: [],
+
+  addItem: (product) =&gt;
+    set((state) =&gt; {
+      const found = state.items.find((item) =&gt; item.id === product.id)
+      if (found) {
+        return {
+          items: state.items.map((item) =&gt;
+            item.id === product.id ? { ...item, qty: item.qty + 1 } : item
+          ),
+        }
+      }
+      return { items: [...state.items, { ...product, qty: 1 }] }
+    }),
+
+  decreaseItem: (id) =&gt;
+    set((state) =&gt; ({
+      items: state.items
+        .map((item) =&gt; (item.id === id ? { ...item, qty: item.qty - 1 } : item))
+        .filter((item) =&gt; item.qty &gt; 0),
+    })),
+
+  removeItem: (id) =&gt;
+    set((state) =&gt; ({ items: state.items.filter((item) =&gt; item.id !== id) })),
+
+  clearCart: () =&gt; set({ items: [] }),
+}))</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>create&lt;CartStore&gt;()((set) =&gt; ...)</code>처럼 <b>괄호를 두 번</b> 쓰는 것이 TypeScript에서 Zustand를 쓰는 공식 방법입니다. <code>set</code>에 함수를 넘기면 이전 state를 받아 <b>바꿀 부분만</b> 반환하면 되고, 나머지 값은 자동으로 유지됩니다.</div>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — Provider 없이 컴포넌트에서 사용하기</div>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">import Header from './apps/Header'
+import ProductList from './apps/ProductList'
+import Cart from './apps/Cart'
+
+// Provider가 필요 없음 : store를 import해서 바로 사용
+function App() {
+  return (
+    &lt;&gt;
+      &lt;Header /&gt;
+      &lt;ProductList /&gt;
+      &lt;Cart /&gt;
+    &lt;/&gt;
+  )
+}
+
+export default App</code></pre>
+      <span class="fname">src/apps/Header.tsx</span>
+      <pre><code class="language-tsx">import { useCartStore } from '../store/useCartStore'
+
+const Header = () =&gt; {
+  // selector로 필요한 값만 계산해서 구독 → 이 값이 바뀔 때만 다시 렌더링
+  const totalCount = useCartStore((state) =&gt;
+    state.items.reduce((sum, item) =&gt; sum + item.qty, 0)
+  )
+
+  return (
+    &lt;header className="cart-header"&gt;
+      &lt;h2&gt;SPACE SHOP&lt;/h2&gt;
+      &lt;span&gt;🛒 장바구니 ({totalCount})&lt;/span&gt;
+    &lt;/header&gt;
+  )
+}
+
+export default Header</code></pre>
+      <span class="fname">src/apps/ProductList.tsx</span>
+      <pre><code class="language-tsx">import { useCartStore } from '../store/useCartStore'
+import type { Product } from '../store/useCartStore'
+
+const products: Product[] = [
+  { id: 1, name: '무선마우스', price: 32000 },
+  { id: 2, name: '키보드', price: 40000 },
+  { id: 3, name: '모니터', price: 120000 },
+]
+
+const ProductList = () =&gt; {
+  // 함수만 꺼내 쓰므로 장바구니 내용이 바뀌어도 다시 렌더링되지 않음
+  const addItem = useCartStore((state) =&gt; state.addItem)
+
+  return (
+    &lt;ul className="product-list"&gt;
+      {products.map((product) =&gt; (
+        &lt;li key={product.id}&gt;
+          {product.name} - {product.price.toLocaleString()}원
+          &lt;button onClick={() =&gt; addItem(product)}&gt;담기&lt;/button&gt;
+        &lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  )
+}
+
+export default ProductList</code></pre>
+      <span class="fname">src/apps/Cart.tsx</span>
+      <pre><code class="language-tsx">import { useCartStore } from '../store/useCartStore'
+
+const Cart = () =&gt; {
+  const items = useCartStore((state) =&gt; state.items) // CartItem[]
+  const addItem = useCartStore((state) =&gt; state.addItem)
+  const decreaseItem = useCartStore((state) =&gt; state.decreaseItem)
+  const removeItem = useCartStore((state) =&gt; state.removeItem)
+  const clearCart = useCartStore((state) =&gt; state.clearCart)
+
+  const totalPrice = items.reduce((sum, item) =&gt; sum + item.price * item.qty, 0)
+
+  if (items.length === 0) return &lt;p&gt;장바구니가 비어 있습니다.&lt;/p&gt;
+
+  return (
+    &lt;div className="cart"&gt;
+      &lt;h3&gt;장바구니&lt;/h3&gt;
+      &lt;ul&gt;
+        {items.map((item) =&gt; (
+          &lt;li key={item.id}&gt;
+            {item.name} × {item.qty}
+            &lt;button onClick={() =&gt; addItem(item)}&gt;+&lt;/button&gt;
+            &lt;button onClick={() =&gt; decreaseItem(item.id)}&gt;-&lt;/button&gt;
+            &lt;button onClick={() =&gt; removeItem(item.id)}&gt;삭제&lt;/button&gt;
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+      &lt;p&gt;총액: {totalPrice.toLocaleString()}원&lt;/p&gt;
+      &lt;button onClick={clearCart}&gt;비우기&lt;/button&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default Cart</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;background:#333;color:#fff;padding:8px 12px;border-radius:6px"><strong>SPACE SHOP</strong><span>🛒 장바구니 (3)</span></div>
+        <ul style="margin:10px 0">
+          <li>무선마우스 - 32,000원 <button>담기</button></li>
+          <li>키보드 - 40,000원 <button>담기</button></li>
+          <li>모니터 - 120,000원 <button>담기</button></li>
+        </ul>
+        <div style="border:1px solid #ccc;padding:10px;border-radius:6px">
+          <strong>장바구니</strong>
+          <ul style="margin:6px 0">
+            <li>무선마우스 × 2 <button>+</button> <button>-</button> <button>삭제</button></li>
+            <li>키보드 × 1 <button>+</button> <button>-</button> <button>삭제</button></li>
+          </ul>
+          <p>총액: 104,000원</p>
+          <button>비우기</button>
+        </div>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> 화면은 단원 2 · 3과 똑같습니다. <code>useCartStore((state) =&gt; state.addItem)</code>처럼 <b>필요한 값만 골라서</b> 꺼내면, 그 값이 바뀔 때만 컴포넌트가 다시 렌더링됩니다. 그래서 ProductList는 장바구니 내용이 바뀌어도 다시 그려지지 않습니다. Context에서는 값을 쓰는 모든 컴포넌트가 다시 그려지는 것과 다른 점입니다.</div>
+    </div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 4-1. Zustand로 카운터 만들기</h4>
+      <p>단원 3의 RTK Counter를 Zustand로 바꿔 보세요. <code>count</code>와 <code>increment</code> · <code>decrement</code> · <code>reset</code> 함수를 가진 <code>CounterStore</code> 타입을 정의하고 <code>useCounterStore</code>를 만듭니다.</p>
+      <details><summary>정답 보기</summary>
+        <pre><code class="language-typescript">import { create } from 'zustand'
+
+interface CounterStore {
+  count: number
+  increment: () =&gt; void
+  decrement: () =&gt; void
+  reset: () =&gt; void
+}
+
+export const useCounterStore = create&lt;CounterStore&gt;()((set) =&gt; ({
+  count: 0,
+  increment: () =&gt; set((state) =&gt; ({ count: state.count + 1 })),
+  decrement: () =&gt; set((state) =&gt; ({ count: state.count - 1 })),
+  reset: () =&gt; set({ count: 0 }),
+}))
+
+// 컴포넌트에서 사용
+// const count = useCounterStore((state) =&gt; state.count)
+// const increment = useCounterStore((state) =&gt; state.increment)
+// &lt;button onClick={increment}&gt;증가&lt;/button&gt;</code></pre>
+      </details>
+    </div>
+  </section>
+
+
+
+
+  <footer>9강. 타입스크립트 기반 전역관리 · 학습 교안<br>모듈별 학습목표 · 개념 · 예제 · 실습문제 구성</footer>
+</div>
+
+<script>
+(()=>{var wn=Object.create;var Ce=Object.defineProperty;var On=Object.getOwnPropertyDescriptor;var Rn=Object.getOwnPropertyNames;var xn=Object.getPrototypeOf,Mn=Object.prototype.hasOwnProperty;var vn=(e,n)=>()=>{try{return n||e((n={exports:{}}).exports,n),n.exports}catch(t){throw n=0,t}};var kn=(e,n,t,s)=>{if(n&&typeof n=="object"||typeof n=="function")for(let g of Rn(n))!Mn.call(e,g)&&g!==t&&Ce(e,g,{get:()=>n[g],enumerable:!(s=On(n,g))||s.enumerable});return e};var In=(e,n,t)=>(t=e!=null?wn(xn(e)):{},kn(n||!e||!e.__esModule?Ce(t,"default",{value:e,enumerable:!0}):t,e));var Ve=vn((Lt,Je)=>{function $e(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(n=>{let t=e[n],s=typeof t;(s==="object"||s==="function")&&!Object.isFrozen(t)&&$e(t)}),e}var de=class{constructor(n){n.data===void 0&&(n.data={}),this.data=n.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function He(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function K(e,...n){let t=Object.create(null);for(let s in e)t[s]=e[s];return n.forEach(function(s){for(let g in s)t[g]=s[g]}),t}var Cn="</span>",Le=e=>!!e.scope,Ln=(e,{prefix:n})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let t=e.split(".");return[`${n}${t.shift()}`,...t.map((s,g)=>`${s}${"_".repeat(g+1)}`)].join(" ")}return`${n}${e}`},_e=class{constructor(n,t){this.buffer="",this.classPrefix=t.classPrefix,n.walk(this)}addText(n){this.buffer+=He(n)}openNode(n){if(!Le(n))return;let t=Ln(n.scope,{prefix:this.classPrefix});this.span(t)}closeNode(n){Le(n)&&(this.buffer+=Cn)}value(){return this.buffer}span(n){this.buffer+=`<span class="${n}">`}},De=(e={})=>{let n={children:[]};return Object.assign(n,e),n},Ne=class e{constructor(){this.rootNode=De(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(n){this.top.children.push(n)}openNode(n){let t=De({scope:n});this.add(t),this.stack.push(t)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(n){return this.constructor._walk(n,this.rootNode)}static _walk(n,t){return typeof t=="string"?n.addText(t):t.children&&(n.openNode(t),t.children.forEach(s=>this._walk(n,s)),n.closeNode(t)),n}static _collapse(n){typeof n!="string"&&n.children&&(n.children.every(t=>typeof t=="string")?n.children=[n.children.join("")]:n.children.forEach(t=>{e._collapse(t)}))}},Se=class extends Ne{constructor(n){super(),this.options=n}addText(n){n!==""&&this.add(n)}startScope(n){this.openNode(n)}endScope(){this.closeNode()}__addSublanguage(n,t){let s=n.root;t&&(s.scope=`language:${t}`),this.add(s)}toHTML(){return new _e(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function re(e){return e?typeof e=="string"?e:e.source:null}function Ge(e){return j("(?=",e,")")}function Dn(e){return j("(?:",e,")*")}function Bn(e){return j("(?:",e,")?")}function j(...e){return e.map(t=>re(t)).join("")}function Un(e){let n=e[e.length-1];return typeof n=="object"&&n.constructor===Object?(e.splice(e.length-1,1),n):{}}function ye(...e){return"("+(Un(e).capture?"":"?:")+e.map(s=>re(s)).join("|")+")"}function Fe(e){return new RegExp(e.toString()+"|").exec("").length-1}function Pn(e,n){let t=e&&e.exec(n);return t&&t.index===0}var zn=/\[(?:[^\\\]]|\\.)*\]|\(\??|\\([1-9][0-9]*)|\\./;function Te(e,{joinWith:n}){let t=0;return e.map(s=>{t+=1;let g=t,E=re(s),a="";for(;E.length>0;){let i=zn.exec(E);if(!i){a+=E;break}a+=E.substring(0,i.index),E=E.substring(i.index+i[0].length),i[0][0]==="\\"&&i[1]?a+="\\"+String(Number(i[1])+g):(a+=i[0],i[0]==="("&&t++)}return a}).map(s=>`(${s})`).join(n)}var $n=/\b\B/,Ke="[a-zA-Z]\\w*",we="[a-zA-Z_]\\w*",Ze="\\b\\d+(\\.\\d+)?",We="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Xe="\\b(0b[01]+)",Hn="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",Gn=(e={})=>{let n=/^#![ ]*\//;return e.binary&&(e.begin=j(n,/.*\b/,e.binary,/\b.*/)),K({scope:"meta",begin:n,end:/$/,relevance:0,"on:begin":(t,s)=>{t.index!==0&&s.ignoreMatch()}},e)},ae={begin:"\\\\[\\s\\S]",relevance:0},Fn={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[ae]},Kn={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[ae]},Zn={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},fe=function(e,n,t={}){let s=K({scope:"comment",begin:e,end:n,contains:[]},t);s.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let g=ye("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return s.contains.push({begin:j(/[ ]+/,"(",g,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),s},Wn=fe("//","$"),Xn=fe("/\\*","\\*/"),Yn=fe("#","$"),jn={scope:"number",begin:Ze,relevance:0},qn={scope:"number",begin:We,relevance:0},Qn={scope:"number",begin:Xe,relevance:0},Jn={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[ae,{begin:/\[/,end:/\]/,relevance:0,contains:[ae]}]},Vn={scope:"title",begin:Ke,relevance:0},et={scope:"title",begin:we,relevance:0},nt={begin:"\\.\\s*"+we,relevance:0},tt=function(e){return Object.assign(e,{"on:begin":(n,t)=>{t.data._beginMatch=n[1]},"on:end":(n,t)=>{t.data._beginMatch!==n[1]&&t.ignoreMatch()}})},ue=Object.freeze({__proto__:null,APOS_STRING_MODE:Fn,BACKSLASH_ESCAPE:ae,BINARY_NUMBER_MODE:Qn,BINARY_NUMBER_RE:Xe,COMMENT:fe,C_BLOCK_COMMENT_MODE:Xn,C_LINE_COMMENT_MODE:Wn,C_NUMBER_MODE:qn,C_NUMBER_RE:We,END_SAME_AS_BEGIN:tt,HASH_COMMENT_MODE:Yn,IDENT_RE:Ke,MATCH_NOTHING_RE:$n,METHOD_GUARD:nt,NUMBER_MODE:jn,NUMBER_RE:Ze,PHRASAL_WORDS_MODE:Zn,QUOTE_STRING_MODE:Kn,REGEXP_MODE:Jn,RE_STARTERS_RE:Hn,SHEBANG:Gn,TITLE_MODE:Vn,UNDERSCORE_IDENT_RE:we,UNDERSCORE_TITLE_MODE:et});function it(e,n){e.input[e.index-1]==="."&&n.ignoreMatch()}function st(e,n){e.className!==void 0&&(e.scope=e.className,delete e.className)}function rt(e,n){n&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=it,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function at(e,n){Array.isArray(e.illegal)&&(e.illegal=ye(...e.illegal))}function ot(e,n){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function ct(e,n){e.relevance===void 0&&(e.relevance=1)}var lt=(e,n)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let t=Object.assign({},e);Object.keys(e).forEach(s=>{delete e[s]}),e.keywords=t.keywords,e.begin=j(t.beforeMatch,Ge(t.begin)),e.starts={relevance:0,contains:[Object.assign(t,{endsParent:!0})]},e.relevance=0,delete t.beforeMatch},ut=["of","and","for","in","not","or","if","then","parent","list","value"],dt="keyword";function Ye(e,n,t=dt){let s=Object.create(null);return typeof e=="string"?g(t,e.split(" ")):Array.isArray(e)?g(t,e):Object.keys(e).forEach(function(E){Object.assign(s,Ye(e[E],n,E))}),s;function g(E,a){n&&(a=a.map(i=>i.toLowerCase())),a.forEach(function(i){let l=i.split("|");s[l[0]]=[E,gt(l[0],l[1])]})}}function gt(e,n){return n?Number(n):ft(e)?0:1}function ft(e){return ut.includes(e.toLowerCase())}var Be={},Y=e=>{console.error(e)},Ue=(e,...n)=>{console.log(`WARN: ${e}`,...n)},J=(e,n)=>{Be[`${e}/${n}`]||(console.log(`Deprecated as of ${e}. ${n}`),Be[`${e}/${n}`]=!0)},ge=new Error;function je(e,n,{key:t}){let s=0,g=e[t],E={},a={};for(let i=1;i<=n.length;i++)a[i+s]=g[i],E[i+s]=!0,s+=Fe(n[i-1]);e[t]=a,e[t]._emit=E,e[t]._multi=!0}function bt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw Y("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),ge;if(typeof e.beginScope!="object"||e.beginScope===null)throw Y("beginScope must be object"),ge;je(e,e.begin,{key:"beginScope"}),e.begin=Te(e.begin,{joinWith:""})}}function pt(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw Y("skip, excludeEnd, returnEnd not compatible with endScope: {}"),ge;if(typeof e.endScope!="object"||e.endScope===null)throw Y("endScope must be object"),ge;je(e,e.end,{key:"endScope"}),e.end=Te(e.end,{joinWith:""})}}function ht(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function Et(e){ht(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),bt(e),pt(e)}function mt(e){function n(a,i){return new RegExp(re(a),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(i?"g":""))}class t{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(i,l){l.position=this.position++,this.matchIndexes[this.matchAt]=l,this.regexes.push([l,i]),this.matchAt+=Fe(i)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let i=this.regexes.map(l=>l[1]);this.matcherRe=n(Te(i,{joinWith:"|"}),!0),this.lastIndex=0}exec(i){this.matcherRe.lastIndex=this.lastIndex;let l=this.matcherRe.exec(i);if(!l)return null;let f=l.findIndex((w,S)=>S>0&&w!==void 0),m=this.matchIndexes[f];return l.splice(0,f),Object.assign(l,m)}}class s{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(i){if(this.multiRegexes[i])return this.multiRegexes[i];let l=new t;return this.rules.slice(i).forEach(([f,m])=>l.addRule(f,m)),l.compile(),this.multiRegexes[i]=l,l}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(i,l){this.rules.push([i,l]),l.type==="begin"&&this.count++}exec(i){let l=this.getMatcher(this.regexIndex);l.lastIndex=this.lastIndex;let f=l.exec(i);if(this.resumingScanAtSamePosition()&&!(f&&f.index===this.lastIndex)){let m=this.getMatcher(0);m.lastIndex=this.lastIndex+1,f=m.exec(i)}return f&&(this.regexIndex+=f.position+1,this.regexIndex===this.count&&this.considerAll()),f}}function g(a){let i=new s;return a.contains.forEach(l=>i.addRule(l.begin,{rule:l,type:"begin"})),a.terminatorEnd&&i.addRule(a.terminatorEnd,{type:"end"}),a.illegal&&i.addRule(a.illegal,{type:"illegal"}),i}function E(a,i){let l=a;if(a.isCompiled)return l;[st,ot,Et,lt].forEach(m=>m(a,i)),e.compilerExtensions.forEach(m=>m(a,i)),a.__beforeBegin=null,[rt,at,ct].forEach(m=>m(a,i)),a.isCompiled=!0;let f=null;return typeof a.keywords=="object"&&a.keywords.$pattern&&(a.keywords=Object.assign({},a.keywords),f=a.keywords.$pattern,delete a.keywords.$pattern),f=f||/\w+/,a.keywords&&(a.keywords=Ye(a.keywords,e.case_insensitive)),l.keywordPatternRe=n(f,!0),i&&(a.begin||(a.begin=/\B|\b/),l.beginRe=n(l.begin),!a.end&&!a.endsWithParent&&(a.end=/\B|\b/),a.end&&(l.endRe=n(l.end)),l.terminatorEnd=re(l.end)||"",a.endsWithParent&&i.terminatorEnd&&(l.terminatorEnd+=(a.end?"|":"")+i.terminatorEnd)),a.illegal&&(l.illegalRe=n(a.illegal)),a.contains||(a.contains=[]),a.contains=[].concat(...a.contains.map(function(m){return _t(m==="self"?a:m)})),a.contains.forEach(function(m){E(m,l)}),a.starts&&E(a.starts,i),l.matcher=g(l),l}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=K(e.classNameAliases||{}),E(e)}function qe(e){return e?e.endsWithParent||qe(e.starts):!1}function _t(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(n){return K(e,{variants:null},n)})),e.cachedVariants?e.cachedVariants:qe(e)?K(e,{starts:e.starts?K(e.starts):null}):Object.isFrozen(e)?K(e):e}var Nt="11.9.0",Ae=class extends Error{constructor(n,t){super(n),this.name="HTMLInjectionError",this.html=t}},me=He,Pe=K,ze=Symbol("nomatch"),St=7,Qe=function(e){let n=Object.create(null),t=Object.create(null),s=[],g=!0,E="Could not find the language '{}', did you forget to load/include a language module?",a={disableAutodetect:!0,name:"Plain text",contains:[]},i={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:Se};function l(r){return i.noHighlightRe.test(r)}function f(r){let o=r.className+" ";o+=r.parentNode?r.parentNode.className:"";let d=i.languageDetectRe.exec(o);if(d){let h=D(d[1]);return h||(Ue(E.replace("{}",d[1])),Ue("Falling back to no-highlight mode for this block.",r)),h?d[1]:"no-highlight"}return o.split(/\s+/).find(h=>l(h)||D(h))}function m(r,o,d){let h="",_="";typeof o=="object"?(h=r,d=o.ignoreIllegals,_=o.language):(J("10.7.0","highlight(lang, code, ...args) has been deprecated."),J("10.7.0",`Please use highlight(code, options) instead.
+https://github.com/highlightjs/highlight.js/issues/2277`),_=r,h=o),d===void 0&&(d=!0);let T={code:h,language:_};F("before:highlight",T);let v=T.result?T.result:w(T.language,T.code,d);return v.code=T.code,F("after:highlight",v),v}function w(r,o,d,h){let _=Object.create(null);function T(c,u){return c.keywords[u]}function v(){if(!b.keywords){O.addText(A);return}let c=0;b.keywordPatternRe.lastIndex=0;let u=b.keywordPatternRe.exec(A),p="";for(;u;){p+=A.substring(c,u.index);let N=$.case_insensitive?u[0].toLowerCase():u[0],R=T(b,N);if(R){let[G,yn]=R;if(O.addText(p),p="",_[N]=(_[N]||0)+1,_[N]<=St&&(le+=yn),G.startsWith("_"))p+=u[0];else{let Tn=$.classNameAliases[G]||G;z(u[0],Tn)}}else p+=u[0];c=b.keywordPatternRe.lastIndex,u=b.keywordPatternRe.exec(A)}p+=A.substring(c),O.addText(p)}function oe(){if(A==="")return;let c=null;if(typeof b.subLanguage=="string"){if(!n[b.subLanguage]){O.addText(A);return}c=w(b.subLanguage,A,!0,Ie[b.subLanguage]),Ie[b.subLanguage]=c._top}else c=y(A,b.subLanguage.length?b.subLanguage:null);b.relevance>0&&(le+=c.relevance),O.__addSublanguage(c._emitter,c.language)}function I(){b.subLanguage!=null?oe():v(),A=""}function z(c,u){c!==""&&(O.startScope(u),O.addText(c),O.endScope())}function xe(c,u){let p=1,N=u.length-1;for(;p<=N;){if(!c._emit[p]){p++;continue}let R=$.classNameAliases[c[p]]||c[p],G=u[p];R?z(G,R):(A=G,v(),A=""),p++}}function Me(c,u){return c.scope&&typeof c.scope=="string"&&O.openNode($.classNameAliases[c.scope]||c.scope),c.beginScope&&(c.beginScope._wrap?(z(A,$.classNameAliases[c.beginScope._wrap]||c.beginScope._wrap),A=""):c.beginScope._multi&&(xe(c.beginScope,u),A="")),b=Object.create(c,{parent:{value:b}}),b}function ve(c,u,p){let N=Pn(c.endRe,p);if(N){if(c["on:end"]){let R=new de(c);c["on:end"](u,R),R.isMatchIgnored&&(N=!1)}if(N){for(;c.endsParent&&c.parent;)c=c.parent;return c}}if(c.endsWithParent)return ve(c.parent,u,p)}function mn(c){return b.matcher.regexIndex===0?(A+=c[0],1):(Ee=!0,0)}function _n(c){let u=c[0],p=c.rule,N=new de(p),R=[p.__beforeBegin,p["on:begin"]];for(let G of R)if(G&&(G(c,N),N.isMatchIgnored))return mn(u);return p.skip?A+=u:(p.excludeBegin&&(A+=u),I(),!p.returnBegin&&!p.excludeBegin&&(A=u)),Me(p,c),p.returnBegin?0:u.length}function Nn(c){let u=c[0],p=o.substring(c.index),N=ve(b,c,p);if(!N)return ze;let R=b;b.endScope&&b.endScope._wrap?(I(),z(u,b.endScope._wrap)):b.endScope&&b.endScope._multi?(I(),xe(b.endScope,c)):R.skip?A+=u:(R.returnEnd||R.excludeEnd||(A+=u),I(),R.excludeEnd&&(A=u));do b.scope&&O.closeNode(),!b.skip&&!b.subLanguage&&(le+=b.relevance),b=b.parent;while(b!==N.parent);return N.starts&&Me(N.starts,c),R.returnEnd?0:u.length}function Sn(){let c=[];for(let u=b;u!==$;u=u.parent)u.scope&&c.unshift(u.scope);c.forEach(u=>O.openNode(u))}let ce={};function ke(c,u){let p=u&&u[0];if(A+=c,p==null)return I(),0;if(ce.type==="begin"&&u.type==="end"&&ce.index===u.index&&p===""){if(A+=o.slice(u.index,u.index+1),!g){let N=new Error(`0 width match regex (${r})`);throw N.languageName=r,N.badRule=ce.rule,N}return 1}if(ce=u,u.type==="begin")return _n(u);if(u.type==="illegal"&&!d){let N=new Error('Illegal lexeme "'+p+'" for mode "'+(b.scope||"<unnamed>")+'"');throw N.mode=b,N}else if(u.type==="end"){let N=Nn(u);if(N!==ze)return N}if(u.type==="illegal"&&p==="")return 1;if(he>1e5&&he>u.index*3)throw new Error("potential infinite loop, way more iterations than matches");return A+=p,p.length}let $=D(r);if(!$)throw Y(E.replace("{}",r)),new Error('Unknown language: "'+r+'"');let An=mt($),pe="",b=h||An,Ie={},O=new i.__emitter(i);Sn();let A="",le=0,X=0,he=0,Ee=!1;try{if($.__emitTokens)$.__emitTokens(o,O);else{for(b.matcher.considerAll();;){he++,Ee?Ee=!1:b.matcher.considerAll(),b.matcher.lastIndex=X;let c=b.matcher.exec(o);if(!c)break;let u=o.substring(X,c.index),p=ke(u,c);X=c.index+p}ke(o.substring(X))}return O.finalize(),pe=O.toHTML(),{language:r,value:pe,relevance:le,illegal:!1,_emitter:O,_top:b}}catch(c){if(c.message&&c.message.includes("Illegal"))return{language:r,value:me(o),illegal:!0,relevance:0,_illegalBy:{message:c.message,index:X,context:o.slice(X-100,X+100),mode:c.mode,resultSoFar:pe},_emitter:O};if(g)return{language:r,value:me(o),illegal:!1,relevance:0,errorRaised:c,_emitter:O,_top:b};throw c}}function S(r){let o={value:me(r),illegal:!1,relevance:0,_top:a,_emitter:new i.__emitter(i)};return o._emitter.addText(r),o}function y(r,o){o=o||i.languages||Object.keys(n);let d=S(r),h=o.filter(D).filter(Q).map(I=>w(I,r,!1));h.unshift(d);let _=h.sort((I,z)=>{if(I.relevance!==z.relevance)return z.relevance-I.relevance;if(I.language&&z.language){if(D(I.language).supersetOf===z.language)return 1;if(D(z.language).supersetOf===I.language)return-1}return 0}),[T,v]=_,oe=T;return oe.secondBest=v,oe}function C(r,o,d){let h=o&&t[o]||d;r.classList.add("hljs"),r.classList.add(`language-${h}`)}function x(r){let o=null,d=f(r);if(l(d))return;if(F("before:highlightElement",{el:r,language:d}),r.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",r);return}if(r.children.length>0&&(i.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("https://github.com/highlightjs/highlight.js/wiki/security"),console.warn("The element with unescaped HTML:"),console.warn(r)),i.throwUnescapedHTML))throw new Ae("One of your code blocks includes unescaped HTML.",r.innerHTML);o=r;let h=o.textContent,_=d?m(h,{language:d,ignoreIllegals:!0}):y(h);r.innerHTML=_.value,r.dataset.highlighted="yes",C(r,d,_.language),r.result={language:_.language,re:_.relevance,relevance:_.relevance},_.secondBest&&(r.secondBest={language:_.secondBest.language,relevance:_.secondBest.relevance}),F("after:highlightElement",{el:r,result:_,text:h})}function M(r){i=Pe(i,r)}let ee=()=>{L(),J("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function B(){L(),J("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let P=!1;function L(){if(document.readyState==="loading"){P=!0;return}document.querySelectorAll(i.cssSelector).forEach(x)}function H(){P&&L()}typeof window<"u"&&window.addEventListener&&window.addEventListener("DOMContentLoaded",H,!1);function k(r,o){let d=null;try{d=o(e)}catch(h){if(Y("Language definition for '{}' could not be registered.".replace("{}",r)),g)Y(h);else throw h;d=a}d.name||(d.name=r),n[r]=d,d.rawDefinition=o.bind(null,e),d.aliases&&q(d.aliases,{languageName:r})}function ne(r){delete n[r];for(let o of Object.keys(t))t[o]===r&&delete t[o]}function Z(){return Object.keys(n)}function D(r){return r=(r||"").toLowerCase(),n[r]||n[t[r]]}function q(r,{languageName:o}){typeof r=="string"&&(r=[r]),r.forEach(d=>{t[d.toLowerCase()]=o})}function Q(r){let o=D(r);return o&&!o.disableAutodetect}function te(r){r["before:highlightBlock"]&&!r["before:highlightElement"]&&(r["before:highlightElement"]=o=>{r["before:highlightBlock"](Object.assign({block:o.el},o))}),r["after:highlightBlock"]&&!r["after:highlightElement"]&&(r["after:highlightElement"]=o=>{r["after:highlightBlock"](Object.assign({block:o.el},o))})}function ie(r){te(r),s.push(r)}function se(r){let o=s.indexOf(r);o!==-1&&s.splice(o,1)}function F(r,o){let d=r;s.forEach(function(h){h[d]&&h[d](o)})}function W(r){return J("10.7.0","highlightBlock will be removed entirely in v12.0"),J("10.7.0","Please use highlightElement now."),x(r)}Object.assign(e,{highlight:m,highlightAuto:y,highlightAll:L,highlightElement:x,highlightBlock:W,configure:M,initHighlighting:ee,initHighlightingOnLoad:B,registerLanguage:k,unregisterLanguage:ne,listLanguages:Z,getLanguage:D,registerAliases:q,autoDetection:Q,inherit:Pe,addPlugin:ie,removePlugin:se}),e.debugMode=function(){g=!1},e.safeMode=function(){g=!0},e.versionString=Nt,e.regex={concat:j,lookahead:Ge,either:ye,optional:Bn,anyNumberOfTimes:Dn};for(let r in ue)typeof ue[r]=="object"&&$e(ue[r]);return Object.assign(e,ue),e},V=Qe({});V.newInstance=()=>Qe({});Je.exports=V;V.HighlightJS=V;V.default=V});var en=In(Ve(),1);var U=en.default;var nn="[A-Za-z$_][0-9A-Za-z$_]*",At=["as","in","of","if","for","while","finally","var","new","function","do","return","void","else","break","catch","instanceof","with","throw","case","default","try","switch","continue","typeof","delete","let","yield","const","class","debugger","async","await","static","import","from","export","extends"],yt=["true","false","null","undefined","NaN","Infinity"],tn=["Object","Function","Boolean","Symbol","Math","Date","Number","BigInt","String","RegExp","Array","Float32Array","Float64Array","Int8Array","Uint8Array","Uint8ClampedArray","Int16Array","Int32Array","Uint16Array","Uint32Array","BigInt64Array","BigUint64Array","Set","Map","WeakSet","WeakMap","ArrayBuffer","SharedArrayBuffer","Atomics","DataView","JSON","Promise","Generator","GeneratorFunction","AsyncFunction","Reflect","Proxy","Intl","WebAssembly"],sn=["Error","EvalError","InternalError","RangeError","ReferenceError","SyntaxError","TypeError","URIError"],rn=["setInterval","setTimeout","clearInterval","clearTimeout","require","exports","eval","isFinite","isNaN","parseFloat","parseInt","decodeURI","decodeURIComponent","encodeURI","encodeURIComponent","escape","unescape"],Tt=["arguments","this","super","console","window","document","localStorage","sessionStorage","module","global"],wt=[].concat(rn,tn,sn);function Oe(e){let n=e.regex,t=(o,{after:d})=>{let h="</"+o[0].slice(1);return o.input.indexOf(h,d)!==-1},s=nn,g={begin:"<>",end:"</>"},E=/<[A-Za-z0-9\\._:-]+\s*\/>/,a={begin:/<[A-Za-z0-9\\._:-]+/,end:/\/[A-Za-z0-9\\._:-]+>|\/>/,isTrulyOpeningTag:(o,d)=>{let h=o[0].length+o.index,_=o.input[h];if(_==="<"||_===","){d.ignoreMatch();return}_===">"&&(t(o,{after:h})||d.ignoreMatch());let T,v=o.input.substring(h);if(T=v.match(/^\s*=/)){d.ignoreMatch();return}if((T=v.match(/^\s+extends\s+/))&&T.index===0){d.ignoreMatch();return}}},i={$pattern:nn,keyword:At,literal:yt,built_in:wt,"variable.language":Tt},l="[0-9](_?[0-9])*",f=`\\.(${l})`,m="0|[1-9](_?[0-9])*|0[0-7]*[89][0-9]*",w={className:"number",variants:[{begin:`(\\b(${m})((${f})|\\.)?|(${f}))[eE][+-]?(${l})\\b`},{begin:`\\b(${m})\\b((${f})\\b|\\.)?|(${f})\\b`},{begin:"\\b(0|[1-9](_?[0-9])*)n\\b"},{begin:"\\b0[xX][0-9a-fA-F](_?[0-9a-fA-F])*n?\\b"},{begin:"\\b0[bB][0-1](_?[0-1])*n?\\b"},{begin:"\\b0[oO][0-7](_?[0-7])*n?\\b"},{begin:"\\b0[0-7]+n?\\b"}],relevance:0},S={className:"subst",begin:"\\$\\{",end:"\\}",keywords:i,contains:[]},y={begin:"html`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"xml"}},C={begin:"css`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"css"}},x={begin:"gql`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"graphql"}},M={className:"string",begin:"`",end:"`",contains:[e.BACKSLASH_ESCAPE,S]},B={className:"comment",variants:[e.COMMENT(/\/\*\*(?!\/)/,"\\*/",{relevance:0,contains:[{begin:"(?=@[A-Za-z]+)",relevance:0,contains:[{className:"doctag",begin:"@[A-Za-z]+"},{className:"type",begin:"\\{",end:"\\}",excludeEnd:!0,excludeBegin:!0,relevance:0},{className:"variable",begin:s+"(?=\\s*(-)|$)",endsParent:!0,relevance:0},{begin:/(?=[^\n])\s/,relevance:0}]}]}),e.C_BLOCK_COMMENT_MODE,e.C_LINE_COMMENT_MODE]},P=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,{match:/\$\d+/},w];S.contains=P.concat({begin:/\{/,end:/\}/,keywords:i,contains:["self"].concat(P)});let L=[].concat(B,S.contains),H=L.concat([{begin:/\(/,end:/\)/,keywords:i,contains:["self"].concat(L)}]),k={className:"params",begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H},ne={variants:[{match:[/class/,/\s+/,s,/\s+/,/extends/,/\s+/,n.concat(s,"(",n.concat(/\./,s),")*")],scope:{1:"keyword",3:"title.class",5:"keyword",7:"title.class.inherited"}},{match:[/class/,/\s+/,s],scope:{1:"keyword",3:"title.class"}}]},Z={relevance:0,match:n.either(/\bJSON/,/\b[A-Z][a-z]+([A-Z][a-z]*|\d)*/,/\b[A-Z]{2,}([A-Z][a-z]+|\d)+([A-Z][a-z]*)*/,/\b[A-Z]{2,}[a-z]+([A-Z][a-z]+|\d)*([A-Z][a-z]*)*/),className:"title.class",keywords:{_:[...tn,...sn]}},D={label:"use_strict",className:"meta",relevance:10,begin:/^\s*['"]use (strict|asm)['"]/},q={variants:[{match:[/function/,/\s+/,s,/(?=\s*\()/]},{match:[/function/,/\s*(?=\()/]}],className:{1:"keyword",3:"title.function"},label:"func.def",contains:[k],illegal:/%/},Q={relevance:0,match:/\b[A-Z][A-Z_0-9]+\b/,className:"variable.constant"};function te(o){return n.concat("(?!",o.join("|"),")")}let ie={match:n.concat(/\b/,te([...rn,"super","import"]),s,n.lookahead(/\(/)),className:"title.function",relevance:0},se={begin:n.concat(/\./,n.lookahead(n.concat(s,/(?![0-9A-Za-z$_(])/))),end:s,excludeBegin:!0,keywords:"prototype",className:"property",relevance:0},F={match:[/get|set/,/\s+/,s,/(?=\()/],className:{1:"keyword",3:"title.function"},contains:[{begin:/\(\)/},k]},W="(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|"+e.UNDERSCORE_IDENT_RE+")\\s*=>",r={match:[/const|var|let/,/\s+/,s,/\s*/,/=\s*/,/(async\s*)?/,n.lookahead(W)],keywords:"async",className:{1:"keyword",3:"title.function"},contains:[k]};return{name:"JavaScript",aliases:["js","jsx","mjs","cjs"],keywords:i,exports:{PARAMS_CONTAINS:H,CLASS_REFERENCE:Z},illegal:/#(?![$_A-z])/,contains:[e.SHEBANG({label:"shebang",binary:"node",relevance:5}),D,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,B,{match:/\$\d+/},w,Z,{className:"attr",begin:s+n.lookahead(":"),relevance:0},r,{begin:"("+e.RE_STARTERS_RE+"|\\b(case|return|throw)\\b)\\s*",keywords:"return throw case",relevance:0,contains:[B,e.REGEXP_MODE,{className:"function",begin:W,returnBegin:!0,end:"\\s*=>",contains:[{className:"params",variants:[{begin:e.UNDERSCORE_IDENT_RE,relevance:0},{className:null,begin:/\(\s*\)/,skip:!0},{begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H}]}]},{begin:/,/,relevance:0},{match:/\s+/,relevance:0},{variants:[{begin:g.begin,end:g.end},{match:E},{begin:a.begin,"on:begin":a.isTrulyOpeningTag,end:a.end}],subLanguage:"xml",contains:[{begin:a.begin,end:a.end,skip:!0,contains:["self"]}]}]},q,{beginKeywords:"while if switch catch for"},{begin:"\\b(?!function)"+e.UNDERSCORE_IDENT_RE+"\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)\\s*\\{",returnBegin:!0,label:"func.def",contains:[k,e.inherit(e.TITLE_MODE,{begin:s,className:"title.function"})]},{match:/\.\.\./,relevance:0},se,{match:"\\$"+s,relevance:0},{match:[/\bconstructor(?=\s*\()/],className:{1:"title.function"},contains:[k]},ie,Q,ne,F,{match:/\$[(.]/}]}}var be="[A-Za-z$_][0-9A-Za-z$_]*",an=["as","in","of","if","for","while","finally","var","new","function","do","return","void","else","break","catch","instanceof","with","throw","case","default","try","switch","continue","typeof","delete","let","yield","const","class","debugger","async","await","static","import","from","export","extends"],on=["true","false","null","undefined","NaN","Infinity"],cn=["Object","Function","Boolean","Symbol","Math","Date","Number","BigInt","String","RegExp","Array","Float32Array","Float64Array","Int8Array","Uint8Array","Uint8ClampedArray","Int16Array","Int32Array","Uint16Array","Uint32Array","BigInt64Array","BigUint64Array","Set","Map","WeakSet","WeakMap","ArrayBuffer","SharedArrayBuffer","Atomics","DataView","JSON","Promise","Generator","GeneratorFunction","AsyncFunction","Reflect","Proxy","Intl","WebAssembly"],ln=["Error","EvalError","InternalError","RangeError","ReferenceError","SyntaxError","TypeError","URIError"],un=["setInterval","setTimeout","clearInterval","clearTimeout","require","exports","eval","isFinite","isNaN","parseFloat","parseInt","decodeURI","decodeURIComponent","encodeURI","encodeURIComponent","escape","unescape"],dn=["arguments","this","super","console","window","document","localStorage","sessionStorage","module","global"],gn=[].concat(un,cn,ln);function Ot(e){let n=e.regex,t=(o,{after:d})=>{let h="</"+o[0].slice(1);return o.input.indexOf(h,d)!==-1},s=be,g={begin:"<>",end:"</>"},E=/<[A-Za-z0-9\\._:-]+\s*\/>/,a={begin:/<[A-Za-z0-9\\._:-]+/,end:/\/[A-Za-z0-9\\._:-]+>|\/>/,isTrulyOpeningTag:(o,d)=>{let h=o[0].length+o.index,_=o.input[h];if(_==="<"||_===","){d.ignoreMatch();return}_===">"&&(t(o,{after:h})||d.ignoreMatch());let T,v=o.input.substring(h);if(T=v.match(/^\s*=/)){d.ignoreMatch();return}if((T=v.match(/^\s+extends\s+/))&&T.index===0){d.ignoreMatch();return}}},i={$pattern:be,keyword:an,literal:on,built_in:gn,"variable.language":dn},l="[0-9](_?[0-9])*",f=`\\.(${l})`,m="0|[1-9](_?[0-9])*|0[0-7]*[89][0-9]*",w={className:"number",variants:[{begin:`(\\b(${m})((${f})|\\.)?|(${f}))[eE][+-]?(${l})\\b`},{begin:`\\b(${m})\\b((${f})\\b|\\.)?|(${f})\\b`},{begin:"\\b(0|[1-9](_?[0-9])*)n\\b"},{begin:"\\b0[xX][0-9a-fA-F](_?[0-9a-fA-F])*n?\\b"},{begin:"\\b0[bB][0-1](_?[0-1])*n?\\b"},{begin:"\\b0[oO][0-7](_?[0-7])*n?\\b"},{begin:"\\b0[0-7]+n?\\b"}],relevance:0},S={className:"subst",begin:"\\$\\{",end:"\\}",keywords:i,contains:[]},y={begin:"html`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"xml"}},C={begin:"css`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"css"}},x={begin:"gql`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"graphql"}},M={className:"string",begin:"`",end:"`",contains:[e.BACKSLASH_ESCAPE,S]},B={className:"comment",variants:[e.COMMENT(/\/\*\*(?!\/)/,"\\*/",{relevance:0,contains:[{begin:"(?=@[A-Za-z]+)",relevance:0,contains:[{className:"doctag",begin:"@[A-Za-z]+"},{className:"type",begin:"\\{",end:"\\}",excludeEnd:!0,excludeBegin:!0,relevance:0},{className:"variable",begin:s+"(?=\\s*(-)|$)",endsParent:!0,relevance:0},{begin:/(?=[^\n])\s/,relevance:0}]}]}),e.C_BLOCK_COMMENT_MODE,e.C_LINE_COMMENT_MODE]},P=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,{match:/\$\d+/},w];S.contains=P.concat({begin:/\{/,end:/\}/,keywords:i,contains:["self"].concat(P)});let L=[].concat(B,S.contains),H=L.concat([{begin:/\(/,end:/\)/,keywords:i,contains:["self"].concat(L)}]),k={className:"params",begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H},ne={variants:[{match:[/class/,/\s+/,s,/\s+/,/extends/,/\s+/,n.concat(s,"(",n.concat(/\./,s),")*")],scope:{1:"keyword",3:"title.class",5:"keyword",7:"title.class.inherited"}},{match:[/class/,/\s+/,s],scope:{1:"keyword",3:"title.class"}}]},Z={relevance:0,match:n.either(/\bJSON/,/\b[A-Z][a-z]+([A-Z][a-z]*|\d)*/,/\b[A-Z]{2,}([A-Z][a-z]+|\d)+([A-Z][a-z]*)*/,/\b[A-Z]{2,}[a-z]+([A-Z][a-z]+|\d)*([A-Z][a-z]*)*/),className:"title.class",keywords:{_:[...cn,...ln]}},D={label:"use_strict",className:"meta",relevance:10,begin:/^\s*['"]use (strict|asm)['"]/},q={variants:[{match:[/function/,/\s+/,s,/(?=\s*\()/]},{match:[/function/,/\s*(?=\()/]}],className:{1:"keyword",3:"title.function"},label:"func.def",contains:[k],illegal:/%/},Q={relevance:0,match:/\b[A-Z][A-Z_0-9]+\b/,className:"variable.constant"};function te(o){return n.concat("(?!",o.join("|"),")")}let ie={match:n.concat(/\b/,te([...un,"super","import"]),s,n.lookahead(/\(/)),className:"title.function",relevance:0},se={begin:n.concat(/\./,n.lookahead(n.concat(s,/(?![0-9A-Za-z$_(])/))),end:s,excludeBegin:!0,keywords:"prototype",className:"property",relevance:0},F={match:[/get|set/,/\s+/,s,/(?=\()/],className:{1:"keyword",3:"title.function"},contains:[{begin:/\(\)/},k]},W="(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|"+e.UNDERSCORE_IDENT_RE+")\\s*=>",r={match:[/const|var|let/,/\s+/,s,/\s*/,/=\s*/,/(async\s*)?/,n.lookahead(W)],keywords:"async",className:{1:"keyword",3:"title.function"},contains:[k]};return{name:"JavaScript",aliases:["js","jsx","mjs","cjs"],keywords:i,exports:{PARAMS_CONTAINS:H,CLASS_REFERENCE:Z},illegal:/#(?![$_A-z])/,contains:[e.SHEBANG({label:"shebang",binary:"node",relevance:5}),D,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,B,{match:/\$\d+/},w,Z,{className:"attr",begin:s+n.lookahead(":"),relevance:0},r,{begin:"("+e.RE_STARTERS_RE+"|\\b(case|return|throw)\\b)\\s*",keywords:"return throw case",relevance:0,contains:[B,e.REGEXP_MODE,{className:"function",begin:W,returnBegin:!0,end:"\\s*=>",contains:[{className:"params",variants:[{begin:e.UNDERSCORE_IDENT_RE,relevance:0},{className:null,begin:/\(\s*\)/,skip:!0},{begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H}]}]},{begin:/,/,relevance:0},{match:/\s+/,relevance:0},{variants:[{begin:g.begin,end:g.end},{match:E},{begin:a.begin,"on:begin":a.isTrulyOpeningTag,end:a.end}],subLanguage:"xml",contains:[{begin:a.begin,end:a.end,skip:!0,contains:["self"]}]}]},q,{beginKeywords:"while if switch catch for"},{begin:"\\b(?!function)"+e.UNDERSCORE_IDENT_RE+"\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)\\s*\\{",returnBegin:!0,label:"func.def",contains:[k,e.inherit(e.TITLE_MODE,{begin:s,className:"title.function"})]},{match:/\.\.\./,relevance:0},se,{match:"\\$"+s,relevance:0},{match:[/\bconstructor(?=\s*\()/],className:{1:"title.function"},contains:[k]},ie,Q,ne,F,{match:/\$[(.]/}]}}function Re(e){let n=Ot(e),t=be,s=["any","void","number","boolean","string","object","never","symbol","bigint","unknown"],g={beginKeywords:"namespace",end:/\{/,excludeEnd:!0,contains:[n.exports.CLASS_REFERENCE]},E={beginKeywords:"interface",end:/\{/,excludeEnd:!0,keywords:{keyword:"interface extends",built_in:s},contains:[n.exports.CLASS_REFERENCE]},a={className:"meta",relevance:10,begin:/^\s*['"]use strict['"]/},i=["type","namespace","interface","public","private","protected","implements","declare","abstract","readonly","enum","override"],l={$pattern:be,keyword:an.concat(i),literal:on,built_in:gn.concat(s),"variable.language":dn},f={className:"meta",begin:"@"+t},m=(S,y,C)=>{let x=S.contains.findIndex(M=>M.label===y);if(x===-1)throw new Error("can not find mode to replace");S.contains.splice(x,1,C)};Object.assign(n.keywords,l),n.exports.PARAMS_CONTAINS.push(f),n.contains=n.contains.concat([f,g,E]),m(n,"shebang",e.SHEBANG()),m(n,"use_strict",a);let w=n.contains.find(S=>S.label==="func.def");return w.relevance=0,Object.assign(n,{name:"TypeScript",aliases:["ts","tsx","mts","cts"]}),n}function fn(e){let n=e.regex,t=n.concat(/[\p{L}_]/u,n.optional(/[\p{L}0-9_.-]*:/u),/[\p{L}0-9_.-]*/u),s=/[\p{L}0-9._:-]+/u,g={className:"symbol",begin:/&[a-z]+;|&#[0-9]+;|&#x[a-f0-9]+;/},E={begin:/\s/,contains:[{className:"keyword",begin:/#?[a-z_][a-z1-9_-]+/,illegal:/\n/}]},a=e.inherit(E,{begin:/\(/,end:/\)/}),i=e.inherit(e.APOS_STRING_MODE,{className:"string"}),l=e.inherit(e.QUOTE_STRING_MODE,{className:"string"}),f={endsWithParent:!0,illegal:/</,relevance:0,contains:[{className:"attr",begin:s,relevance:0},{begin:/=\s*/,relevance:0,contains:[{className:"string",endsParent:!0,variants:[{begin:/"/,end:/"/,contains:[g]},{begin:/'/,end:/'/,contains:[g]},{begin:/[^\s"'=<>`]+/}]}]}]};return{name:"HTML, XML",aliases:["html","xhtml","rss","atom","xjb","xsd","xsl","plist","wsf","svg"],case_insensitive:!0,unicodeRegex:!0,contains:[{className:"meta",begin:/<![a-z]/,end:/>/,relevance:10,contains:[E,l,i,a,{begin:/\[/,end:/\]/,contains:[{className:"meta",begin:/<![a-z]/,end:/>/,contains:[E,a,l,i]}]}]},e.COMMENT(/<!--/,/-->/,{relevance:10}),{begin:/<!\[CDATA\[/,end:/\]\]>/,relevance:10},g,{className:"meta",end:/\?>/,variants:[{begin:/<\?xml/,relevance:10,contains:[l]},{begin:/<\?[a-z][a-z0-9]+/}]},{className:"tag",begin:/<style(?=\s|>)/,end:/>/,keywords:{name:"style"},contains:[f],starts:{end:/<\/style>/,returnEnd:!0,subLanguage:["css","xml"]}},{className:"tag",begin:/<script(?=\s|>)/,end:/>/,keywords:{name:"script"},contains:[f],starts:{end:/<\/script>/,returnEnd:!0,subLanguage:["javascript","handlebars","xml"]}},{className:"tag",begin:/<>|<\/>/},{className:"tag",begin:n.concat(/</,n.lookahead(n.concat(t,n.either(/\/>/,/>/,/\s/)))),end:/\/?>/,contains:[{className:"name",begin:t,relevance:0,starts:f}]},{className:"tag",begin:n.concat(/<\//,n.lookahead(n.concat(t,/>/))),contains:[{className:"name",begin:t,relevance:0},{begin:/>/,relevance:0,endsParent:!0}]}]}}var Rt=e=>({IMPORTANT:{scope:"meta",begin:"!important"},BLOCK_COMMENT:e.C_BLOCK_COMMENT_MODE,HEXCOLOR:{scope:"number",begin:/#(([0-9a-fA-F]{3,4})|(([0-9a-fA-F]{2}){3,4}))\b/},FUNCTION_DISPATCH:{className:"built_in",begin:/[\w-]+(?=\()/},ATTRIBUTE_SELECTOR_MODE:{scope:"selector-attr",begin:/\[/,end:/\]/,illegal:"$",contains:[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE]},CSS_NUMBER_MODE:{scope:"number",begin:e.NUMBER_RE+"(%|em|ex|ch|rem|vw|vh|vmin|vmax|cm|mm|in|pt|pc|px|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?",relevance:0},CSS_VARIABLE:{className:"attr",begin:/--[A-Za-z_][A-Za-z0-9_-]*/}}),xt=["a","abbr","address","article","aside","audio","b","blockquote","body","button","canvas","caption","cite","code","dd","del","details","dfn","div","dl","dt","em","fieldset","figcaption","figure","footer","form","h1","h2","h3","h4","h5","h6","header","hgroup","html","i","iframe","img","input","ins","kbd","label","legend","li","main","mark","menu","nav","object","ol","p","q","quote","samp","section","span","strong","summary","sup","table","tbody","td","textarea","tfoot","th","thead","time","tr","ul","var","video"],Mt=["any-hover","any-pointer","aspect-ratio","color","color-gamut","color-index","device-aspect-ratio","device-height","device-width","display-mode","forced-colors","grid","height","hover","inverted-colors","monochrome","orientation","overflow-block","overflow-inline","pointer","prefers-color-scheme","prefers-contrast","prefers-reduced-motion","prefers-reduced-transparency","resolution","scan","scripting","update","width","min-width","max-width","min-height","max-height"],vt=["active","any-link","blank","checked","current","default","defined","dir","disabled","drop","empty","enabled","first","first-child","first-of-type","fullscreen","future","focus","focus-visible","focus-within","has","host","host-context","hover","indeterminate","in-range","invalid","is","lang","last-child","last-of-type","left","link","local-link","not","nth-child","nth-col","nth-last-child","nth-last-col","nth-last-of-type","nth-of-type","only-child","only-of-type","optional","out-of-range","past","placeholder-shown","read-only","read-write","required","right","root","scope","target","target-within","user-invalid","valid","visited","where"],kt=["after","backdrop","before","cue","cue-region","first-letter","first-line","grammar-error","marker","part","placeholder","selection","slotted","spelling-error"],It=["align-content","align-items","align-self","all","animation","animation-delay","animation-direction","animation-duration","animation-fill-mode","animation-iteration-count","animation-name","animation-play-state","animation-timing-function","backface-visibility","background","background-attachment","background-blend-mode","background-clip","background-color","background-image","background-origin","background-position","background-repeat","background-size","block-size","border","border-block","border-block-color","border-block-end","border-block-end-color","border-block-end-style","border-block-end-width","border-block-start","border-block-start-color","border-block-start-style","border-block-start-width","border-block-style","border-block-width","border-bottom","border-bottom-color","border-bottom-left-radius","border-bottom-right-radius","border-bottom-style","border-bottom-width","border-collapse","border-color","border-image","border-image-outset","border-image-repeat","border-image-slice","border-image-source","border-image-width","border-inline","border-inline-color","border-inline-end","border-inline-end-color","border-inline-end-style","border-inline-end-width","border-inline-start","border-inline-start-color","border-inline-start-style","border-inline-start-width","border-inline-style","border-inline-width","border-left","border-left-color","border-left-style","border-left-width","border-radius","border-right","border-right-color","border-right-style","border-right-width","border-spacing","border-style","border-top","border-top-color","border-top-left-radius","border-top-right-radius","border-top-style","border-top-width","border-width","bottom","box-decoration-break","box-shadow","box-sizing","break-after","break-before","break-inside","caption-side","caret-color","clear","clip","clip-path","clip-rule","color","column-count","column-fill","column-gap","column-rule","column-rule-color","column-rule-style","column-rule-width","column-span","column-width","columns","contain","content","content-visibility","counter-increment","counter-reset","cue","cue-after","cue-before","cursor","direction","display","empty-cells","filter","flex","flex-basis","flex-direction","flex-flow","flex-grow","flex-shrink","flex-wrap","float","flow","font","font-display","font-family","font-feature-settings","font-kerning","font-language-override","font-size","font-size-adjust","font-smoothing","font-stretch","font-style","font-synthesis","font-variant","font-variant-caps","font-variant-east-asian","font-variant-ligatures","font-variant-numeric","font-variant-position","font-variation-settings","font-weight","gap","glyph-orientation-vertical","grid","grid-area","grid-auto-columns","grid-auto-flow","grid-auto-rows","grid-column","grid-column-end","grid-column-start","grid-gap","grid-row","grid-row-end","grid-row-start","grid-template","grid-template-areas","grid-template-columns","grid-template-rows","hanging-punctuation","height","hyphens","icon","image-orientation","image-rendering","image-resolution","ime-mode","inline-size","isolation","justify-content","left","letter-spacing","line-break","line-height","list-style","list-style-image","list-style-position","list-style-type","margin","margin-block","margin-block-end","margin-block-start","margin-bottom","margin-inline","margin-inline-end","margin-inline-start","margin-left","margin-right","margin-top","marks","mask","mask-border","mask-border-mode","mask-border-outset","mask-border-repeat","mask-border-slice","mask-border-source","mask-border-width","mask-clip","mask-composite","mask-image","mask-mode","mask-origin","mask-position","mask-repeat","mask-size","mask-type","max-block-size","max-height","max-inline-size","max-width","min-block-size","min-height","min-inline-size","min-width","mix-blend-mode","nav-down","nav-index","nav-left","nav-right","nav-up","none","normal","object-fit","object-position","opacity","order","orphans","outline","outline-color","outline-offset","outline-style","outline-width","overflow","overflow-wrap","overflow-x","overflow-y","padding","padding-block","padding-block-end","padding-block-start","padding-bottom","padding-inline","padding-inline-end","padding-inline-start","padding-left","padding-right","padding-top","page-break-after","page-break-before","page-break-inside","pause","pause-after","pause-before","perspective","perspective-origin","pointer-events","position","quotes","resize","rest","rest-after","rest-before","right","row-gap","scroll-margin","scroll-margin-block","scroll-margin-block-end","scroll-margin-block-start","scroll-margin-bottom","scroll-margin-inline","scroll-margin-inline-end","scroll-margin-inline-start","scroll-margin-left","scroll-margin-right","scroll-margin-top","scroll-padding","scroll-padding-block","scroll-padding-block-end","scroll-padding-block-start","scroll-padding-bottom","scroll-padding-inline","scroll-padding-inline-end","scroll-padding-inline-start","scroll-padding-left","scroll-padding-right","scroll-padding-top","scroll-snap-align","scroll-snap-stop","scroll-snap-type","scrollbar-color","scrollbar-gutter","scrollbar-width","shape-image-threshold","shape-margin","shape-outside","speak","speak-as","src","tab-size","table-layout","text-align","text-align-all","text-align-last","text-combine-upright","text-decoration","text-decoration-color","text-decoration-line","text-decoration-style","text-emphasis","text-emphasis-color","text-emphasis-position","text-emphasis-style","text-indent","text-justify","text-orientation","text-overflow","text-rendering","text-shadow","text-transform","text-underline-position","top","transform","transform-box","transform-origin","transform-style","transition","transition-delay","transition-duration","transition-property","transition-timing-function","unicode-bidi","vertical-align","visibility","voice-balance","voice-duration","voice-family","voice-pitch","voice-range","voice-rate","voice-stress","voice-volume","white-space","widows","width","will-change","word-break","word-spacing","word-wrap","writing-mode","z-index"].reverse();function bn(e){let n=e.regex,t=Rt(e),s={begin:/-(webkit|moz|ms|o)-(?=[a-z])/},g="and or not only",E=/@-?\w[\w]*(-\w+)*/,a="[a-zA-Z-][a-zA-Z0-9_-]*",i=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE];return{name:"CSS",case_insensitive:!0,illegal:/[=|'\$]/,keywords:{keyframePosition:"from to"},classNameAliases:{keyframePosition:"selector-tag"},contains:[t.BLOCK_COMMENT,s,t.CSS_NUMBER_MODE,{className:"selector-id",begin:/#[A-Za-z0-9_-]+/,relevance:0},{className:"selector-class",begin:"\\."+a,relevance:0},t.ATTRIBUTE_SELECTOR_MODE,{className:"selector-pseudo",variants:[{begin:":("+vt.join("|")+")"},{begin:":(:)?("+kt.join("|")+")"}]},t.CSS_VARIABLE,{className:"attribute",begin:"\\b("+It.join("|")+")\\b"},{begin:/:/,end:/[;}{]/,contains:[t.BLOCK_COMMENT,t.HEXCOLOR,t.IMPORTANT,t.CSS_NUMBER_MODE,...i,{begin:/(url|data-uri)\(/,end:/\)/,relevance:0,keywords:{built_in:"url data-uri"},contains:[...i,{className:"string",begin:/[^)]/,endsWithParent:!0,excludeEnd:!0}]},t.FUNCTION_DISPATCH]},{begin:n.lookahead(/@/),end:"[{;]",relevance:0,illegal:/:/,contains:[{className:"keyword",begin:E},{begin:/\s/,endsWithParent:!0,excludeEnd:!0,relevance:0,keywords:{$pattern:/[a-z-]+/,keyword:g,attribute:Mt.join(" ")},contains:[{begin:/[a-z-]+(?=:)/,className:"attribute"},...i,t.CSS_NUMBER_MODE]}]},{className:"selector-tag",begin:"\\b("+xt.join("|")+")\\b"}]}}function pn(e){let n={className:"attr",begin:/"(\\.|[^\\"\r\n])*"(?=\s*:)/,relevance:1.01},t={match:/[{}[\],:]/,className:"punctuation",relevance:0},s=["true","false","null"],g={scope:"literal",beginKeywords:s.join(" ")};return{name:"JSON",keywords:{literal:s},contains:[n,t,e.QUOTE_STRING_MODE,g,e.C_NUMBER_MODE,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE],illegal:"\\S"}}function hn(e){let n=e.regex,t={},s={begin:/\$\{/,end:/\}/,contains:["self",{begin:/:-/,contains:[t]}]};Object.assign(t,{className:"variable",variants:[{begin:n.concat(/\$[\w\d#@][\w\d_]*/,"(?![\\w\\d])(?![$])")},s]});let g={className:"subst",begin:/\$\(/,end:/\)/,contains:[e.BACKSLASH_ESCAPE]},E={begin:/<<-?\s*(?=\w+)/,starts:{contains:[e.END_SAME_AS_BEGIN({begin:/(\w+)/,end:/(\w+)/,className:"string"})]}},a={className:"string",begin:/"/,end:/"/,contains:[e.BACKSLASH_ESCAPE,t,g]};g.contains.push(a);let i={match:/\\"/},l={className:"string",begin:/'/,end:/'/},f={match:/\\'/},m={begin:/\$?\(\(/,end:/\)\)/,contains:[{begin:/\d+#[0-9a-f]+/,className:"number"},e.NUMBER_MODE,t]},w=["fish","bash","zsh","sh","csh","ksh","tcsh","dash","scsh"],S=e.SHEBANG({binary:`(${w.join("|")})`,relevance:10}),y={className:"function",begin:/\w[\w\d_]*\s*\(\s*\)\s*\{/,returnBegin:!0,contains:[e.inherit(e.TITLE_MODE,{begin:/\w[\w\d_]*/})],relevance:0},C=["if","then","else","elif","fi","for","while","until","in","do","done","case","esac","function","select"],x=["true","false"],M={match:/(\/[a-z._-]+)+/},ee=["break","cd","continue","eval","exec","exit","export","getopts","hash","pwd","readonly","return","shift","test","times","trap","umask","unset"],B=["alias","bind","builtin","caller","command","declare","echo","enable","help","let","local","logout","mapfile","printf","read","readarray","source","type","typeset","ulimit","unalias"],P=["autoload","bg","bindkey","bye","cap","chdir","clone","comparguments","compcall","compctl","compdescribe","compfiles","compgroups","compquote","comptags","comptry","compvalues","dirs","disable","disown","echotc","echoti","emulate","fc","fg","float","functions","getcap","getln","history","integer","jobs","kill","limit","log","noglob","popd","print","pushd","pushln","rehash","sched","setcap","setopt","stat","suspend","ttyctl","unfunction","unhash","unlimit","unsetopt","vared","wait","whence","where","which","zcompile","zformat","zftp","zle","zmodload","zparseopts","zprof","zpty","zregexparse","zsocket","zstyle","ztcp"],L=["chcon","chgrp","chown","chmod","cp","dd","df","dir","dircolors","ln","ls","mkdir","mkfifo","mknod","mktemp","mv","realpath","rm","rmdir","shred","sync","touch","truncate","vdir","b2sum","base32","base64","cat","cksum","comm","csplit","cut","expand","fmt","fold","head","join","md5sum","nl","numfmt","od","paste","ptx","pr","sha1sum","sha224sum","sha256sum","sha384sum","sha512sum","shuf","sort","split","sum","tac","tail","tr","tsort","unexpand","uniq","wc","arch","basename","chroot","date","dirname","du","echo","env","expr","factor","groups","hostid","id","link","logname","nice","nohup","nproc","pathchk","pinky","printenv","printf","pwd","readlink","runcon","seq","sleep","stat","stdbuf","stty","tee","test","timeout","tty","uname","unlink","uptime","users","who","whoami","yes"];return{name:"Bash",aliases:["sh"],keywords:{$pattern:/\b[a-z][a-z0-9._-]+\b/,keyword:C,literal:x,built_in:[...ee,...B,"set","shopt",...P,...L]},contains:[S,e.SHEBANG(),y,m,e.HASH_COMMENT_MODE,E,M,a,i,l,f,t]}}function En(e){let n=e.regex,t={begin:/<\/?[A-Za-z_]/,end:">",subLanguage:"xml",relevance:0},s={begin:"^[-\\*]{3,}",end:"$"},g={className:"code",variants:[{begin:"(`{3,})[^`](.|\\n)*?\\1`*[ ]*"},{begin:"(~{3,})[^~](.|\\n)*?\\1~*[ ]*"},{begin:"```",end:"```+[ ]*$"},{begin:"~~~",end:"~~~+[ ]*$"},{begin:"`.+?`"},{begin:"(?=^( {4}|\\t))",contains:[{begin:"^( {4}|\\t)",end:"(\\n)$"}],relevance:0}]},E={className:"bullet",begin:"^[ 	]*([*+-]|(\\d+\\.))(?=\\s+)",end:"\\s+",excludeEnd:!0},a={begin:/^\[[^\n]+\]:/,returnBegin:!0,contains:[{className:"symbol",begin:/\[/,end:/\]/,excludeBegin:!0,excludeEnd:!0},{className:"link",begin:/:\s*/,end:/$/,excludeBegin:!0}]},i=/[A-Za-z][A-Za-z0-9+.-]*/,l={variants:[{begin:/\[.+?\]\[.*?\]/,relevance:0},{begin:/\[.+?\]\(((data|javascript|mailto):|(?:http|ftp)s?:\/\/).*?\)/,relevance:2},{begin:n.concat(/\[.+?\]\(/,i,/:\/\/.*?\)/),relevance:2},{begin:/\[.+?\]\([./?&#].*?\)/,relevance:1},{begin:/\[.*?\]\(.*?\)/,relevance:0}],returnBegin:!0,contains:[{match:/\[(?=\])/},{className:"string",relevance:0,begin:"\\[",end:"\\]",excludeBegin:!0,returnEnd:!0},{className:"link",relevance:0,begin:"\\]\\(",end:"\\)",excludeBegin:!0,excludeEnd:!0},{className:"symbol",relevance:0,begin:"\\]\\[",end:"\\]",excludeBegin:!0,excludeEnd:!0}]},f={className:"strong",contains:[],variants:[{begin:/_{2}(?!\s)/,end:/_{2}/},{begin:/\*{2}(?!\s)/,end:/\*{2}/}]},m={className:"emphasis",contains:[],variants:[{begin:/\*(?![*\s])/,end:/\*/},{begin:/_(?![_\s])/,end:/_/,relevance:0}]},w=e.inherit(f,{contains:[]}),S=e.inherit(m,{contains:[]});f.contains.push(S),m.contains.push(w);let y=[t,l];return[f,m,w,S].forEach(M=>{M.contains=M.contains.concat(y)}),y=y.concat(f,m),{name:"Markdown",aliases:["md","mkdown","mkd"],contains:[{className:"section",variants:[{begin:"^#{1,6}",end:"$",contains:y},{begin:"(?=^.+?\\n[=-]{2,}$)",contains:[{begin:"^[=-]*$"},{begin:"^",end:"\\n",contains:y}]}]},t,E,f,m,{className:"quote",begin:"^>\\s+",contains:y,end:"$"},g,s,l,a]}}U.registerLanguage("javascript",Oe);U.registerLanguage("typescript",Re);U.registerLanguage("tsx",Re);U.registerLanguage("jsx",Oe);U.registerLanguage("xml",fn);U.registerLanguage("css",bn);U.registerLanguage("json",pn);U.registerLanguage("bash",hn);U.registerLanguage("markdown",En);window.hljs=U;})();
+
+</script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>
