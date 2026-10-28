@@ -364,6 +364,97 @@ export default Counter;</code></pre>
       <p>Provider 밖에서 <code>useContext</code>를 호출하면 값이 없으므로 기본값을 <code>null</code>로 둡니다. 그러면 꺼낸 값의 타입이 <code>CartContextType | null</code>이 되어 매번 null 검사가 필요한데, <b>커스텀 훅에서 한 번만 검사</b>하면 사용하는 컴포넌트는 항상 <code>CartContextType</code>으로 받을 수 있습니다.</p>
     </div>
 
+    <div class="ex"><div class="lbl">💡 예제 — 기본형: user 객체를 손자 컴포넌트까지 전달</div>
+      <p>7강 예제 A(UserParent → UserChild → UserGrandChild)를 TypeScript로 바꾼 가장 간단한 형태입니다. Context에 담을 값의 타입(<code>User</code>)만 정하면, 꺼내 쓰는 쪽에서는 타입이 자동으로 추론됩니다.</p>
+      <div class="flow">
+UserParent         → Provider로 user 데이터 제공
+ └ UserChild       → user 데이터 몰라도 됨 (단순 중간 컴포넌트)
+    └ UserGrandChild → useContext로 직접 user 데이터 접근
+      </div>
+      <span class="fname">src/UserContext.tsx</span>
+      <pre><code class="language-tsx">import { createContext } from "react";
+
+// 1. Context에 담을 값의 타입
+export interface User {
+  name: string;
+  age: number;
+}
+
+// 2. createContext&lt;타입&gt;(기본값) : 기본값도 User 타입을 따라야 함
+export const UserContext = createContext&lt;User&gt;({ name: "", age: 0 });</code></pre>
+      <span class="fname">src/UserParent.tsx</span>
+      <pre><code class="language-tsx">import { UserContext } from "./UserContext";
+import type { User } from "./UserContext";
+import UserChild from "./UserChild";
+
+const UserParent = () =&gt; {
+  // user 객체는 User 타입
+  const user: User = {
+    name: "오상식",
+    age: 45,
+  };
+
+  return (
+    &lt;div className="user-parent"&gt;
+      &lt;h2&gt;UserParent 컴포넌트입니다.&lt;/h2&gt;
+      {/* value에는 User 타입의 값만 넣을 수 있음 */}
+      &lt;UserContext.Provider value={user}&gt;
+        {/* props 전달 없음 */}
+        &lt;UserChild /&gt;
+      &lt;/UserContext.Provider&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default UserParent;</code></pre>
+      <span class="fname">src/UserChild.tsx</span>
+      <pre><code class="language-tsx">import UserGrandChild from "./UserGrandChild";
+
+// 중간 컴포넌트: user를 사용하지도, props로 넘기지도 않음
+const UserChild = () =&gt; {
+  return (
+    &lt;div className="user-child"&gt;
+      &lt;h3&gt;UserChild 컴포넌트입니다.&lt;/h3&gt;
+      &lt;p&gt;(user 데이터를 전달하지 않음)&lt;/p&gt;
+      &lt;UserGrandChild /&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default UserChild;</code></pre>
+      <span class="fname">src/UserGrandChild.tsx</span>
+      <pre><code class="language-tsx">import { useContext } from "react";
+import { UserContext } from "./UserContext";
+
+// 손자 컴포넌트: Context에서 직접 user를 받음
+const UserGrandChild = () =&gt; {
+  // user의 타입이 User로 자동 추론 → user.name, user.age 자동완성
+  const user = useContext(UserContext);
+
+  return (
+    &lt;div className="user-grandchild"&gt;
+      &lt;h4&gt;UserGrandChild 컴포넌트입니다.&lt;/h4&gt;
+      &lt;p&gt;이름: {user.name}&lt;/p&gt;
+      &lt;p&gt;나이: {user.age}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default UserGrandChild;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p style="text-align:center"><strong>UserParent 컴포넌트입니다.</strong></p>
+        <div style="border:1px solid #ccc;padding:12px;margin:8px 0">
+          <p style="text-align:center"><strong>UserChild 컴포넌트입니다.</strong></p>
+          <p style="text-align:center" class="muted">(user 데이터를 전달하지 않음)</p>
+          <div style="border:1px solid #ccc;padding:8px">
+            <p style="text-align:center"><strong>UserGrandChild 컴포넌트입니다.</strong></p>
+            <p style="text-align:center">이름: 오상식<br>나이: 45</p>
+          </div>
+        </div>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>createContext&lt;User&gt;(기본값)</code>처럼 타입을 지정하면, Provider의 <code>value</code>에 <code>{ name: "오상식" }</code>처럼 <code>age</code>를 빠뜨렸을 때 바로 타입 오류가 납니다. 이 예제는 기본값을 빈 객체 대신 <code>{ name: "", age: 0 }</code>으로 주었는데, 아래 장바구니 예제처럼 기본값을 <code>null</code>로 두고 커스텀 훅에서 검사하는 방법이 실무에서 더 많이 쓰입니다.</div>
+    </div>
+
     <div class="ex"><div class="lbl">💡 예제 — 장바구니 Context (타입 정의 · 리듀서 · Provider · 커스텀 훅)</div>
       <div class="flow">
 App
