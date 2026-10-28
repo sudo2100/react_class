@@ -152,7 +152,7 @@ hue-6-2: #e6c07b
 </head>
 <body>
 <header class="hero">
-  <div class="eyebrow">React 심화 · Chapter 07 · 학습 교안</div>
+  <div class="eyebrow">React 심화 · Chapter 08 · 학습 교안</div>
   <h1>타입스크립트(TypeScript) 기반 React</h1>
   <p>JavaScript에 정적 타입이라는 안전망을 더한 TypeScript를 익히고, Vite 기반 React 프로젝트에서 Props·useState·이벤트·라우터·비동기 처리까지 타입과 함께 다루는 실전 교안입니다.</p>
   <div class="tags">
@@ -180,8 +180,9 @@ hue-6-2: #e6c07b
       <li><a href="#m7">Props에 타입 지정하기</a></li>
       <li><a href="#m8">useState와 이벤트 객체 타입</a></li>
       <li><a href="#m9">할 일 관리 앱 만들기</a></li>
-      <li><a href="#m10">React Router 주요 Hook</a></li>
-      <li><a href="#m11">비동기 처리 — axios로 할 일 CRUD</a></li>
+      <li><a href="#m10">localStorage — 타입과 함께 저장·불러오기</a></li>
+      <li><a href="#m11">React Router 주요 Hook</a></li>
+      <li><a href="#m12">비동기 처리 — axios로 할 일 CRUD</a></li>
     </ol>
   </nav>
 
@@ -773,6 +774,7 @@ createRoot(document.getElementById('root')!).render(
         <li>인라인 방식으로 Props 타입을 지정할 수 있다.</li>
         <li>객체·함수 Props의 타입을 작성할 수 있다.</li>
         <li>type 별칭(<code>PlayerProps</code>)으로 Props 타입을 분리할 수 있다.</li>
+        <li><code>children</code>을 <code>ReactNode</code> 타입으로 받아 감싸는 컴포넌트를 만들 수 있다.</li>
       </ul>
     </div>
 
@@ -901,6 +903,155 @@ const Player2 = ({ player, clickHandler }: PlayerProps) =&gt; {
   )
 }</code></pre>
       <div class="tip"><span class="lbl">💡 정리</span> Props가 많아지면 인라인 타입 대신 <b>type/interface로 분리</b>하면 재사용성과 가독성이 좋아집니다.</div>
+    </div>
+
+    <div class="concept">
+      <h3 class="blk">📖 children Props — 태그 사이의 내용 전달하기</h3>
+      <p>컴포넌트를 <code>&lt;Card&gt; ... &lt;/Card&gt;</code>처럼 여는 태그와 닫는 태그로 쓰면, <b>태그 사이에 넣은 내용</b>이 자동으로 <code>children</code>이라는 props로 전달됩니다. 카드 · 모달 · 레이아웃처럼 <b>틀은 같고 안의 내용만 바뀌는</b> 컴포넌트를 만들 때 사용합니다.</p>
+      <table>
+        <tr><th>구분</th><th>일반 Props</th><th>children</th></tr>
+        <tr><td>전달 방법</td><td><code>&lt;Card title="공지" /&gt;</code> 속성으로 전달</td><td><code>&lt;Card&gt;내용&lt;/Card&gt;</code> 태그 사이에 넣음</td></tr>
+        <tr><td>타입</td><td><code>string</code>, <code>number</code> 등</td><td><code>ReactNode</code> (문자열 · JSX · 배열 등 화면에 그릴 수 있는 모든 것)</td></tr>
+        <tr><td>import</td><td>-</td><td><code>import type { ReactNode } from "react"</code></td></tr>
+      </table>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — children을 받는 Box 컴포넌트 (1강 예제를 TypeScript로)</div>
+      <p>1강에서 만든 <code>Box</code>를 TypeScript로 바꾼 예제입니다. <code>&lt;Box&gt;</code>와 <code>&lt;/Box&gt;</code> 사이의 모든 것이 <code>{children}</code>으로 전달됩니다.</p>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">import Box from "./Box";
+
+function App() {
+  return (
+    &lt;&gt;
+      &lt;h2&gt;props children&lt;/h2&gt;
+      {/* Box 컴포넌트는 자식 요소를 받아서 보여줍니다. */}
+      &lt;Box&gt;
+        &lt;h3&gt;박스 안의 내용&lt;/h3&gt;
+        &lt;p&gt;이것은 Box 컴포넌트 안에 있는 내용입니다.&lt;/p&gt;
+      &lt;/Box&gt;
+      &lt;Box&gt;
+        &lt;h3&gt;또 다른 박스&lt;/h3&gt;
+        &lt;p&gt;이것은 또 다른 Box 컴포넌트 안에 있는 내용입니다.&lt;/p&gt;
+      &lt;/Box&gt;
+    &lt;/&gt;
+  );
+}
+
+export default App;</code></pre>
+      <span class="fname">src/Box.tsx</span>
+      <pre><code class="language-tsx">import type { ReactNode } from "react";
+
+// children의 타입은 ReactNode
+const Box = ({ children }: { children: ReactNode }) =&gt; {
+  // 스타일 객체의 타입은 React.CSSProperties
+  const boxStyle: React.CSSProperties = {
+    width: '200px',
+    border: '1px solid black',
+    padding: '20px',
+    margin: '10px',
+  };
+
+  return &lt;div style={boxStyle}&gt;{children}&lt;/div&gt;;
+}
+
+export default Box</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p><b>props children</b></p>
+        <div style="width:200px;border:1px solid #333;padding:10px 14px;margin:8px 0;border-radius:4px">
+          <b>박스 안의 내용</b><br><span class="muted">이것은 Box 컴포넌트 안에 있는 내용입니다.</span>
+        </div>
+        <div style="width:200px;border:1px solid #333;padding:10px 14px;margin:8px 0;border-radius:4px">
+          <b>또 다른 박스</b><br><span class="muted">이것은 또 다른 Box 컴포넌트 안에 있는 내용입니다.</span>
+        </div>
+      </div>
+      <div class="tip"><span class="lbl">💡 JavaScript와 다른 점</span> <code>({children})</code> → <code>({ children }: { children: ReactNode })</code>로 children의 타입을 지정하고, 스타일 객체에는 <code>React.CSSProperties</code> 타입을 붙입니다. 그러면 <code>widht</code>처럼 속성 이름을 잘못 쓰면 바로 오류로 알려 줍니다.</div>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — children을 받는 Card 컴포넌트</div>
+      <span class="fname">src/Card.tsx</span>
+      <pre><code class="language-tsx">import type { ReactNode } from "react";
+
+// children : 컴포넌트 태그 사이에 넣은 내용(JSX)
+// ReactNode : 문자열, 숫자, JSX, 배열 등 화면에 그릴 수 있는 모든 것
+interface CardProps {
+  title: string;
+  children: ReactNode;
+}
+
+const Card = ({ title, children }: CardProps) =&gt; {
+  return (
+    &lt;div className="card"&gt;
+      &lt;h3&gt;{title}&lt;/h3&gt;
+      {/* 부모가 태그 사이에 넣은 내용이 이 자리에 표시됨 */}
+      &lt;div className="card-body"&gt;{children}&lt;/div&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default Card;</code></pre>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">import Card from "./Card";
+
+function App() {
+  return (
+    &lt;&gt;
+      {/* 태그 사이의 내용이 Card의 children으로 전달됨 */}
+      &lt;Card title="공지사항"&gt;
+        &lt;p&gt;내일은 TypeScript 시험이 있습니다.&lt;/p&gt;
+      &lt;/Card&gt;
+
+      &lt;Card title="오늘의 할 일"&gt;
+        &lt;ul&gt;
+          &lt;li&gt;Props 타입 복습&lt;/li&gt;
+          &lt;li&gt;children 예제 실습&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;button&gt;확인&lt;/button&gt;
+      &lt;/Card&gt;
+    &lt;/&gt;
+  );
+}
+
+export default App;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <div style="border:1px solid #ccc;border-radius:8px;padding:10px 14px;margin-bottom:10px">
+          <p><b>공지사항</b></p>
+          <p>내일은 TypeScript 시험이 있습니다.</p>
+        </div>
+        <div style="border:1px solid #ccc;border-radius:8px;padding:10px 14px">
+          <p><b>오늘의 할 일</b></p>
+          <ul><li>Props 타입 복습</li><li>children 예제 실습</li></ul>
+          <div class="demo"><button>확인</button></div>
+        </div>
+      </div>
+      <div class="tip"><span class="lbl">💡 정리</span> 같은 <code>Card</code> 틀에 문장 하나, 목록과 버튼처럼 서로 다른 내용을 넣을 수 있습니다. <code>children: ReactNode</code>로 지정하면 필수 props가 되어, <code>&lt;Card title="공지" /&gt;</code>처럼 내용 없이 쓰면 "Property 'children' is missing" 타입 오류로 알려 줍니다. 내용이 없어도 되는 경우에는 <code>children?: ReactNode</code>로 선택적 속성을 사용합니다.</div>
+    </div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 7-1. 테두리 색을 받는 ColorBox 컴포넌트</h4>
+      <p><code>color</code>(string)와 <code>children</code>(ReactNode)을 props로 받아, 지정한 색의 테두리 안에 내용을 보여 주는 <code>ColorBox</code> 컴포넌트를 만드세요.</p>
+      <details><summary>정답 보기</summary>
+        <pre><code class="language-tsx">import type { ReactNode } from "react";
+
+interface ColorBoxProps {
+  color: string;
+  children: ReactNode;
+}
+
+const ColorBox = ({ color, children }: ColorBoxProps) =&gt; {
+  return (
+    &lt;div style={{ border: `2px solid ${color}`, padding: "12px", margin: "8px 0" }}&gt;
+      {children}
+    &lt;/div&gt;
+  );
+};
+
+export default ColorBox;
+
+// 사용 예
+// &lt;ColorBox color="tomato"&gt;&lt;p&gt;빨간 테두리 상자&lt;/p&gt;&lt;/ColorBox&gt;
+// &lt;ColorBox color="royalblue"&gt;&lt;h4&gt;파란 테두리 상자&lt;/h4&gt;&lt;/ColorBox&gt;</code></pre>
+      </details>
     </div>
   </section>
 
@@ -1212,9 +1363,170 @@ export default TodoList</code></pre>
     </div>
   </section>
 
-  <!-- ================= MODULE 13 ================= -->
+  <!-- ================= MODULE 10 ================= -->
   <section class="module" id="m10">
-    <h2><span class="num">10</span> React Router 주요 Hook</h2>
+    <h2><span class="num">10</span> localStorage — 타입과 함께 저장·불러오기</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div>
+      <ul>
+        <li>localStorage 메서드의 타입(<code>getItem(): string | null</code>, <code>setItem(key: string, value: string)</code>)을 이해한다.</li>
+        <li><code>JSON.parse()</code> 결과에 <code>as</code>로 타입을 지정해 객체·배열을 불러올 수 있다.</li>
+        <li><code>useState&lt;T&gt;</code> 지연 초기화와 useEffect로 상태를 저장·복원할 수 있다.</li>
+      </ul>
+    </div>
+
+    <div class="concept">
+      <h3 class="blk">📖 localStorage의 타입</h3>
+      <p><b>localStorage</b>는 새로고침하거나 브라우저를 껐다 켜도 데이터가 남는 브라우저 저장소입니다(2강 참고). TypeScript에서는 메서드마다 타입이 정해져 있어서, JavaScript에서 그냥 지나가던 실수를 미리 알려 줍니다.</p>
+      <table>
+        <tr><th>메서드</th><th>타입</th><th>주의할 점</th></tr>
+        <tr><td><code>getItem(key)</code></td><td><code>string | null</code></td><td>값이 없으면 <code>null</code> → <code>??</code>나 조건문으로 처리</td></tr>
+        <tr><td><code>setItem(key, value)</code></td><td><code>value: string</code></td><td>숫자를 그대로 넣으면 오류 → <code>String(count)</code></td></tr>
+        <tr><td><code>JSON.parse(text)</code></td><td><code>any</code></td><td>결과 타입을 모름 → <code>as Todo[]</code>로 지정</td></tr>
+        <tr><td><code>JSON.stringify(value)</code></td><td><code>string</code></td><td>객체·배열을 저장할 때 사용</td></tr>
+      </table>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 ① — 새로고침해도 남는 메모장 (문자열 저장)</div>
+      <span class="fname">src/Memo.tsx</span>
+      <pre><code class="language-tsx">import { useState, useEffect } from "react";
+
+const Memo = () =&gt; {
+  // getItem()의 반환 타입은 string | null → ?? 로 null이면 "" 사용
+  const [memo, setMemo] = useState&lt;string&gt;(() =&gt; {
+    return localStorage.getItem("memo") ?? "";
+  });
+
+  // memo가 바뀔 때마다 저장
+  useEffect(() =&gt; {
+    localStorage.setItem("memo", memo);
+  }, [memo]);
+
+  const handleChange = (e: React.ChangeEvent&lt;HTMLTextAreaElement&gt;) =&gt; {
+    setMemo(e.target.value);
+  };
+
+  const handleClear = () =&gt; {
+    setMemo("");
+    localStorage.removeItem("memo");
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;메모장&lt;/h2&gt;
+      &lt;textarea
+        value={memo}
+        onChange={handleChange}
+        placeholder="메모를 입력하세요"
+        rows={4}
+        cols={40}
+      /&gt;
+      &lt;p&gt;글자 수: {memo.length}&lt;/p&gt;
+      &lt;button onClick={handleClear}&gt;지우기&lt;/button&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default Memo;</code></pre>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <p><b>메모장</b></p>
+        <div class="demo"><textarea rows="3" cols="36">오늘 할 일: useEffect 복습</textarea></div>
+        <p>글자 수: 20</p>
+        <div class="demo"><button>지우기</button></div>
+        <p class="muted">메모를 입력한 뒤 새로고침해도 내용이 그대로 남아 있습니다.</p>
+      </div>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 ② — 할 일 목록 저장하기 (배열 저장)</div>
+      <p>단원 9의 <code>Todo</code> 타입을 그대로 사용합니다. 배열은 <code>JSON.stringify()</code>로 저장하고, 불러올 때 <code>JSON.parse()</code> 결과에 <code>as Todo[]</code>로 타입을 붙입니다.</p>
+      <span class="fname">src/Todos.tsx</span>
+      <pre><code class="language-tsx">import { useState, useEffect } from "react";
+
+export type Todo = {
+  id: number
+  text: string
+  completed: boolean
+}
+
+// 저장된 할 일 목록 불러오기
+// - JSON.parse()의 반환 타입은 any → as Todo[]로 타입을 알려 줌
+// - 저장값이 없거나 깨져 있으면 빈 배열
+const loadTodos = (): Todo[] =&gt; {
+  try {
+    const saved = localStorage.getItem("todos");
+    return saved ? (JSON.parse(saved) as Todo[]) : [];
+  } catch {
+    return [];
+  }
+};
+
+const Todos = () =&gt; {
+  // 함수를 넘기면 처음 렌더링 때 한 번만 실행(지연 초기화)
+  const [todos, setTodos] = useState&lt;Todo[]&gt;(loadTodos);
+  const [inputValue, setInputValue] = useState&lt;string&gt;("");
+
+  // todos가 바뀔 때마다 JSON 문자열로 저장
+  useEffect(() =&gt; {
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }, [todos]);
+
+  const addTodo = () =&gt; {
+    if (!inputValue.trim()) return;
+    setTodos([...todos, { id: Date.now(), text: inputValue, completed: false }]);
+    setInputValue("");
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;할 일 목록&lt;/h2&gt;
+      &lt;input value={inputValue} onChange={(e) =&gt; setInputValue(e.target.value)} /&gt;
+      &lt;button onClick={addTodo}&gt;추가&lt;/button&gt;
+      &lt;ul&gt;
+        {todos.map((todo) =&gt; (
+          &lt;li key={todo.id}&gt;{todo.text}&lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default Todos;</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>useState&lt;Todo[]&gt;(loadTodos)</code>처럼 <b>함수 자체</b>를 넘기면 처음 렌더링 때 한 번만 localStorage를 읽습니다. <code>try / catch</code>를 두면 저장값이 깨져 있어도 앱이 멈추지 않습니다. 개발자 도구(F12) → <b>Application</b> → <b>Local Storage</b>에서 저장된 값을 확인할 수 있습니다.</div>
+    </div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 10-1. 새로고침해도 유지되는 좋아요 버튼</h4>
+      <p><code>useState&lt;number&gt;</code>로 좋아요 숫자를 관리하고 localStorage에 저장하세요. <code>setItem</code>의 값은 <code>string</code> 타입이므로 숫자를 그대로 넣으면 타입 오류가 납니다.</p>
+      <details><summary>정답 보기</summary>
+        <pre><code class="language-tsx">import { useState, useEffect } from "react";
+
+const LikeCounter = () =&gt; {
+  // 저장된 값은 문자열이므로 Number()로 변환, 없으면 0
+  const [count, setCount] = useState&lt;number&gt;(() =&gt; {
+    return Number(localStorage.getItem("likeCount")) || 0;
+  });
+
+  useEffect(() =&gt; {
+    // setItem은 문자열만 받으므로 String()으로 변환
+    localStorage.setItem("likeCount", String(count));
+  }, [count]);
+
+  return (
+    &lt;div&gt;
+      &lt;p&gt;좋아요: {count}&lt;/p&gt;
+      &lt;button onClick={() =&gt; setCount(count + 1)}&gt;👍 좋아요&lt;/button&gt;
+      &lt;button onClick={() =&gt; setCount(0)}&gt;초기화&lt;/button&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default LikeCounter;</code></pre>
+      </details>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 13 ================= -->
+  <section class="module" id="m11">
+    <h2><span class="num">11</span> React Router 주요 Hook</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li>React Router의 대표 Hook 4가지의 역할을 안다.</li>
@@ -1253,8 +1565,8 @@ navigate('/dashboard');</code></pre>
   </section>
 
   <!-- ================= MODULE 14 ================= -->
-  <section class="module" id="m11">
-    <h2><span class="num">11</span> 비동기 처리 — axios로 할 일 CRUD</h2>
+  <section class="module" id="m12">
+    <h2><span class="num">12</span> 비동기 처리 — axios로 할 일 CRUD</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div>
       <ul>
         <li><code>async/await</code>와 <code>Promise(.then)</code> 방식을 비교한다.</li>
@@ -1514,7 +1826,7 @@ const AddTodo = () =&gt; {
     </div>
 
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 11-1. 삭제(DELETE) 기능 추가</h4>
+      <h4>실습 12-1. 삭제(DELETE) 기능 추가</h4>
       <p>목록의 각 항목에 "삭제" 버튼을 추가하고, 클릭 시 axios로 DELETE 요청을 보낸 뒤 화면 상태에서도 해당 항목을 제거하는 함수를 작성하세요. (jsonplaceholder는 실제로 삭제하지 않지만 요청은 성공으로 응답합니다.)</p>
       <details><summary>정답 보기</summary>
         <pre><code class="language-tsx">const deleteTodo = async (id: number) =&gt; {
@@ -1533,7 +1845,9 @@ const AddTodo = () =&gt; {
     </div>
   </section>
 
-  <footer>7강. 타입스크립트(TypeScript) 기반 React · 학습 교안<br>모듈별 학습목표 · 개념 · 예제 · 실습문제 구성</footer>
+
+
+  <footer>8강. 타입스크립트(TypeScript) 기반 React · 학습 교안<br>모듈별 학습목표 · 개념 · 예제 · 실습문제 구성</footer>
 </div>
 
 <script>
