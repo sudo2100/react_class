@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>11강. 쇼핑 사이트 개발 및 운영</title>
+<style>
+/* highlight.js atom-one-dark theme (inlined) */
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*
+
+Atom One Dark by Daniel Gamage
+Original One Dark Syntax theme from https://github.com/atom/one-dark-syntax
+
+base:    #282c34
+mono-1:  #abb2bf
+mono-2:  #818896
+mono-3:  #5c6370
+hue-1:   #56b6c2
+hue-2:   #61aeee
+hue-3:   #c678dd
+hue-4:   #98c379
+hue-5:   #e06c75
+hue-5-2: #be5046
+hue-6:   #d19a66
+hue-6-2: #e6c07b
+
+*/
+.hljs {
+  color: #abb2bf;
+  background: #282c34
+}
+.hljs-comment,
+.hljs-quote {
+  color: #5c6370;
+  font-style: italic
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #c678dd
+}
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+  color: #e06c75
+}
+.hljs-literal {
+  color: #56b6c2
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #98c379
+}
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: #d19a66
+}
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #61aeee
+}
+.hljs-built_in,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: #e6c07b
+}
+.hljs-emphasis {
+  font-style: italic
+}
+.hljs-strong {
+  font-weight: bold
+}
+.hljs-link {
+  text-decoration: underline
+}
+</style>
+<style>
+  :root{--bg:#f4f6f9;--card:#fff;--ink:#1f2933;--muted:#52606d;--line:#e4e7eb;--accent:#2965f1;--accent2:#1b3a8f;--code-bg:#282c34;--goal:#eafaf1;--goal-line:#27ae60;--ex:#eef4ff;--ex-line:#5b8def;--lab:#eef7ff;--lab-line:#2965f1;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Malgun Gothic","맑은 고딕",-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.75;}
+  header.hero{background:linear-gradient(135deg,#2965f1,#1b3a8f 60%,#153e75);color:#fff;padding:52px 24px;text-align:center;}
+  header.hero .eyebrow{letter-spacing:3px;font-size:.78rem;opacity:.92;text-transform:uppercase}
+  header.hero h1{margin:12px 0 8px;font-size:1.9rem}header.hero p{margin:0;opacity:.94}
+  header.hero .tags{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  header.hero .tags span{background:rgba(255,255,255,.18);border-radius:999px;padding:5px 13px;font-size:.82rem}
+  .wrap{max-width:920px;margin:0 auto;padding:32px 20px 80px}
+  nav.toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 26px;margin-bottom:34px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  nav.toc h2{margin:0 0 12px;font-size:1.05rem;color:var(--accent2)}
+  nav.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+  nav.toc a{color:var(--ink);text-decoration:none}nav.toc a:hover{color:var(--accent);text-decoration:underline}
+  section.module{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px 30px;margin-bottom:26px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  section.module > h2{margin:0 0 6px;font-size:1.4rem;color:var(--accent2);display:flex;align-items:center;gap:12px;}
+  section.module > h2 .num{background:var(--accent);color:#fff;font-size:.95rem;font-weight:800;padding:4px 12px;border-radius:10px;min-width:38px;text-align:center;}
+  h3.blk{font-size:1.02rem;margin:22px 0 8px;font-weight:800}
+  .goal{background:var(--goal);border-left:5px solid var(--goal-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:14px 0}
+  .goal .lbl{font-weight:800;color:#1e874b}.goal ul{margin:8px 0 0}
+  .concept h3.blk{color:var(--ink);border-left:4px solid var(--accent);padding-left:10px}
+  .ex{background:var(--ex);border-left:5px solid var(--ex-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .ex .lbl{font-weight:800;color:#2f5fc7}
+  .lab{background:var(--lab);border-left:5px solid var(--lab-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .lab .lbl{font-weight:800;color:#1b4fc0}.lab h4{margin:6px 0 6px;font-size:.98rem}
+  ul{margin:8px 0}li{margin:5px 0}.muted{color:var(--muted)}
+  code{background:#eceef1;padding:2px 6px;border-radius:5px;font-size:.92em;font-family:Consolas,"D2Coding",monospace}
+  pre{background:var(--code-bg);border-radius:10px;padding:0;overflow-x:auto;margin:10px 0}
+  pre code{display:block;padding:16px 18px;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;line-height:1.6;background:var(--code-bg);color:#abb2bf;border-radius:10px;white-space:pre}
+  pre code.hljs{background:var(--code-bg);padding:16px 18px}
+  .fname{display:inline-block;background:#1b3a8f;color:#fff;font-family:Consolas,"D2Coding",monospace;font-size:.8rem;font-weight:700;padding:4px 12px;border-radius:8px 8px 0 0;margin:10px 0 -8px}
+  .fname + pre{border-top-left-radius:0}
+  .out{background:#fff;color:var(--ink);border:1px solid var(--line);border-left:4px solid #27ae60;border-radius:8px;padding:12px 16px;margin:8px 0 0}
+  .out .rt{font-size:.72rem;letter-spacing:1px;color:#27ae60;font-weight:800;text-transform:uppercase;display:block;margin-bottom:6px}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:.93rem}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:#eef2fb;color:var(--accent2)}td.c,th.c{text-align:center}
+  td code,th code{background:#eef1f5}
+  details{margin-top:10px;background:#fff;border:1px solid #cfe0ff;border-radius:8px;padding:8px 14px}
+  details summary{cursor:pointer;font-weight:700;color:#1b4fc0}details pre{margin-top:10px}
+  footer{text-align:center;color:var(--muted);font-size:.85rem;padding:30px 20px}
+  .pill{display:inline-block;background:#eceef1;border-radius:6px;padding:2px 9px;margin:2px;font-size:.85rem}
+  .flow{background:#f7f9fc;border:1px dashed #b9c6de;border-radius:10px;padding:12px 16px;margin:12px 0;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;white-space:pre-wrap;color:#37475f}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}nav.toc ol{columns:1}}
+  .tip{background:#fff8e6;border-left:5px solid #f2b705;border-radius:0 10px 10px 0;padding:12px 18px;margin:14px 0}
+  .tip .lbl{font-weight:800;color:#b57f00}
+  .demo{border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:8px 0 0;background:#fafbfc}
+  .demo button{margin:2px 4px 2px 0;padding:4px 12px;border:1px solid #b9c6de;border-radius:6px;background:#fff;cursor:default}
+  .demo input{padding:4px 8px;border:1px solid #b9c6de;border-radius:6px;margin:2px 0}
+
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="eyebrow">React 심화 · Chapter 11 · 학습 교안</div>
+  <h1>쇼핑 사이트 개발 및 운영</h1>
+  <p><b>1. 상품 목록 만들기와 확장을 고려한 설계</b> — React + TypeScript로 쇼핑몰의 상품 목록을 만들고, Context로 상품 상태를 공유해 <b>상품 상세 · 상품 등록</b> 화면을 붙입니다.<br><b>2. 장바구니 만들기</b> — 같은 Context 구조를 따라 <b>장바구니</b>를 만들고, 목록 · 상세 · 헤더 · 장바구니 화면이 같은 상태를 함께 씁니다.</p>
+  <div class="tags">
+    <span>🏷️ React + TypeScript</span>
+    <span>🏷️ Props 타입</span>
+    <span>🏷️ map / key</span>
+    <span>🏷️ .ts 데이터 파일</span>
+    <span>🏷️ as const</span>
+    <span>🏷️ Omit</span>
+    <span>🏷️ Context API</span>
+  </div>
+</header>
+<div class="wrap">
+  <nav class="toc">
+    <h2>📚 학습 목차</h2>
+    <ol>
+      <li><a href="#m1">강의 개요와 시작 상태 확인</a></li>
+      <li><a href="#m2">상품 카드와 상품 목록 컴포넌트</a></li>
+      <li><a href="#m3">데이터 파일 분리 (.js → .ts)</a></li>
+      <li><a href="#m4">타입 파일 분리</a></li>
+      <li><a href="#m5">확장을 고려한 타입 설계</a></li>
+      <li><a href="#m6">Context로 상품 상태 공유</a></li>
+      <li><a href="#m7">장바구니</a></li>
+    </ol>
+  </nav>
+
+  <!-- ================= MODULE 1 ================= -->
+  <section class="module" id="m1">
+    <h2><span class="num">1</span> 강의 개요와 시작 상태 확인</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>컴포넌트에 넘기는 값(props)에 타입을 붙일 수 있다.</li>
+      <li>배열 데이터를 <code>map</code>으로 화면에 그릴 수 있다.</li>
+      <li>데이터 파일을 <code>.js</code>, <code>.json</code>, <code>.ts</code> 중 무엇으로 둘지 판단할 수 있다.</li>
+      <li><code>as const</code>, <code>Omit</code> 같은 TypeScript 문법으로 타입을 설계할 수 있다.</li>
+      <li>Context API로 여러 화면이 함께 쓰는 상태를 만들 수 있다.</li>
+      <li>입력 폼의 값을 상태로 관리하고, 검사한 뒤 Context에 저장할 수 있다.</li>
+      <li>한 Context가 다른 Context를 쓸 때 Provider를 감싸는 순서를 정할 수 있다.</li>
+    </ul></div>
+
+    <div class="concept">
+      <h3 class="blk">📖 진행 순서</h3>
+      <table>
+        <tr><th>단계</th><th>내용</th><th>다루는 파일</th></tr>
+        <tr><td>0</td><td>시작 상태 확인</td><td><code>App.tsx</code>, <code>Header.tsx</code></td></tr>
+        <tr><td>1</td><td>상품 카드와 상품 목록 컴포넌트</td><td><code>ProductCard.tsx</code>, <code>ProductList.tsx</code></td></tr>
+        <tr><td>2</td><td>데이터 파일 분리 (<code>.js</code> → <code>.ts</code>)</td><td><code>datas/products.ts</code></td></tr>
+        <tr><td>3</td><td>타입 파일 분리</td><td><code>types/product.ts</code></td></tr>
+        <tr><td>4</td><td>확장을 고려한 타입 설계</td><td><code>types/product.ts</code></td></tr>
+        <tr><td>5</td><td>Context로 상품 상태 공유 · 상품 상세 · 상품 등록</td><td><code>contexts/Product*</code>, <code>ProductList.tsx</code>, <code>ProductDetail.tsx</code>, <code>AddProduct.tsx</code>, <code>App.tsx</code>, <code>Header.tsx</code></td></tr>
+        <tr><td>6</td><td>장바구니</td><td><code>types/cart.ts</code>, <code>contexts/Cart*</code>, <code>cart/Cart.tsx</code>, <code>ProductCard.tsx</code>, <code>ProductDetail.tsx</code>, <code>Header.tsx</code>, <code>App.css</code></td></tr>
+      </table>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 시작 상태</h3>
+      <p>Vite로 만든 React + TypeScript 프로젝트에 <code>react-router-dom</code>을 설치한 상태에서 시작합니다.</p>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — App.tsx</div>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import './App.css'
+import Header from './layouts/Header';
+import ProductList from './products/ProductList';
+
+function App() {
+
+  return (
+    &lt;BrowserRouter&gt;
+      &lt;Header /&gt;
+      &lt;main&gt;
+        &lt;Routes&gt;
+          &lt;Route path='/' element={&lt;ProductList /&gt;} /&gt;
+        &lt;/Routes&gt;
+      &lt;/main&gt;
+    &lt;/BrowserRouter&gt;
+  )
+}
+
+export default App;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — Header.tsx</div>
+      <span class="fname">src/layouts/Header.tsx</span>
+      <pre><code class="language-tsx">import { Link } from "react-router-dom";
+
+const Header = () =&gt; {
+
+  return(
+    &lt;div className="header"&gt;
+      &lt;h1&gt;&lt;Link to='/'&gt;SPACE SHOP&lt;/Link&gt;&lt;/h1&gt;
+      &lt;nav&gt;
+        &lt;Link to='/'&gt;상품 목록&lt;/Link&gt;
+      &lt;/nav&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default Header;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — App.css (기본 스타일)</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/*border-box: 모든 요소의 width와 height에
+  padding과 border까지 포함시키는 설정입니다.
+*/
+* { box-sizing: border-box; }
+body { margin: 0; font-family: sans-serif; }
+a { color: inherit; text-decoration: none; }
+
+.header { display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 24px; background: #222; color: #fff; }
+.header h1 { margin: 0; font-size: 20px; color: #fff;}
+.header nav { display: flex; gap: 16px; }
+
+main { max-width: 960px; margin: 0 auto; padding: 24px; }
+
+.product-list{display: flex; flex-wrap: wrap; gap: 16px}
+.card {
+  /* .product-list에 gap: 16px이 있어서 카드 사이마다 16px씩 간격이 생깁니다.
+    카드가 3개면 간격은 2개입니다.
+    | 카드 | 16px | 카드 | 16px | 카드 |
+    calc() 함수: %와 px처럼 단위가 다른 값을 섞어서 계산할 수 있게 해 주는 CSS 함수입니다.
+    주의할 점은 +와 - 앞뒤에 반드시 공백을 넣어야 한다는 것입니다.
+    100%-32px처럼 붙여 쓰면 동작하지 않습니다.
+  */
+  width: calc((100% - 32px) / 3);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+}</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>box-sizing: border-box</code>가 있어야 카드의 <code>padding: 16px</code>과 테두리가 <code>width</code> 안에 포함되어, 3개가 한 줄에 정확히 들어갑니다. 이 설정이 없으면 카드가 조금씩 넓어져 세 번째 카드가 다음 줄로 넘어갑니다.</div>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 2 ================= -->
+  <section class="module" id="m2">
+    <h2><span class="num">2</span> 상품 카드와 상품 목록 컴포넌트</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>props에 interface로 타입을 붙일 수 있다.</li>
+      <li>배열 데이터를 <code>map</code>과 <code>key</code>로 화면에 그릴 수 있다.</li>
+    </ul></div>
+
+    <div class="concept">
+      <p>상품 하나를 그리는 <code>ProductCard</code>와, 여러 상품을 반복해서 그리는 <code>ProductList</code>로 나눕니다.</p>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품 카드</div>
+      <span class="fname">src/products/ProductCard.tsx</span>
+      <pre><code class="language-tsx">import type { ProductProp } from './ProductList';
+
+interface ProductCardProps {
+  product: ProductProp;
+}
+
+const ProductCard = ({ product }: ProductCardProps) =&gt; {
+
+  return(
+    &lt;div className="card"&gt;
+      &lt;span&gt;{product.category}&lt;/span&gt;
+      &lt;h3&gt;{product.pName}&lt;/h3&gt;
+      &lt;p&gt;{product.price.toLocaleString()}원&lt;/p&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default ProductCard;</code></pre>
+      <ul>
+        <li><code>ProductCardProps</code>는 이 컴포넌트가 <b>받는 값</b>의 규칙입니다.</li>
+        <li><code>toLocaleString()</code>은 <code>25000</code>을 <code>25,000</code>처럼 천 단위 쉼표를 붙여 줍니다.</li>
+      </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품 목록</div>
+      <span class="fname">src/products/ProductList.tsx</span>
+      <pre><code class="language-tsx">import ProductCard from './ProductCard';
+
+export interface ProductProp {
+  id: number;
+  pName: string;
+  category: string;
+  price: number;
+}
+
+const products: ProductProp[] = [ /* 상품 데이터 */ ];
+
+const ProductList = () =&gt; {
+
+  return(
+    &lt;div className='product-list'&gt;
+      {products.map((product) =&gt; (
+        &lt;ProductCard
+          key={product.id}
+          product={product}
+        /&gt;
+      ))}
+    &lt;/div&gt;
+  )
+}
+
+export default ProductList;</code></pre>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 짚고 넘어갈 점</h3>
+      <ul>
+        <li><code>ProductCard</code>에서 타입을 가져다 쓰므로 <code>interface</code> 앞에 <b><code>export</code></b> 가 꼭 필요합니다.</li>
+        <li><code>map</code>으로 그리는 요소에는 <b><code>key</code></b> 를 붙입니다. React가 어떤 항목이 바뀌었는지 구분하는 데 씁니다.</li>
+        <li><code>key</code>에는 배열 순서(index)보다 <b>변하지 않는 고유 값(id)</b> 을 쓰는 것이 좋습니다.</li>
+      </ul>
+    </div>
+    <div class="out"><span class="rt">브라우저 출력</span>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#222;color:#fff;border-radius:6px"><strong style="font-size:20px">SPACE SHOP</strong><span>상품 목록</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:16px"><div style="width:calc((100% - 32px) / 3);border:1px solid #ddd;border-radius:8px;padding:16px"><span style="font-size:12px;color:#888">마우스</span><h3 style="margin:6px 0">무선 마우스</h3><p style="margin:0">25,000원</p></div><div style="width:calc((100% - 32px) / 3);border:1px solid #ddd;border-radius:8px;padding:16px"><span style="font-size:12px;color:#888">키보드</span><h3 style="margin:6px 0">기계식 키보드</h3><p style="margin:0">89,000원</p></div><div style="width:calc((100% - 32px) / 3);border:1px solid #ddd;border-radius:8px;padding:16px"><span style="font-size:12px;color:#888">모니터</span><h3 style="margin:6px 0">27인치 모니터</h3><p style="margin:0">320,000원</p></div></div>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 3 ================= -->
+  <section class="module" id="m3">
+    <h2><span class="num">3</span> 데이터 파일 분리 (.js → .ts)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>데이터 파일을 <code>.js</code> · <code>.json</code> · <code>.ts</code> 중 무엇으로 둘지 판단할 수 있다.</li>
+      <li><code>as</code> 타입 단언이 검사를 끄는 것에 가깝다는 점을 이해한다.</li>
+    </ul></div>
+
+    <div class="concept">
+      <p>상품 데이터를 컴포넌트 밖 <code>src/datas/</code> 폴더로 옮깁니다. 이때 파일 형식을 무엇으로 할지 고민해 봅니다.</p>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 <code>.json</code> vs <code>.ts</code> 비교</h3>
+      <table>
+        <tr><th></th><th><code>.ts</code></th><th><code>.json</code></th></tr>
+        <tr><td>타입 검사</td><td>항목을 빠뜨리거나 잘못 적으면 바로 오류</td><td>값만 보고 타입을 추측, 오타를 못 잡음</td></tr>
+        <tr><td>주석, 마지막 쉼표</td><td>가능</td><td>불가능</td></tr>
+        <tr><td>어울리는 상황</td><td>코드 안에서 직접 가져다 쓸 때</td><td><code>fetch</code>로 서버처럼 불러올 때 (<code>public/products.json</code>)</td></tr>
+      </table>
+      <p>TypeScript 프로젝트에서 코드로 직접 가져다 쓴다면 <b><code>.ts</code></b> 가 유리합니다.</p>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>.json</code>을 가져와서 <code>as ProductProp[]</code>로 타입을 붙이면 오류는 사라지지만, 실제로 데이터가 규칙에 맞는지는 <b>검사하지 않습니다.</b> 검사를 끄는 것에 가깝습니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — products.ts</div>
+      <span class="fname">src/datas/products.ts</span>
+      <pre><code class="language-typescript">import type { ProductProp } from '../products/ProductList';
+
+export const products: ProductProp[] = [
+  { id: 1, pName: "무선 마우스", category: "마우스", price: 25000, desc: "조용한 클릭음의 2.4GHz 무선 마우스" },
+  { id: 2, pName: "기계식 키보드", category: "키보드", price: 89000, desc: "청축 스위치, RGB 백라이트" },
+  // ...
+];</code></pre>
+      <p>데이터에 설명(<code>desc</code>)이 생겼으므로 타입에도 <code>desc: string;</code>을 추가합니다.</p>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 4 ================= -->
+  <section class="module" id="m4">
+    <h2><span class="num">4</span> 타입 파일 분리</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>여러 파일이 쓰는 타입을 별도 파일로 분리해 의존 관계를 정리할 수 있다.</li>
+      <li><code>import type</code>의 의미를 설명할 수 있다.</li>
+    </ul></div>
+
+    <div class="concept">
+      <p>지금은 상품 타입이 <code>ProductList.tsx</code> 안에 있어서, 데이터 파일과 카드 컴포넌트가 <b>목록 컴포넌트에 의존</b>하게 됩니다.</p>
+      <div class="flow">ProductCard ──→ ProductList (타입 때문에)
+products.ts ──→ ProductList (타입 때문에)</div>
+      <p>타입을 별도 파일로 빼면 모두가 한 곳만 바라보게 됩니다.</p>
+      <div class="flow">ProductCard ──→ types/product.ts
+ProductList ──→ types/product.ts
+products.ts ──→ types/product.ts</div>
+      <p><code>import type</code>을 쓰면 타입만 가져온다는 뜻이 분명해지고, 빌드 결과에서도 빠집니다.</p>
+      <pre><code class="language-typescript">import type { Product } from '../types/product';</code></pre>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 5 ================= -->
+  <section class="module" id="m5">
+    <h2><span class="num">5</span> 확장을 고려한 타입 설계</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>역할에 맞는 타입 이름을 지을 수 있다.</li>
+      <li><code>as const</code>와 <code>typeof 배열[number]</code>로 값과 타입을 한 곳에서 관리할 수 있다.</li>
+      <li><code>Omit</code>으로 등록용 파생 타입을 만들 수 있다.</li>
+    </ul></div>
+
+    <div class="concept">
+      <p>앞으로 <b>상품 등록</b> 기능을 붙인다고 생각하고 타입을 다듬습니다.</p>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — product.ts</div>
+      <span class="fname">src/types/product.ts</span>
+      <pre><code class="language-typescript">export const CATEGORIES = ['마우스', '키보드', '모니터', '주변기기', '음향'] as const;
+
+export type Category = typeof CATEGORIES[number];
+
+export interface Product {
+  id: number;
+  pName: string;
+  category: Category;
+  price: number;
+  desc: string;
+}
+
+// 상품 등록 시 입력받는 값 (id는 저장할 때 생성)
+export type NewProduct = Omit&lt;Product, 'id'&gt;;</code></pre>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 ① 이름 바꾸기: <code>ProductProp</code> → <code>Product</code></h3>
+      <p><code>Prop</code>은 컴포넌트에 넘기는 값처럼 보이지만, 이 타입은 <b>상품 데이터 자체</b>입니다. 이름이 역할을 정확히 말해 주도록 바꿉니다.</p>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 ② 카테고리 목록: <code>as const</code></h3>
+      <pre><code class="language-typescript">const CATEGORIES = ['마우스', '키보드'];           // string[]
+const CATEGORIES = ['마우스', '키보드'] as const;  // readonly ['마우스', '키보드']</code></pre>
+      <ul>
+        <li><code>as const</code>를 붙이면 값 하나하나가 그대로 타입이 됩니다.</li>
+        <li><code>typeof CATEGORIES[number]</code>는 배열 안의 값들을 모아 <code>'마우스' | '키보드' | ...</code> 타입을 만듭니다.</li>
+        <li><b>배열은 화면의 선택 목록(select)에, 타입은 검사에</b> 함께 쓸 수 있어 한 곳만 고치면 됩니다.</li>
+        <li>목록에 없는 카테고리를 적으면 바로 오류가 납니다.</li>
+      </ul>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 ③ 등록용 타입: <code>Omit</code></h3>
+      <p>사용자가 상품을 등록할 때는 번호(<code>id</code>)를 입력하지 않습니다. 번호는 저장할 때 만들어집니다.</p>
+      <pre><code class="language-typescript">type NewProduct = Omit&lt;Product, 'id'&gt;;
+// { pName: string; category: Category; price: number; desc: string; }</code></pre>
+      <p><code>Product</code>를 고치면 <code>NewProduct</code>도 자동으로 따라 바뀝니다.</p>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 6 ================= -->
+  <section class="module" id="m6">
+    <h2><span class="num">6</span> Context로 상품 상태 공유</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>여러 화면이 함께 쓰는 상태가 왜 필요한지 설명할 수 있다.</li>
+      <li>Context · Provider · 커스텀 훅을 파일로 나눠 상품 상태를 공유할 수 있다.</li>
+      <li>이전 값을 받는 <code>setState</code>와 새 배열로 불변성을 지킬 수 있다.</li>
+    </ul></div>
+
+    <div class="concept">
+      <h3 class="blk">📖 왜 필요할까?</h3>
+      <p>지금 상품 목록은 파일에서 가져와 <b>읽기만 하는 고정된 배열</b>입니다. 상품 등록 화면에서 새 상품을 만들어도 <b>담아 둘 곳</b>이 없고, 목록 화면에 반영할 방법도 없습니다.</p>
+      <div class="flow">[상품 등록 화면] ──추가──→ ??? ←──읽기── [상품 목록 화면]</div>
+      <p>여러 화면이 같은 데이터를 함께 쓰려면 <b>공용 저장소</b>가 필요합니다. React의 <b>Context API</b>를 사용합니다.</p>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ① Context와 꺼내 쓰는 함수 만들기</div>
+      <span class="fname">src/contexts/ProductContext.ts</span>
+      <pre><code class="language-typescript">import { createContext, useContext } from 'react';
+import type { NewProduct, Product } from '../types/product';
+
+interface ProductContextValue {
+  products: Product[];
+  addProduct: (product: NewProduct) =&gt; void;
+}
+
+export const ProductContext = createContext&lt;ProductContextValue | null&gt;(null);
+
+export const useProducts = () =&gt; {
+  const context = useContext(ProductContext);
+  if (!context) {
+    throw new Error('useProducts는 ProductProvider 안에서 사용해야 합니다.');
+  }
+  return context;
+}</code></pre>
+      <ul>
+        <li>처음 값을 <code>null</code>로 두고, <code>useProducts</code> 안에서 <code>null</code>인지 확인합니다.</li>
+        <li>덕분에 사용하는 쪽에서는 매번 <code>null</code> 검사를 하지 않아도 됩니다.</li>
+        <li><code>Provider</code> 밖에서 실수로 쓰면 <b>어디가 잘못됐는지 알려 주는 오류</b>가 납니다.</li>
+      </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 데이터 파일 정리 (initialProducts)</div>
+      <span class="fname">src/datas/products.ts</span>
+      <pre><code class="language-typescript">import type { Product } from '../types/product';
+
+// 상품 목록의 처음 값으로만 쓰므로 이름을 initialProducts로 바꿉니다.
+export const initialProducts: Product[] = [
+  { id: 1, pName: "무선 마우스", category: "마우스", price: 25000, desc: "조용한 클릭음의 2.4GHz 무선 마우스" },
+  { id: 2, pName: "기계식 키보드", category: "키보드", price: 89000, desc: "청축 스위치, RGB 백라이트" },
+  // ...
+];</code></pre>
+      <ul>
+        <li>4단계에서 만든 <code>Product</code> 타입을 가져와 붙입니다. <code>category</code>가 <code>CATEGORIES</code>에 없는 값이면 바로 오류가 납니다.</li>
+        <li>이제 이 배열은 Provider의 <b>처음 값</b>으로만 쓰므로 이름을 <code>initialProducts</code>로 바꿉니다.</li>
+      </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ② 저장소 컴포넌트(Provider) 만들기</div>
+      <span class="fname">src/contexts/ProductProvider.tsx</span>
+      <pre><code class="language-tsx">import { useState, type ReactNode } from 'react';
+import { ProductContext } from './ProductContext';
+import { initialProducts } from '../datas/products';
+import type { NewProduct, Product } from '../types/product';
+
+const ProductProvider = ({ children }: { children: ReactNode }) =&gt; {
+  const [products, setProducts] = useState&lt;Product[]&gt;(initialProducts);
+
+  const addProduct = (product: NewProduct) =&gt; {
+    setProducts((prev) =&gt; {
+      const nextId = Math.max(0, ...prev.map((p) =&gt; p.id)) + 1;
+      return [...prev, { ...product, id: nextId }];
+    });
+  }
+
+  return(
+    &lt;ProductContext.Provider value={{ products, addProduct }}&gt;
+      {children}
+    &lt;/ProductContext.Provider&gt;
+  )
+}
+
+export default ProductProvider;</code></pre>
+      <ul>
+        <li>데이터 파일의 상품은 <b>처음 값(<code>initialProducts</code>)</b> 으로만 씁니다. 이름도 그 역할에 맞게 바꿉니다.</li>
+        <li><code>addProduct</code>는 <code>NewProduct</code>(id 없음)를 받아서, 가장 큰 id + 1로 번호를 붙여 저장합니다.</li>
+        <li><code>setProducts((prev) =&gt; ...)</code>처럼 <b>이전 값을 받아 계산</b>하면 여러 번 연달아 호출해도 안전합니다.</li>
+        <li>기존 배열을 고치지 않고 <code>[...prev, 새상품]</code>으로 <b>새 배열</b>을 만들어야 React가 변화를 알아챕니다.</li>
+      </ul>
+      <div class="tip"><span class="lbl">💡 왜 파일을 두 개로 나눴나요?</span> Vite의 빠른 새로고침(Fast Refresh)은 컴포넌트만 내보내는 파일에서 가장 잘 동작합니다. 컴포넌트(<code>ProductProvider</code>)와 컴포넌트가 아닌 것(<code>ProductContext</code>, <code>useProducts</code>)을 나눠 두면 저장할 때 화면 상태가 유지됩니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ③ 앱 전체를 감싸기</div>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">import ProductProvider from './contexts/ProductProvider';
+
+function App() {
+
+  return (
+    &lt;ProductProvider&gt;
+      &lt;BrowserRouter&gt;
+        &lt;Header /&gt;
+        &lt;main&gt;
+          &lt;Routes&gt;
+            &lt;Route path='/' element={&lt;ProductList /&gt;} /&gt;
+          &lt;/Routes&gt;
+        &lt;/main&gt;
+      &lt;/BrowserRouter&gt;
+    &lt;/ProductProvider&gt;
+  )
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ④ 목록 화면에서 꺼내 쓰기</div>
+      <span class="fname">src/products/ProductList.tsx</span>
+      <pre><code class="language-tsx">import ProductCard from './ProductCard';
+import { useProducts } from '../contexts/ProductContext';
+
+const ProductList = () =&gt; {
+  const { products } = useProducts();
+
+  return(
+    &lt;div className='product-list'&gt;
+      {products.map((product) =&gt; (
+        &lt;ProductCard
+          key={product.id}
+          product={product}
+        /&gt;
+      ))}
+    &lt;/div&gt;
+  )
+}
+
+export default ProductList;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑤ 상세 화면에서 꺼내 쓰기 (상품 상세 보기)</div>
+      <span class="fname">src/products/ProductDetail.tsx</span>
+      <pre><code class="language-tsx">import { Link, useParams } from 'react-router-dom';
+import { useProducts } from '../contexts/ProductContext';
+
+const ProductDetail = () =&gt; {
+  const { id } = useParams&lt;{ id: string }&gt;();
+  const { products } = useProducts();
+
+  // 해당 id와 일치하는 상품 찾기
+  const product = products.find((item) =&gt; item.id === Number(id));
+
+  if (!product) {
+    return (
+      &lt;section className="product-detail"&gt;
+        &lt;h2&gt;상품을 찾을 수 없습니다.&lt;/h2&gt;
+        &lt;Link to="/"&gt;상품 목록으로 돌아가기&lt;/Link&gt;
+      &lt;/section&gt;
+    );
+  }
+
+  return (
+    &lt;article className="product-detail"&gt;
+      &lt;Link to="/" className="product-detail__back"&gt;← 상품 목록&lt;/Link&gt;
+      &lt;span className="product-detail__category"&gt;{product.category}&lt;/span&gt;
+      &lt;h2&gt;{product.pName}&lt;/h2&gt;
+      &lt;p className="product-detail__price"&gt;{product.price.toLocaleString()}원&lt;/p&gt;
+      &lt;p className="product-detail__desc"&gt;{product.desc}&lt;/p&gt;
+    &lt;/article&gt;
+  );
+}
+
+export default ProductDetail;</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>useParams()</code>로 주소의 <code>:id</code> 값을 꺼냅니다. 주소에서 꺼낸 값은 항상 <strong>문자열</strong>이므로 <code>Number(id)</code>로 바꿔서 <code>item.id</code>(숫자)와 비교합니다. <code>find()</code>는 일치하는 상품이 없으면 <code>undefined</code>를 돌려주므로, <code>if (!product)</code>로 먼저 걸러 내야 아래에서 <code>product.pName</code>을 안전하게 쓸 수 있습니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — App.css (상품 상세 스타일)</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 상품 상세 스타일 */
+.product-detail {
+  /* #root에 text-align: center가 있어서 상세 화면은 왼쪽 정렬로 되돌립니다. */
+  text-align: left;
+  max-width: 640px;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 32px;
+  /* 세로로 쌓고 gap으로 요소 사이 간격을 한 번에 지정합니다. */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.product-detail h2 { margin: 0; }
+.product-detail__back { font-size: 14px; color: var(--text); }
+.product-detail__back:hover { color: var(--accent); }
+.product-detail__category {
+  /* flex 안에서 기본값(stretch)이면 가로로 꽉 차므로 글자 길이만큼만 차지하게 합니다. */
+  align-self: flex-start;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+.product-detail__price { font-size: 24px; font-weight: 700; color: var(--text-h); }
+.product-detail__desc {
+  padding-top: 16px;
+  border-top: 1px solid #ddd;
+  line-height: 1.7;
+}</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑥ 등록 화면에서 addProduct 쓰기 (상품 등록)</div>
+      <span class="fname">src/products/AddProduct.tsx</span>
+      <pre><code class="language-tsx">import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useProducts } from '../contexts/ProductContext';
+import { CATEGORIES, type Category } from '../types/product';
+
+// 입력창의 값은 항상 문자열이므로 가격도 문자열로 받고, 등록할 때 숫자로 바꿉니다.
+interface ProductForm {
+  pName: string;
+  category: Category;
+  price: string;
+  desc: string;
+}
+
+const initialForm: ProductForm = {
+  pName: '',
+  category: CATEGORIES[0],
+  price: '',
+  desc: '',
+};
+
+const AddProduct = () =&gt; {
+  const { addProduct } = useProducts();
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState&lt;ProductForm&gt;(initialForm);
+  const [error, setError] = useState('');
+
+  const { pName, category, price, desc } = form;
+
+  // 입력창의 name과 form의 키를 같게 두어서 핸들러 하나로 모든 입력을 처리합니다.
+  const handleInputChange = (
+    e: ChangeEvent&lt;HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement&gt;
+  ) =&gt; {
+    const { name, value } = e.target;
+    setForm((prev) =&gt; ({ ...prev, [name]: value }));
+  }
+
+  const handleSubmit = (e: FormEvent&lt;HTMLFormElement&gt;) =&gt; {
+    e.preventDefault();
+
+    const priceNumber = Number(price);
+
+    if (!pName.trim()) {
+      setError('상품명을 입력하세요.');
+      return;
+    }
+    if (!price || !Number.isInteger(priceNumber) || priceNumber &lt;= 0) {
+      setError('가격은 1원 이상의 정수로 입력하세요.');
+      return;
+    }
+
+    addProduct({
+      pName: pName.trim(),
+      category,
+      price: priceNumber,
+      desc: desc.trim(),
+    });
+    alert("상품 등록을 성공했습니다.");
+    console.log("등록된 상품: ", form);
+    
+    navigate('/');
+  }
+
+  const handleCancel = () =&gt; {
+    navigate('/');
+  }
+
+  return(
+    &lt;div className="add-product"&gt;
+      &lt;h2&gt;상품 등록&lt;/h2&gt;
+      &lt;form onSubmit={handleSubmit}&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="pName"&gt;상품명&lt;/label&gt;
+          &lt;input
+            type="text"
+            id="pName"
+            name="pName"
+            value={pName}
+            onChange={handleInputChange}
+            placeholder="상품명을 입력하세요"
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="category"&gt;카테고리&lt;/label&gt;
+          &lt;select
+            id="category"
+            name="category"
+            value={category}
+            onChange={handleInputChange}
+          &gt;
+            {CATEGORIES.map((item) =&gt; (
+              &lt;option key={item} value={item}&gt;{item}&lt;/option&gt;
+            ))}
+          &lt;/select&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="price"&gt;가격&lt;/label&gt;
+          &lt;input
+            type="number"
+            id="price"
+            name="price"
+            min={1}
+            value={price}
+            onChange={handleInputChange}
+            placeholder="가격을 입력하세요"
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="desc"&gt;설명&lt;/label&gt;
+          &lt;textarea
+            id="desc"
+            name="desc"
+            rows={5}
+            value={desc}
+            onChange={handleInputChange}
+            placeholder="상품 설명을 입력하세요"
+          /&gt;
+        &lt;/div&gt;
+        {error &amp;&amp; &lt;p className="add-product__error"&gt;{error}&lt;/p&gt;}
+        &lt;div className="add-product__buttons"&gt;
+          &lt;button type="submit"&gt;등록&lt;/button&gt;
+          &lt;button type="button" onClick={handleCancel}&gt;취소&lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/form&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default AddProduct;</code></pre>
+      <ul>
+        <li><b>폼 전용 타입:</b> 입력창 값은 <code>type="number"</code>라도 <b>항상 문자열</b>이므로 <code>price</code>를 <code>string</code>으로 받고, 등록할 때 숫자로 바꿉니다.</li>
+        <li><code>initialForm</code>을 컴포넌트 밖에 두면 렌더링할 때마다 새로 만들지 않습니다. 카테고리 처음 값은 <code>CATEGORIES[0]</code>으로 둡니다.</li>
+        <li><b>핸들러 하나:</b> <code>[name]: value</code>는 <b>변수 값을 키로</b> 쓰는 문법입니다. 입력창의 <code>name</code> 속성을 <code>ProductForm</code>의 키와 <b>똑같이</b> 적어야 동작합니다.</li>
+        <li><code>input</code>, <code>textarea</code>, <code>select</code>에서 함께 쓰므로 이벤트 타입을 <code>|</code>로 묶습니다.</li>
+        <li><code>e.preventDefault()</code>로 제출 시 <b>새로고침</b>을 막습니다. 새로고침되면 메모리에 있던 상품이 모두 사라집니다.</li>
+        <li><code>Number('')</code>는 <code>0</code>, <code>Number('abc')</code>는 <code>NaN</code>이므로 비어 있는지와 정수인지를 <b>함께</b> 확인하고, 걸리면 <code>return</code>으로 바로 끝냅니다.</li>
+        <li><code>addProduct</code>에는 <code>NewProduct</code> 타입을 넘겨야 하므로, 가격을 문자열 그대로 넘기면 <b>TypeScript가 오류</b>를 알려 줍니다.</li>
+        <li>취소 버튼은 <code>type="button"</code>으로 둡니다. <code>form</code> 안의 버튼은 기본이 <code>submit</code>이라 적지 않으면 취소를 눌러도 등록이 실행됩니다.</li>
+      </ul>
+      <div class="tip"><span class="lbl">💡 정리</span> 입력창 값은 항상 문자열이라 폼 전용 타입 <code>ProductForm</code>에서는 <code>price</code>를 <code>string</code>으로 두고, 등록할 때 <code>Number(price)</code>로 바꿔 <code>NewProduct</code> 모양으로 <code>addProduct</code>에 넘깁니다. 카테고리 선택 목록은 <code>CATEGORIES</code>를 그대로 <code>map</code>해서 만들므로, 카테고리가 늘어나도 <code>types/product.ts</code> 한 곳만 고치면 됩니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — App.css (상품 등록 스타일)</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 상품 등록 스타일 */
+.add-product {
+  text-align: left;
+  max-width: 640px;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 32px;
+}
+.add-product form { display: flex; flex-direction: column; gap: 16px; }
+.add-product form &gt; div { display: flex; flex-direction: column; gap: 6px; }
+.add-product label { font-size: 14px; font-weight: 600; color: var(--text-h); }
+.add-product input,
+.add-product select,
+.add-product textarea {
+  /* 입력 요소는 부모의 글꼴을 물려받지 않으므로 직접 지정합니다. */
+  font: inherit;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+.add-product textarea { resize: vertical; }
+.add-product__error { color: #d93025; font-size: 14px; }
+/* 위의 `.add-product form &gt; div`보다 우선하도록 선택자를 더 구체적으로 씁니다. */
+.add-product form &gt; .add-product__buttons { flex-direction: row; gap: 8px; justify-content: flex-end; }
+.add-product button {
+  font: inherit;
+  padding: 8px 20px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.add-product button[type="submit"] { background: #222; border-color: #222; color: #fff; }</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑦ 경로와 메뉴 추가</div>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import './App.css'
+import Header from './layouts/Header';
+import ProductProvider from './contexts/ProductProvider';
+import ProductList from './products/ProductList';
+import ProductDetail from './products/ProductDetail';
+import AddProduct from './products/AddProduct';
+
+function App() {
+
+  return (
+    &lt;ProductProvider&gt;
+      &lt;BrowserRouter&gt;
+        &lt;Header /&gt;
+        &lt;main&gt;
+          &lt;Routes&gt;
+            &lt;Route path='/' element={&lt;ProductList /&gt;} /&gt;
+            &lt;Route path='/products/new' element={&lt;AddProduct /&gt;} /&gt;
+            {/* :id 자리에 상품 번호가 들어가고, useParams()로 꺼냅니다. */}
+            &lt;Route path='/products/:id' element={&lt;ProductDetail /&gt;} /&gt;
+          &lt;/Routes&gt;
+        &lt;/main&gt;
+      &lt;/BrowserRouter&gt;
+    &lt;/ProductProvider&gt;
+  )
+}
+
+export default App;</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>/products/new</code>와 <code>/products/:id</code>는 모양이 비슷하지만, React Router(v6 이상)는 <b>고정된 경로를 먼저</b> 고르므로 <code>new</code>가 상품 번호로 잘못 읽히지 않습니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑦ 경로와 메뉴 추가 (헤더)</div>
+      <span class="fname">src/layouts/Header.tsx</span>
+      <pre><code class="language-tsx">import { Link } from "react-router-dom";
+
+const Header = () =&gt; {
+
+  return(
+    &lt;div className="header"&gt;
+      &lt;h1&gt;&lt;Link to='/'&gt;SPACE SHOP&lt;/Link&gt;&lt;/h1&gt;
+      &lt;nav&gt;
+        &lt;Link to='/'&gt;상품 목록&lt;/Link&gt;
+        &lt;Link to='/products/new'&gt;상품 등록&lt;/Link&gt;
+      &lt;/nav&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default Header;</code></pre>
+    </div>
+    <div class="concept">
+      <p>이제 구조는 이렇게 됩니다.</p>
+      <div class="flow">                 ProductProvider (products, addProduct)
+                  ↑ addProduct          ↓ products
+[상품 등록 화면]                  [상품 목록 화면]</div>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 최종 폴더 구조</h3>
+      <div class="flow">src/
+├── App.tsx                  # ProductProvider로 앱 전체 감싸기, /products/new · /products/:id 경로
+├── main.tsx
+├── contexts/
+│   ├── ProductContext.ts    # Context, useProducts
+│   └── ProductProvider.tsx  # 상품 상태와 addProduct
+├── datas/
+│   └── products.ts          # 초기 상품 데이터
+├── layouts/
+│   └── Header.tsx           # 상품 등록 메뉴
+├── products/
+│   ├── AddProduct.tsx       # 상품 등록
+│   ├── ProductCard.tsx      # 상품 하나
+│   ├── ProductDetail.tsx    # 상품 상세 보기
+│   └── ProductList.tsx      # 상품 목록
+└── types/
+    └── product.ts           # Product, Category, NewProduct</div>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 7 ================= -->
+  <section class="module" id="m7">
+    <h2><span class="num">7</span> 장바구니</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>장바구니에 상품 번호와 수량만 저장하는 이유를 설명하고 <code>CartItem</code>, <code>CartLine</code> 타입을 만들 수 있다.</li>
+      <li>상품과 같은 구조로 <code>CartContext</code>, <code>CartProvider</code>, <code>useCart</code>를 만들어 장바구니 상태를 공유할 수 있다.</li>
+      <li>담기 · 수량 변경 · 삭제 · 전체 비우기 기능과 합계 수량 · 금액 계산을 구현할 수 있다.</li>
+      <li>다른 Context를 쓰는 Provider를 <b>감싸는 순서</b>를 정할 수 있다.</li>
+      <li>장바구니 화면 · 상품 카드 · 상세 · 헤더에서 <code>useCart()</code>로 같은 장바구니 상태를 꺼내 쓸 수 있다.</li>
+    </ul></div>
+
+    <div class="concept">
+      <h3 class="blk">📖 왜 장바구니도 Context일까?</h3>
+      <p>장바구니도 <b>여러 화면이 함께 쓰는 데이터</b>입니다. 카드와 상세에서 담고, 헤더와 장바구니 화면에서 읽습니다.</p>
+      <div class="flow">[상품 카드] ──담기──┐
+[상품 상세] ──담기──┼──→ ??? ←──읽기── [헤더 개수] [장바구니 화면]</div>
+      <p>그래서 상품의 <code>ProductContext</code>와 같은 방식으로 <code>CartContext</code>를 만듭니다.</p>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 무엇을 저장할까?</h3>
+      <table>
+        <tr><th></th><th>상품 전체 저장</th><th>번호와 수량만 저장</th></tr>
+        <tr><td>저장 모양</td><td><code>{ id, pName, price, ..., quantity }</code></td><td><code>{ productId, quantity }</code></td></tr>
+        <tr><td>상품 가격이 바뀌면</td><td>장바구니에는 <b>예전 가격</b>이 남음</td><td>상품 목록에서 찾으므로 <b>바뀐 가격</b>이 나옴</td></tr>
+        <tr><td>같은 정보</td><td>두 곳에 있음</td><td>한 곳(상품 목록)에만 있음</td></tr>
+      </table>
+      <p>같은 정보를 두 곳에 두면 한쪽만 바뀌는 문제가 생기므로 <b>번호와 수량만</b> 저장합니다.</p>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ① 장바구니 타입</div>
+      <span class="fname">src/types/cart.ts</span>
+      <pre><code class="language-typescript">import type { Product } from './product';
+
+// 장바구니에는 상품 id와 수량만 저장하고, 상품 정보는 상품 목록에서 찾아 씁니다.
+export interface CartItem {
+  productId: number;
+  quantity: number;
+}
+
+// 화면에 보여줄 때 상품 정보와 합친 형태
+export interface CartLine {
+  product: Product;
+  quantity: number;
+}</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>CartItem</code>은 <b>저장용</b>(상품 번호 + 수량), <code>CartLine</code>은 <b>화면 표시용</b>(상품 정보 + 수량)입니다. 장바구니에 상품 정보 전체를 복사해 두지 않고 번호만 저장하므로, 상품 가격이나 이름이 바뀌어도 장바구니에는 항상 <b>최신 정보</b>가 나옵니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ② 장바구니 Context와 꺼내 쓰는 함수</div>
+      <span class="fname">src/contexts/CartContext.ts</span>
+      <pre><code class="language-typescript">import { createContext, useContext } from 'react';
+import type { CartLine } from '../types/cart';
+
+interface CartContextValue {
+  cartLines: CartLine[];
+  totalQuantity: number;
+  totalPrice: number;
+  addToCart: (productId: number, quantity?: number) =&gt; void;
+  updateQuantity: (productId: number, quantity: number) =&gt; void;
+  removeFromCart: (productId: number) =&gt; void;
+  clearCart: () =&gt; void;
+}
+
+export const CartContext = createContext&lt;CartContextValue | null&gt;(null);
+
+export const useCart = () =&gt; {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error('useCart는 CartProvider 안에서 사용해야 합니다.');
+  }
+  return context;
+}</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> 상품의 <code>ProductContext.ts</code>와 같은 구조입니다. <code>quantity?: number</code>처럼 <code>?</code>를 붙이면 생략할 수 있는 매개변수가 되어 <code>addToCart(1)</code>로도, <code>addToCart(1, 3)</code>으로도 호출할 수 있습니다. 화면에는 <code>CartItem</code>이 아니라 상품 정보가 합쳐진 <code>CartLine[]</code>을 넘겨서 각 화면이 상품을 다시 찾지 않아도 되게 합니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ③ 장바구니 저장소 컴포넌트(Provider)</div>
+      <span class="fname">src/contexts/CartProvider.tsx</span>
+      <pre><code class="language-tsx">import { useState, type ReactNode } from 'react';
+import { CartContext } from './CartContext';
+import { useProducts } from './ProductContext';
+import type { CartItem, CartLine } from '../types/cart';
+
+// 상품 목록이 필요하므로 ProductProvider 안쪽에 두어야 합니다.
+const CartProvider = ({ children }: { children: ReactNode }) =&gt; {
+  const { products } = useProducts();
+  const [items, setItems] = useState&lt;CartItem[]&gt;([]);
+
+  // 이미 담긴 상품이면 수량만 늘리고, 없으면 새로 추가합니다.
+  const addToCart = (productId: number, quantity = 1) =&gt; {
+    setItems((prev) =&gt; {
+      const exists = prev.some((item) =&gt; item.productId === productId);
+      if (exists) {
+        return prev.map((item) =&gt;
+          item.productId === productId
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+      }
+      return [...prev, { productId, quantity }];
+    });
+  }
+
+  // 수량은 1개 이상만 허용합니다. 빼려면 removeFromCart를 사용합니다.
+  const updateQuantity = (productId: number, quantity: number) =&gt; {
+    if (quantity &lt; 1) return;
+    setItems((prev) =&gt;
+      prev.map((item) =&gt;
+        item.productId === productId ? { ...item, quantity } : item
+      )
+    );
+  }
+
+  const removeFromCart = (productId: number) =&gt; {
+    setItems((prev) =&gt; prev.filter((item) =&gt; item.productId !== productId));
+  }
+
+  const clearCart = () =&gt; {
+    setItems([]);
+  }
+
+  // 저장된 id로 상품 정보를 찾아 붙입니다. 찾을 수 없는 상품은 제외합니다.
+  const cartLines: CartLine[] = items.flatMap((item) =&gt; {
+    const product = products.find((p) =&gt; p.id === item.productId);
+    return product ? [{ product, quantity: item.quantity }] : [];
+  });
+
+  const totalQuantity = cartLines.reduce((sum, line) =&gt; sum + line.quantity, 0);
+  const totalPrice = cartLines.reduce(
+    (sum, line) =&gt; sum + line.product.price * line.quantity,
+    0
+  );
+
+  return(
+    &lt;CartContext.Provider
+      value={{
+        cartLines,
+        totalQuantity,
+        totalPrice,
+        addToCart,
+        updateQuantity,
+        removeFromCart,
+        clearCart,
+      }}
+    &gt;
+      {children}
+    &lt;/CartContext.Provider&gt;
+  )
+}
+
+export default CartProvider;</code></pre>
+      <ul>
+        <li><b>담기:</b> <code>some</code>으로 이미 담긴 상품인지 확인해서, 있으면 줄을 하나 더 만들지 않고 <b>수량만</b> 늘립니다. <code>quantity = 1</code>은 <b>기본값</b>이라 <code>addToCart(상품번호)</code>만 부르면 1개가 담깁니다.</li>
+        <li><code>map</code>으로 바꿀 항목만 <code>{ ...item, quantity: ... }</code> <b>새 객체</b>로 만들고, 나머지는 그대로 둡니다.</li>
+        <li><b>수량 변경:</b> 1보다 작으면 무시해서 <b>0개짜리 상품</b>이 남지 않게 합니다. 빼기는 <code>filter</code>로 해당 상품만 제외한 <b>새 배열</b>을 만듭니다.</li>
+        <li><b>계산할 수 있는 값은 상태로 두지 않기:</b> 총 수량 · 총 금액을 <code>useState</code>로 따로 두면 담을 때마다 함께 고쳐야 하고, 하나라도 빠뜨리면 숫자가 틀어집니다. <code>items</code>에서 매번 계산하면 <b>항상 맞는 값</b>이 나옵니다.</li>
+        <li><code>flatMap</code>은 찾은 상품은 <code>[값]</code>, 못 찾은 상품은 <code>[]</code>를 돌려받아 한 겹 펼치므로 <b>변환과 걸러내기를 한 번에</b> 합니다. <code>reduce</code>의 마지막 <code>0</code>은 시작 값입니다.</li>
+      </ul>
+      <div class="tip"><span class="lbl">💡 참고</span> <code>map</code> 후 <code>filter</code>로 걸러도 됩니다. 다만 TypeScript 5.4 이하에서는 <code>undefined</code>가 빠졌다는 것을 알아채지 못해 타입이 <code>(CartLine | undefined)[]</code>로 남습니다(5.5부터는 자동으로 좁혀짐). <code>flatMap</code>은 버전과 관계없이 <code>CartLine[]</code>이 됩니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ④ Provider 감싸는 순서와 경로 추가</div>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import './App.css'
+import Header from './layouts/Header';
+import ProductProvider from './contexts/ProductProvider';
+import CartProvider from './contexts/CartProvider';
+import ProductList from './products/ProductList';
+import ProductDetail from './products/ProductDetail';
+import AddProduct from './products/AddProduct';
+import Cart from './cart/Cart';
+
+function App() {
+
+  return (
+    &lt;ProductProvider&gt;
+      {/* 장바구니는 상품 목록을 참조하므로 ProductProvider 안쪽에 둡니다. */}
+      &lt;CartProvider&gt;
+        &lt;BrowserRouter&gt;
+          &lt;Header /&gt;
+          &lt;main&gt;
+            &lt;Routes&gt;
+              &lt;Route path='/' element={&lt;ProductList /&gt;} /&gt;
+              &lt;Route path='/products/new' element={&lt;AddProduct /&gt;} /&gt;
+              &lt;Route path='/products/:id' element={&lt;ProductDetail /&gt;} /&gt;
+              &lt;Route path='/cart' element={&lt;Cart /&gt;} /&gt;
+            &lt;/Routes&gt;
+          &lt;/main&gt;
+        &lt;/BrowserRouter&gt;
+      &lt;/CartProvider&gt;
+    &lt;/ProductProvider&gt;
+  )
+}
+
+export default App;</code></pre>
+      <p><code>CartProvider</code>는 안에서 <code>useProducts()</code>를 쓰므로 <code>ProductProvider</code> <b>안쪽</b>에 있어야 합니다. 순서를 거꾸로 하면 <code>useProducts는 ProductProvider 안에서 사용해야 합니다.</code> 오류가 납니다. 6단원에서 넣어 둔 오류 메시지 덕분에 원인을 바로 알 수 있습니다.</p>
+      <div class="flow">ProductProvider          ← products
+└── CartProvider         ← useProducts()로 products를 읽음
+    └── 화면들            ← useProducts(), useCart() 둘 다 사용 가능</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑤ 장바구니 화면</div>
+      <span class="fname">src/cart/Cart.tsx</span>
+      <pre><code class="language-tsx">import { Link } from 'react-router-dom';
+import { useCart } from '../contexts/CartContext';
+
+const Cart = () =&gt; {
+  const {
+    cartLines,
+    totalQuantity,
+    totalPrice,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+  } = useCart();
+
+  if (cartLines.length === 0) {
+    return (
+      &lt;section className="cart"&gt;
+        &lt;h2&gt;장바구니&lt;/h2&gt;
+        &lt;p className="cart__empty"&gt;장바구니가 비어 있습니다.&lt;/p&gt;
+        &lt;Link to="/" className="cart__link"&gt;상품 보러 가기&lt;/Link&gt;
+      &lt;/section&gt;
+    );
+  }
+
+  const handleClear = () =&gt; {
+    if (confirm('장바구니를 모두 비울까요?')) {
+      clearCart();
+    }
+  }
+
+  return (
+    &lt;section className="cart"&gt;
+      &lt;h2&gt;장바구니&lt;/h2&gt;
+      &lt;ul className="cart__list"&gt;
+        {cartLines.map(({ product, quantity }) =&gt; (
+          &lt;li key={product.id} className="cart__item"&gt;
+            &lt;div className="cart__info"&gt;
+              &lt;span className="cart__category"&gt;{product.category}&lt;/span&gt;
+              &lt;Link to={`/products/${product.id}`}&gt;{product.pName}&lt;/Link&gt;
+              &lt;span&gt;{product.price.toLocaleString()}원&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;div className="cart__quantity"&gt;
+              &lt;button
+                type="button"
+                onClick={() =&gt; updateQuantity(product.id, quantity - 1)}
+                disabled={quantity &lt;= 1}
+              &gt;
+                −
+              &lt;/button&gt;
+              &lt;span&gt;{quantity}&lt;/span&gt;
+              &lt;button
+                type="button"
+                onClick={() =&gt; updateQuantity(product.id, quantity + 1)}
+              &gt;
+                +
+              &lt;/button&gt;
+            &lt;/div&gt;
+            &lt;strong className="cart__subtotal"&gt;
+              {(product.price * quantity).toLocaleString()}원
+            &lt;/strong&gt;
+            &lt;button
+              type="button"
+              className="cart__remove"
+              onClick={() =&gt; removeFromCart(product.id)}
+            &gt;
+              삭제
+            &lt;/button&gt;
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+      &lt;div className="cart__summary"&gt;
+        &lt;span&gt;총 {totalQuantity}개&lt;/span&gt;
+        &lt;strong&gt;{totalPrice.toLocaleString()}원&lt;/strong&gt;
+      &lt;/div&gt;
+      &lt;div className="cart__buttons"&gt;
+        &lt;button type="button" onClick={handleClear}&gt;전체 비우기&lt;/button&gt;
+        &lt;Link to="/" className="cart__link"&gt;쇼핑 계속하기&lt;/Link&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+  );
+}
+
+export default Cart;</code></pre>
+      <ul>
+        <li><b>비어 있을 때를 먼저 처리하고 <code>return</code></b> 합니다. 아래 코드는 상품이 있다고 생각하고 쓸 수 있습니다.</li>
+        <li><code>map(({ product, quantity }) =&gt; ...)</code>처럼 매개변수 자리에서 바로 <b>구조 분해</b>할 수 있습니다.</li>
+        <li>− 버튼은 수량이 1이면 <code>disabled</code>로 막습니다. Provider에서도 막아 두었지만 <b>누를 수 없다는 것을 화면으로 보여 주는 것</b>이 더 친절합니다.</li>
+        <li>소계(<code>가격 × 수량</code>)도 저장하지 않고 화면에서 바로 계산합니다.</li>
+        <li>전체 비우기는 되돌릴 수 없으므로 <code>confirm</code>으로 한 번 더 묻습니다.</li>
+      </ul>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 ⑥ 담기 버튼과 헤더 개수 표시</h3>
+      <p>어느 컴포넌트든 <code>useCart()</code>만 부르면 장바구니를 쓸 수 있습니다.</p>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑥ 상품 카드에 담기 버튼</div>
+      <span class="fname">src/products/ProductCard.tsx</span>
+      <pre><code class="language-tsx">import { Link } from 'react-router-dom';
+import { useCart } from '../contexts/CartContext';
+import type { Product } from '../types/product';
+
+interface ProductCardProps {
+  product: Product;
+}
+
+const ProductCard = ({ product }: ProductCardProps) =&gt; {
+  const { addToCart } = useCart();
+
+  return(
+    &lt;div className="card"&gt;
+      &lt;span&gt;{product.category}&lt;/span&gt;
+      {/* 상품명을 누르면 상세 화면으로 이동합니다. */}
+      &lt;h3&gt;&lt;Link to={`/products/${product.id}`}&gt;{product.pName}&lt;/Link&gt;&lt;/h3&gt;
+      &lt;p&gt;{product.price.toLocaleString()}원&lt;/p&gt;
+      &lt;button type="button" onClick={() =&gt; addToCart(product.id)}&gt;장바구니 담기&lt;/button&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default ProductCard;</code></pre>
+      <div class="tip"><span class="lbl">💡 주의</span> 카드 전체를 <code>Link</code>로 감싸면 그 안에 담기 버튼이 들어가 <b>링크 안에 버튼</b>이 있는 잘못된 구조가 됩니다. 그래서 상품명(<code>h3</code>)에만 <code>Link</code>를 겁니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑥ 상품 상세에 담기 버튼</div>
+      <span class="fname">src/products/ProductDetail.tsx</span>
+      <pre><code class="language-tsx">import { Link, useParams } from 'react-router-dom';
+import { useProducts } from '../contexts/ProductContext';
+import { useCart } from '../contexts/CartContext';
+
+const ProductDetail = () =&gt; {
+  const { id } = useParams&lt;{ id: string }&gt;();
+  const { products } = useProducts();
+  const { addToCart } = useCart();
+
+  // 해당 id와 일치하는 상품 찾기
+  const product = products.find((item) =&gt; item.id === Number(id));
+
+  if (!product) {
+    return (
+      &lt;section className="product-detail"&gt;
+        &lt;h2&gt;상품을 찾을 수 없습니다.&lt;/h2&gt;
+        &lt;Link to="/"&gt;상품 목록으로 돌아가기&lt;/Link&gt;
+      &lt;/section&gt;
+    );
+  }
+
+  return (
+    &lt;article className="product-detail"&gt;
+      &lt;Link to="/" className="product-detail__back"&gt;← 상품 목록&lt;/Link&gt;
+      &lt;span className="product-detail__category"&gt;{product.category}&lt;/span&gt;
+      &lt;h2&gt;{product.pName}&lt;/h2&gt;
+      &lt;p className="product-detail__price"&gt;{product.price.toLocaleString()}원&lt;/p&gt;
+      &lt;p className="product-detail__desc"&gt;{product.desc}&lt;/p&gt;
+      &lt;button
+        type="button"
+        className="product-detail__cart"
+        onClick={() =&gt; {
+          addToCart(product.id);
+          alert('장바구니에 담았습니다.');
+        }}
+      &gt;
+        장바구니 담기
+      &lt;/button&gt;
+    &lt;/article&gt;
+  );
+}
+
+export default ProductDetail;</code></pre>
+      <div class="tip"><span class="lbl">💡 주의</span> <code>useCart()</code>도 Hook이므로 <code>if (!product) return</code> <b>위에서</b> 불러야 합니다. Hook은 조건문이나 <code>return</code> 뒤에서 부를 수 없습니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑥ 헤더에 장바구니 개수 표시</div>
+      <span class="fname">src/layouts/Header.tsx</span>
+      <pre><code class="language-tsx">import { Link } from "react-router-dom";
+import { useCart } from "../contexts/CartContext";
+
+const Header = () =&gt; {
+  const { totalQuantity } = useCart();
+
+  return(
+    &lt;div className="header"&gt;
+      &lt;h1&gt;&lt;Link to='/'&gt;SPACE SHOP&lt;/Link&gt;&lt;/h1&gt;
+      &lt;nav&gt;
+        &lt;Link to='/'&gt;상품 목록&lt;/Link&gt;
+        &lt;Link to='/products/new'&gt;상품 등록&lt;/Link&gt;
+        &lt;Link to='/cart'&gt;장바구니 ({totalQuantity})&lt;/Link&gt;
+      &lt;/nav&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default Header;</code></pre>
+      <ul>
+        <li>카드에서 담기를 누르면 <b>헤더 숫자가 바로 바뀝니다.</b> 두 컴포넌트는 서로를 모르지만 같은 Context를 보고 있기 때문입니다.</li>
+        <li><code>onClick={() =&gt; addToCart(product.id)}</code>처럼 <b>화살표 함수로 감싸야</b> 합니다. <code>onClick={addToCart(product.id)}</code>라고 쓰면 화면을 그릴 때 바로 실행됩니다.</li>
+        <li>버튼에는 <code>type="button"</code>을 붙여 둡니다. 나중에 <code>form</code> 안에 들어가도 제출 버튼으로 동작하지 않습니다.</li>
+      </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑦ 장바구니 스타일</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 장바구니 담기 버튼 */
+.card button,
+.product-detail__cart {
+  font: inherit;
+  padding: 8px 20px;
+  border: 1px solid #222;
+  border-radius: 6px;
+  background: #222;
+  color: #fff;
+  cursor: pointer;
+}
+.product-detail__cart { align-self: flex-end; }
+
+/* 장바구니 스타일 */
+.cart {
+  text-align: left;
+  max-width: 760px;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 32px;
+}
+.cart h2 { margin-top: 0; }
+.cart__empty { color: var(--text); }
+.cart__link { color: var(--accent); }
+.cart__list { list-style: none; margin: 0; padding: 0; }
+.cart__item {
+  /* 상품 정보 | 수량 | 소계 | 삭제 를 한 줄에 배치합니다. */
+  display: grid;
+  grid-template-columns: 1fr auto 120px auto;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid #ddd;
+}
+.cart__info { display: flex; flex-direction: column; gap: 4px; }
+.cart__category { font-size: 13px; color: var(--accent); }
+.cart__quantity { display: flex; align-items: center; gap: 8px; }
+.cart__quantity span { min-width: 24px; text-align: center; }
+.cart__subtotal { text-align: right; color: var(--text-h); }
+.cart button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.cart button:disabled { opacity: 0.4; cursor: not-allowed; }
+.cart__remove { color: #d93025 !important; }
+.cart__summary {
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 16px;
+  padding: 20px 0;
+}
+.cart__summary strong { font-size: 24px; color: var(--text-h); }
+.cart__buttons { display: flex; justify-content: space-between; align-items: center; }</code></pre>
+      <ul>
+        <li>장바구니 한 줄은 <b>상품 정보 | 수량 | 소계 | 삭제</b> 네 칸이고 줄마다 너비를 맞춰야 하므로 <code>grid</code>를 씁니다.</li>
+        <li><code>1fr</code>은 <b>남는 공간을 모두</b>, <code>auto</code>는 <b>내용 크기만큼</b>, <code>120px</code>은 <b>고정 너비</b>입니다. 소계 칸을 고정하면 금액 자릿수가 달라도 위치가 맞습니다.</li>
+        <li><code>flex</code>는 한 방향으로 늘어놓을 때, <code>grid</code>는 <b>줄마다 칸을 맞춰야 할 때</b> 편합니다.</li>
+        <li><code>var(--text)</code>, <code>var(--text-h)</code>, <code>var(--accent)</code>는 Vite 기본 템플릿의 <code>index.css</code>에 들어 있는 색상 변수입니다. <code>index.css</code>를 지웠다면 직접 색상 값으로 바꿔 주세요.</li>
+      </ul>
+    </div>
+    <div class="out"><span class="rt">브라우저 출력</span>
+      <img src="data:image/png;base64,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" alt="장바구니 화면" style="display:block;width:780px;max-width:100%;height:auto;border:1px solid #e4e7eb;border-radius:8px;margin:8px 0 14px">
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 최종 폴더 구조</h3>
+      <div class="flow">src/
+├── App.tsx                  # ProductProvider &gt; CartProvider 순서로 감싸기, /cart 경로
+├── cart/
+│   └── Cart.tsx             # 장바구니 화면
+├── contexts/
+│   ├── CartContext.ts       # Context, useCart
+│   ├── CartProvider.tsx     # 장바구니 상태와 담기/수량/삭제/비우기
+│   ├── ProductContext.ts
+│   └── ProductProvider.tsx
+├── datas/
+│   └── products.ts
+├── layouts/
+│   └── Header.tsx           # 장바구니 개수 표시
+├── products/
+│   ├── AddProduct.tsx
+│   ├── ProductCard.tsx      # 담기 버튼
+│   ├── ProductDetail.tsx    # 담기 버튼
+│   └── ProductList.tsx
+└── types/
+    ├── cart.ts              # CartItem, CartLine
+    └── product.ts</div>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 생각해 볼 점 — 새로고침하면 장바구니가 비워집니다</h3>
+      <p>장바구니도 상품 목록처럼 메모리에만 있습니다. <code>localStorage</code>에 저장하면 새로고침 후에도 남길 수 있습니다.</p>
+      <pre><code class="language-tsx">const [items, setItems] = useState&lt;CartItem[]&gt;(() =&gt; {
+  const saved = localStorage.getItem('cart');
+  return saved ? JSON.parse(saved) : [];
+});
+
+useEffect(() =&gt; {
+  localStorage.setItem('cart', JSON.stringify(items));
+}, [items]);</code></pre>
+      <ul>
+        <li><code>useState(() =&gt; ...)</code>처럼 <b>함수를 넘기면</b> 처음 한 번만 실행됩니다. (<code>useEffect</code>도 import해야 합니다.)</li>
+        <li>이때 상품 목록은 저장되지 않으므로 직접 등록한 상품은 새로고침 후 사라집니다. ③에서 <b>찾을 수 없는 상품을 제외</b>하도록 만들어 두었기 때문에 화면이 깨지지 않습니다.</li>
+      </ul>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 생각해 볼 점 — 담았다는 것을 알리는 방법</h3>
+      <p>상세 화면에서는 <code>alert</code>로 알리지만, <code>alert</code>은 확인을 누를 때까지 <b>화면 전체를 멈춥니다.</b> 여러 개를 연달아 담는 목록 화면에는 넣지 않았고, 헤더 숫자가 바뀌는 것으로 대신합니다. 잠깐 보였다 사라지는 안내 메시지(토스트)로 바꾸는 방법도 있습니다.</p>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 정리</h3>
+      <ol>
+        <li>장바구니에는 상품 전체가 아니라 <b>번호와 수량만</b> 저장하고, 상품 정보는 목록에서 찾는다.</li>
+        <li>이미 담긴 상품은 <code>some</code>으로 확인해서 <b>새 줄 대신 수량만</b> 늘린다.</li>
+        <li>총 수량, 총 금액, 소계처럼 <b>계산할 수 있는 값은 상태로 두지 않는다.</b></li>
+        <li>다른 Context를 쓰는 Provider는 그 Context의 Provider <b>안쪽에</b> 둔다.</li>
+        <li>같은 Context를 보는 컴포넌트들은 서로 몰라도 <b>함께 바뀐다.</b></li>
+      </ol>
+    </div>
+  </section>
+
+  <footer>11강. 쇼핑 사이트 개발 및 운영 · 학습 교안<br>모듈별 학습목표 · 개념 · 예제 · 실습문제 구성</footer>
+</div>
+
+<script>
+(()=>{var wn=Object.create;var Ce=Object.defineProperty;var On=Object.getOwnPropertyDescriptor;var Rn=Object.getOwnPropertyNames;var xn=Object.getPrototypeOf,Mn=Object.prototype.hasOwnProperty;var vn=(e,n)=>()=>{try{return n||e((n={exports:{}}).exports,n),n.exports}catch(t){throw n=0,t}};var kn=(e,n,t,s)=>{if(n&&typeof n=="object"||typeof n=="function")for(let g of Rn(n))!Mn.call(e,g)&&g!==t&&Ce(e,g,{get:()=>n[g],enumerable:!(s=On(n,g))||s.enumerable});return e};var In=(e,n,t)=>(t=e!=null?wn(xn(e)):{},kn(n||!e||!e.__esModule?Ce(t,"default",{value:e,enumerable:!0}):t,e));var Ve=vn((Lt,Je)=>{function $e(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(n=>{let t=e[n],s=typeof t;(s==="object"||s==="function")&&!Object.isFrozen(t)&&$e(t)}),e}var de=class{constructor(n){n.data===void 0&&(n.data={}),this.data=n.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function He(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function K(e,...n){let t=Object.create(null);for(let s in e)t[s]=e[s];return n.forEach(function(s){for(let g in s)t[g]=s[g]}),t}var Cn="</span>",Le=e=>!!e.scope,Ln=(e,{prefix:n})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let t=e.split(".");return[`${n}${t.shift()}`,...t.map((s,g)=>`${s}${"_".repeat(g+1)}`)].join(" ")}return`${n}${e}`},_e=class{constructor(n,t){this.buffer="",this.classPrefix=t.classPrefix,n.walk(this)}addText(n){this.buffer+=He(n)}openNode(n){if(!Le(n))return;let t=Ln(n.scope,{prefix:this.classPrefix});this.span(t)}closeNode(n){Le(n)&&(this.buffer+=Cn)}value(){return this.buffer}span(n){this.buffer+=`<span class="${n}">`}},De=(e={})=>{let n={children:[]};return Object.assign(n,e),n},Ne=class e{constructor(){this.rootNode=De(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(n){this.top.children.push(n)}openNode(n){let t=De({scope:n});this.add(t),this.stack.push(t)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(n){return this.constructor._walk(n,this.rootNode)}static _walk(n,t){return typeof t=="string"?n.addText(t):t.children&&(n.openNode(t),t.children.forEach(s=>this._walk(n,s)),n.closeNode(t)),n}static _collapse(n){typeof n!="string"&&n.children&&(n.children.every(t=>typeof t=="string")?n.children=[n.children.join("")]:n.children.forEach(t=>{e._collapse(t)}))}},Se=class extends Ne{constructor(n){super(),this.options=n}addText(n){n!==""&&this.add(n)}startScope(n){this.openNode(n)}endScope(){this.closeNode()}__addSublanguage(n,t){let s=n.root;t&&(s.scope=`language:${t}`),this.add(s)}toHTML(){return new _e(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function re(e){return e?typeof e=="string"?e:e.source:null}function Ge(e){return j("(?=",e,")")}function Dn(e){return j("(?:",e,")*")}function Bn(e){return j("(?:",e,")?")}function j(...e){return e.map(t=>re(t)).join("")}function Un(e){let n=e[e.length-1];return typeof n=="object"&&n.constructor===Object?(e.splice(e.length-1,1),n):{}}function ye(...e){return"("+(Un(e).capture?"":"?:")+e.map(s=>re(s)).join("|")+")"}function Fe(e){return new RegExp(e.toString()+"|").exec("").length-1}function Pn(e,n){let t=e&&e.exec(n);return t&&t.index===0}var zn=/\[(?:[^\\\]]|\\.)*\]|\(\??|\\([1-9][0-9]*)|\\./;function Te(e,{joinWith:n}){let t=0;return e.map(s=>{t+=1;let g=t,E=re(s),a="";for(;E.length>0;){let i=zn.exec(E);if(!i){a+=E;break}a+=E.substring(0,i.index),E=E.substring(i.index+i[0].length),i[0][0]==="\\"&&i[1]?a+="\\"+String(Number(i[1])+g):(a+=i[0],i[0]==="("&&t++)}return a}).map(s=>`(${s})`).join(n)}var $n=/\b\B/,Ke="[a-zA-Z]\\w*",we="[a-zA-Z_]\\w*",Ze="\\b\\d+(\\.\\d+)?",We="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Xe="\\b(0b[01]+)",Hn="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",Gn=(e={})=>{let n=/^#![ ]*\//;return e.binary&&(e.begin=j(n,/.*\b/,e.binary,/\b.*/)),K({scope:"meta",begin:n,end:/$/,relevance:0,"on:begin":(t,s)=>{t.index!==0&&s.ignoreMatch()}},e)},ae={begin:"\\\\[\\s\\S]",relevance:0},Fn={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[ae]},Kn={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[ae]},Zn={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},fe=function(e,n,t={}){let s=K({scope:"comment",begin:e,end:n,contains:[]},t);s.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let g=ye("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return s.contains.push({begin:j(/[ ]+/,"(",g,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),s},Wn=fe("//","$"),Xn=fe("/\\*","\\*/"),Yn=fe("#","$"),jn={scope:"number",begin:Ze,relevance:0},qn={scope:"number",begin:We,relevance:0},Qn={scope:"number",begin:Xe,relevance:0},Jn={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[ae,{begin:/\[/,end:/\]/,relevance:0,contains:[ae]}]},Vn={scope:"title",begin:Ke,relevance:0},et={scope:"title",begin:we,relevance:0},nt={begin:"\\.\\s*"+we,relevance:0},tt=function(e){return Object.assign(e,{"on:begin":(n,t)=>{t.data._beginMatch=n[1]},"on:end":(n,t)=>{t.data._beginMatch!==n[1]&&t.ignoreMatch()}})},ue=Object.freeze({__proto__:null,APOS_STRING_MODE:Fn,BACKSLASH_ESCAPE:ae,BINARY_NUMBER_MODE:Qn,BINARY_NUMBER_RE:Xe,COMMENT:fe,C_BLOCK_COMMENT_MODE:Xn,C_LINE_COMMENT_MODE:Wn,C_NUMBER_MODE:qn,C_NUMBER_RE:We,END_SAME_AS_BEGIN:tt,HASH_COMMENT_MODE:Yn,IDENT_RE:Ke,MATCH_NOTHING_RE:$n,METHOD_GUARD:nt,NUMBER_MODE:jn,NUMBER_RE:Ze,PHRASAL_WORDS_MODE:Zn,QUOTE_STRING_MODE:Kn,REGEXP_MODE:Jn,RE_STARTERS_RE:Hn,SHEBANG:Gn,TITLE_MODE:Vn,UNDERSCORE_IDENT_RE:we,UNDERSCORE_TITLE_MODE:et});function it(e,n){e.input[e.index-1]==="."&&n.ignoreMatch()}function st(e,n){e.className!==void 0&&(e.scope=e.className,delete e.className)}function rt(e,n){n&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=it,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function at(e,n){Array.isArray(e.illegal)&&(e.illegal=ye(...e.illegal))}function ot(e,n){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function ct(e,n){e.relevance===void 0&&(e.relevance=1)}var lt=(e,n)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let t=Object.assign({},e);Object.keys(e).forEach(s=>{delete e[s]}),e.keywords=t.keywords,e.begin=j(t.beforeMatch,Ge(t.begin)),e.starts={relevance:0,contains:[Object.assign(t,{endsParent:!0})]},e.relevance=0,delete t.beforeMatch},ut=["of","and","for","in","not","or","if","then","parent","list","value"],dt="keyword";function Ye(e,n,t=dt){let s=Object.create(null);return typeof e=="string"?g(t,e.split(" ")):Array.isArray(e)?g(t,e):Object.keys(e).forEach(function(E){Object.assign(s,Ye(e[E],n,E))}),s;function g(E,a){n&&(a=a.map(i=>i.toLowerCase())),a.forEach(function(i){let l=i.split("|");s[l[0]]=[E,gt(l[0],l[1])]})}}function gt(e,n){return n?Number(n):ft(e)?0:1}function ft(e){return ut.includes(e.toLowerCase())}var Be={},Y=e=>{console.error(e)},Ue=(e,...n)=>{console.log(`WARN: ${e}`,...n)},J=(e,n)=>{Be[`${e}/${n}`]||(console.log(`Deprecated as of ${e}. ${n}`),Be[`${e}/${n}`]=!0)},ge=new Error;function je(e,n,{key:t}){let s=0,g=e[t],E={},a={};for(let i=1;i<=n.length;i++)a[i+s]=g[i],E[i+s]=!0,s+=Fe(n[i-1]);e[t]=a,e[t]._emit=E,e[t]._multi=!0}function bt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw Y("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),ge;if(typeof e.beginScope!="object"||e.beginScope===null)throw Y("beginScope must be object"),ge;je(e,e.begin,{key:"beginScope"}),e.begin=Te(e.begin,{joinWith:""})}}function pt(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw Y("skip, excludeEnd, returnEnd not compatible with endScope: {}"),ge;if(typeof e.endScope!="object"||e.endScope===null)throw Y("endScope must be object"),ge;je(e,e.end,{key:"endScope"}),e.end=Te(e.end,{joinWith:""})}}function ht(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function Et(e){ht(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),bt(e),pt(e)}function mt(e){function n(a,i){return new RegExp(re(a),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(i?"g":""))}class t{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(i,l){l.position=this.position++,this.matchIndexes[this.matchAt]=l,this.regexes.push([l,i]),this.matchAt+=Fe(i)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let i=this.regexes.map(l=>l[1]);this.matcherRe=n(Te(i,{joinWith:"|"}),!0),this.lastIndex=0}exec(i){this.matcherRe.lastIndex=this.lastIndex;let l=this.matcherRe.exec(i);if(!l)return null;let f=l.findIndex((w,S)=>S>0&&w!==void 0),m=this.matchIndexes[f];return l.splice(0,f),Object.assign(l,m)}}class s{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(i){if(this.multiRegexes[i])return this.multiRegexes[i];let l=new t;return this.rules.slice(i).forEach(([f,m])=>l.addRule(f,m)),l.compile(),this.multiRegexes[i]=l,l}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(i,l){this.rules.push([i,l]),l.type==="begin"&&this.count++}exec(i){let l=this.getMatcher(this.regexIndex);l.lastIndex=this.lastIndex;let f=l.exec(i);if(this.resumingScanAtSamePosition()&&!(f&&f.index===this.lastIndex)){let m=this.getMatcher(0);m.lastIndex=this.lastIndex+1,f=m.exec(i)}return f&&(this.regexIndex+=f.position+1,this.regexIndex===this.count&&this.considerAll()),f}}function g(a){let i=new s;return a.contains.forEach(l=>i.addRule(l.begin,{rule:l,type:"begin"})),a.terminatorEnd&&i.addRule(a.terminatorEnd,{type:"end"}),a.illegal&&i.addRule(a.illegal,{type:"illegal"}),i}function E(a,i){let l=a;if(a.isCompiled)return l;[st,ot,Et,lt].forEach(m=>m(a,i)),e.compilerExtensions.forEach(m=>m(a,i)),a.__beforeBegin=null,[rt,at,ct].forEach(m=>m(a,i)),a.isCompiled=!0;let f=null;return typeof a.keywords=="object"&&a.keywords.$pattern&&(a.keywords=Object.assign({},a.keywords),f=a.keywords.$pattern,delete a.keywords.$pattern),f=f||/\w+/,a.keywords&&(a.keywords=Ye(a.keywords,e.case_insensitive)),l.keywordPatternRe=n(f,!0),i&&(a.begin||(a.begin=/\B|\b/),l.beginRe=n(l.begin),!a.end&&!a.endsWithParent&&(a.end=/\B|\b/),a.end&&(l.endRe=n(l.end)),l.terminatorEnd=re(l.end)||"",a.endsWithParent&&i.terminatorEnd&&(l.terminatorEnd+=(a.end?"|":"")+i.terminatorEnd)),a.illegal&&(l.illegalRe=n(a.illegal)),a.contains||(a.contains=[]),a.contains=[].concat(...a.contains.map(function(m){return _t(m==="self"?a:m)})),a.contains.forEach(function(m){E(m,l)}),a.starts&&E(a.starts,i),l.matcher=g(l),l}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=K(e.classNameAliases||{}),E(e)}function qe(e){return e?e.endsWithParent||qe(e.starts):!1}function _t(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(n){return K(e,{variants:null},n)})),e.cachedVariants?e.cachedVariants:qe(e)?K(e,{starts:e.starts?K(e.starts):null}):Object.isFrozen(e)?K(e):e}var Nt="11.9.0",Ae=class extends Error{constructor(n,t){super(n),this.name="HTMLInjectionError",this.html=t}},me=He,Pe=K,ze=Symbol("nomatch"),St=7,Qe=function(e){let n=Object.create(null),t=Object.create(null),s=[],g=!0,E="Could not find the language '{}', did you forget to load/include a language module?",a={disableAutodetect:!0,name:"Plain text",contains:[]},i={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:Se};function l(r){return i.noHighlightRe.test(r)}function f(r){let o=r.className+" ";o+=r.parentNode?r.parentNode.className:"";let d=i.languageDetectRe.exec(o);if(d){let h=D(d[1]);return h||(Ue(E.replace("{}",d[1])),Ue("Falling back to no-highlight mode for this block.",r)),h?d[1]:"no-highlight"}return o.split(/\s+/).find(h=>l(h)||D(h))}function m(r,o,d){let h="",_="";typeof o=="object"?(h=r,d=o.ignoreIllegals,_=o.language):(J("10.7.0","highlight(lang, code, ...args) has been deprecated."),J("10.7.0",`Please use highlight(code, options) instead.
+https://github.com/highlightjs/highlight.js/issues/2277`),_=r,h=o),d===void 0&&(d=!0);let T={code:h,language:_};F("before:highlight",T);let v=T.result?T.result:w(T.language,T.code,d);return v.code=T.code,F("after:highlight",v),v}function w(r,o,d,h){let _=Object.create(null);function T(c,u){return c.keywords[u]}function v(){if(!b.keywords){O.addText(A);return}let c=0;b.keywordPatternRe.lastIndex=0;let u=b.keywordPatternRe.exec(A),p="";for(;u;){p+=A.substring(c,u.index);let N=$.case_insensitive?u[0].toLowerCase():u[0],R=T(b,N);if(R){let[G,yn]=R;if(O.addText(p),p="",_[N]=(_[N]||0)+1,_[N]<=St&&(le+=yn),G.startsWith("_"))p+=u[0];else{let Tn=$.classNameAliases[G]||G;z(u[0],Tn)}}else p+=u[0];c=b.keywordPatternRe.lastIndex,u=b.keywordPatternRe.exec(A)}p+=A.substring(c),O.addText(p)}function oe(){if(A==="")return;let c=null;if(typeof b.subLanguage=="string"){if(!n[b.subLanguage]){O.addText(A);return}c=w(b.subLanguage,A,!0,Ie[b.subLanguage]),Ie[b.subLanguage]=c._top}else c=y(A,b.subLanguage.length?b.subLanguage:null);b.relevance>0&&(le+=c.relevance),O.__addSublanguage(c._emitter,c.language)}function I(){b.subLanguage!=null?oe():v(),A=""}function z(c,u){c!==""&&(O.startScope(u),O.addText(c),O.endScope())}function xe(c,u){let p=1,N=u.length-1;for(;p<=N;){if(!c._emit[p]){p++;continue}let R=$.classNameAliases[c[p]]||c[p],G=u[p];R?z(G,R):(A=G,v(),A=""),p++}}function Me(c,u){return c.scope&&typeof c.scope=="string"&&O.openNode($.classNameAliases[c.scope]||c.scope),c.beginScope&&(c.beginScope._wrap?(z(A,$.classNameAliases[c.beginScope._wrap]||c.beginScope._wrap),A=""):c.beginScope._multi&&(xe(c.beginScope,u),A="")),b=Object.create(c,{parent:{value:b}}),b}function ve(c,u,p){let N=Pn(c.endRe,p);if(N){if(c["on:end"]){let R=new de(c);c["on:end"](u,R),R.isMatchIgnored&&(N=!1)}if(N){for(;c.endsParent&&c.parent;)c=c.parent;return c}}if(c.endsWithParent)return ve(c.parent,u,p)}function mn(c){return b.matcher.regexIndex===0?(A+=c[0],1):(Ee=!0,0)}function _n(c){let u=c[0],p=c.rule,N=new de(p),R=[p.__beforeBegin,p["on:begin"]];for(let G of R)if(G&&(G(c,N),N.isMatchIgnored))return mn(u);return p.skip?A+=u:(p.excludeBegin&&(A+=u),I(),!p.returnBegin&&!p.excludeBegin&&(A=u)),Me(p,c),p.returnBegin?0:u.length}function Nn(c){let u=c[0],p=o.substring(c.index),N=ve(b,c,p);if(!N)return ze;let R=b;b.endScope&&b.endScope._wrap?(I(),z(u,b.endScope._wrap)):b.endScope&&b.endScope._multi?(I(),xe(b.endScope,c)):R.skip?A+=u:(R.returnEnd||R.excludeEnd||(A+=u),I(),R.excludeEnd&&(A=u));do b.scope&&O.closeNode(),!b.skip&&!b.subLanguage&&(le+=b.relevance),b=b.parent;while(b!==N.parent);return N.starts&&Me(N.starts,c),R.returnEnd?0:u.length}function Sn(){let c=[];for(let u=b;u!==$;u=u.parent)u.scope&&c.unshift(u.scope);c.forEach(u=>O.openNode(u))}let ce={};function ke(c,u){let p=u&&u[0];if(A+=c,p==null)return I(),0;if(ce.type==="begin"&&u.type==="end"&&ce.index===u.index&&p===""){if(A+=o.slice(u.index,u.index+1),!g){let N=new Error(`0 width match regex (${r})`);throw N.languageName=r,N.badRule=ce.rule,N}return 1}if(ce=u,u.type==="begin")return _n(u);if(u.type==="illegal"&&!d){let N=new Error('Illegal lexeme "'+p+'" for mode "'+(b.scope||"<unnamed>")+'"');throw N.mode=b,N}else if(u.type==="end"){let N=Nn(u);if(N!==ze)return N}if(u.type==="illegal"&&p==="")return 1;if(he>1e5&&he>u.index*3)throw new Error("potential infinite loop, way more iterations than matches");return A+=p,p.length}let $=D(r);if(!$)throw Y(E.replace("{}",r)),new Error('Unknown language: "'+r+'"');let An=mt($),pe="",b=h||An,Ie={},O=new i.__emitter(i);Sn();let A="",le=0,X=0,he=0,Ee=!1;try{if($.__emitTokens)$.__emitTokens(o,O);else{for(b.matcher.considerAll();;){he++,Ee?Ee=!1:b.matcher.considerAll(),b.matcher.lastIndex=X;let c=b.matcher.exec(o);if(!c)break;let u=o.substring(X,c.index),p=ke(u,c);X=c.index+p}ke(o.substring(X))}return O.finalize(),pe=O.toHTML(),{language:r,value:pe,relevance:le,illegal:!1,_emitter:O,_top:b}}catch(c){if(c.message&&c.message.includes("Illegal"))return{language:r,value:me(o),illegal:!0,relevance:0,_illegalBy:{message:c.message,index:X,context:o.slice(X-100,X+100),mode:c.mode,resultSoFar:pe},_emitter:O};if(g)return{language:r,value:me(o),illegal:!1,relevance:0,errorRaised:c,_emitter:O,_top:b};throw c}}function S(r){let o={value:me(r),illegal:!1,relevance:0,_top:a,_emitter:new i.__emitter(i)};return o._emitter.addText(r),o}function y(r,o){o=o||i.languages||Object.keys(n);let d=S(r),h=o.filter(D).filter(Q).map(I=>w(I,r,!1));h.unshift(d);let _=h.sort((I,z)=>{if(I.relevance!==z.relevance)return z.relevance-I.relevance;if(I.language&&z.language){if(D(I.language).supersetOf===z.language)return 1;if(D(z.language).supersetOf===I.language)return-1}return 0}),[T,v]=_,oe=T;return oe.secondBest=v,oe}function C(r,o,d){let h=o&&t[o]||d;r.classList.add("hljs"),r.classList.add(`language-${h}`)}function x(r){let o=null,d=f(r);if(l(d))return;if(F("before:highlightElement",{el:r,language:d}),r.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",r);return}if(r.children.length>0&&(i.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("https://github.com/highlightjs/highlight.js/wiki/security"),console.warn("The element with unescaped HTML:"),console.warn(r)),i.throwUnescapedHTML))throw new Ae("One of your code blocks includes unescaped HTML.",r.innerHTML);o=r;let h=o.textContent,_=d?m(h,{language:d,ignoreIllegals:!0}):y(h);r.innerHTML=_.value,r.dataset.highlighted="yes",C(r,d,_.language),r.result={language:_.language,re:_.relevance,relevance:_.relevance},_.secondBest&&(r.secondBest={language:_.secondBest.language,relevance:_.secondBest.relevance}),F("after:highlightElement",{el:r,result:_,text:h})}function M(r){i=Pe(i,r)}let ee=()=>{L(),J("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function B(){L(),J("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let P=!1;function L(){if(document.readyState==="loading"){P=!0;return}document.querySelectorAll(i.cssSelector).forEach(x)}function H(){P&&L()}typeof window<"u"&&window.addEventListener&&window.addEventListener("DOMContentLoaded",H,!1);function k(r,o){let d=null;try{d=o(e)}catch(h){if(Y("Language definition for '{}' could not be registered.".replace("{}",r)),g)Y(h);else throw h;d=a}d.name||(d.name=r),n[r]=d,d.rawDefinition=o.bind(null,e),d.aliases&&q(d.aliases,{languageName:r})}function ne(r){delete n[r];for(let o of Object.keys(t))t[o]===r&&delete t[o]}function Z(){return Object.keys(n)}function D(r){return r=(r||"").toLowerCase(),n[r]||n[t[r]]}function q(r,{languageName:o}){typeof r=="string"&&(r=[r]),r.forEach(d=>{t[d.toLowerCase()]=o})}function Q(r){let o=D(r);return o&&!o.disableAutodetect}function te(r){r["before:highlightBlock"]&&!r["before:highlightElement"]&&(r["before:highlightElement"]=o=>{r["before:highlightBlock"](Object.assign({block:o.el},o))}),r["after:highlightBlock"]&&!r["after:highlightElement"]&&(r["after:highlightElement"]=o=>{r["after:highlightBlock"](Object.assign({block:o.el},o))})}function ie(r){te(r),s.push(r)}function se(r){let o=s.indexOf(r);o!==-1&&s.splice(o,1)}function F(r,o){let d=r;s.forEach(function(h){h[d]&&h[d](o)})}function W(r){return J("10.7.0","highlightBlock will be removed entirely in v12.0"),J("10.7.0","Please use highlightElement now."),x(r)}Object.assign(e,{highlight:m,highlightAuto:y,highlightAll:L,highlightElement:x,highlightBlock:W,configure:M,initHighlighting:ee,initHighlightingOnLoad:B,registerLanguage:k,unregisterLanguage:ne,listLanguages:Z,getLanguage:D,registerAliases:q,autoDetection:Q,inherit:Pe,addPlugin:ie,removePlugin:se}),e.debugMode=function(){g=!1},e.safeMode=function(){g=!0},e.versionString=Nt,e.regex={concat:j,lookahead:Ge,either:ye,optional:Bn,anyNumberOfTimes:Dn};for(let r in ue)typeof ue[r]=="object"&&$e(ue[r]);return Object.assign(e,ue),e},V=Qe({});V.newInstance=()=>Qe({});Je.exports=V;V.HighlightJS=V;V.default=V});var en=In(Ve(),1);var U=en.default;var nn="[A-Za-z$_][0-9A-Za-z$_]*",At=["as","in","of","if","for","while","finally","var","new","function","do","return","void","else","break","catch","instanceof","with","throw","case","default","try","switch","continue","typeof","delete","let","yield","const","class","debugger","async","await","static","import","from","export","extends"],yt=["true","false","null","undefined","NaN","Infinity"],tn=["Object","Function","Boolean","Symbol","Math","Date","Number","BigInt","String","RegExp","Array","Float32Array","Float64Array","Int8Array","Uint8Array","Uint8ClampedArray","Int16Array","Int32Array","Uint16Array","Uint32Array","BigInt64Array","BigUint64Array","Set","Map","WeakSet","WeakMap","ArrayBuffer","SharedArrayBuffer","Atomics","DataView","JSON","Promise","Generator","GeneratorFunction","AsyncFunction","Reflect","Proxy","Intl","WebAssembly"],sn=["Error","EvalError","InternalError","RangeError","ReferenceError","SyntaxError","TypeError","URIError"],rn=["setInterval","setTimeout","clearInterval","clearTimeout","require","exports","eval","isFinite","isNaN","parseFloat","parseInt","decodeURI","decodeURIComponent","encodeURI","encodeURIComponent","escape","unescape"],Tt=["arguments","this","super","console","window","document","localStorage","sessionStorage","module","global"],wt=[].concat(rn,tn,sn);function Oe(e){let n=e.regex,t=(o,{after:d})=>{let h="</"+o[0].slice(1);return o.input.indexOf(h,d)!==-1},s=nn,g={begin:"<>",end:"</>"},E=/<[A-Za-z0-9\\._:-]+\s*\/>/,a={begin:/<[A-Za-z0-9\\._:-]+/,end:/\/[A-Za-z0-9\\._:-]+>|\/>/,isTrulyOpeningTag:(o,d)=>{let h=o[0].length+o.index,_=o.input[h];if(_==="<"||_===","){d.ignoreMatch();return}_===">"&&(t(o,{after:h})||d.ignoreMatch());let T,v=o.input.substring(h);if(T=v.match(/^\s*=/)){d.ignoreMatch();return}if((T=v.match(/^\s+extends\s+/))&&T.index===0){d.ignoreMatch();return}}},i={$pattern:nn,keyword:At,literal:yt,built_in:wt,"variable.language":Tt},l="[0-9](_?[0-9])*",f=`\\.(${l})`,m="0|[1-9](_?[0-9])*|0[0-7]*[89][0-9]*",w={className:"number",variants:[{begin:`(\\b(${m})((${f})|\\.)?|(${f}))[eE][+-]?(${l})\\b`},{begin:`\\b(${m})\\b((${f})\\b|\\.)?|(${f})\\b`},{begin:"\\b(0|[1-9](_?[0-9])*)n\\b"},{begin:"\\b0[xX][0-9a-fA-F](_?[0-9a-fA-F])*n?\\b"},{begin:"\\b0[bB][0-1](_?[0-1])*n?\\b"},{begin:"\\b0[oO][0-7](_?[0-7])*n?\\b"},{begin:"\\b0[0-7]+n?\\b"}],relevance:0},S={className:"subst",begin:"\\$\\{",end:"\\}",keywords:i,contains:[]},y={begin:"html`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"xml"}},C={begin:"css`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"css"}},x={begin:"gql`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"graphql"}},M={className:"string",begin:"`",end:"`",contains:[e.BACKSLASH_ESCAPE,S]},B={className:"comment",variants:[e.COMMENT(/\/\*\*(?!\/)/,"\\*/",{relevance:0,contains:[{begin:"(?=@[A-Za-z]+)",relevance:0,contains:[{className:"doctag",begin:"@[A-Za-z]+"},{className:"type",begin:"\\{",end:"\\}",excludeEnd:!0,excludeBegin:!0,relevance:0},{className:"variable",begin:s+"(?=\\s*(-)|$)",endsParent:!0,relevance:0},{begin:/(?=[^\n])\s/,relevance:0}]}]}),e.C_BLOCK_COMMENT_MODE,e.C_LINE_COMMENT_MODE]},P=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,{match:/\$\d+/},w];S.contains=P.concat({begin:/\{/,end:/\}/,keywords:i,contains:["self"].concat(P)});let L=[].concat(B,S.contains),H=L.concat([{begin:/\(/,end:/\)/,keywords:i,contains:["self"].concat(L)}]),k={className:"params",begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H},ne={variants:[{match:[/class/,/\s+/,s,/\s+/,/extends/,/\s+/,n.concat(s,"(",n.concat(/\./,s),")*")],scope:{1:"keyword",3:"title.class",5:"keyword",7:"title.class.inherited"}},{match:[/class/,/\s+/,s],scope:{1:"keyword",3:"title.class"}}]},Z={relevance:0,match:n.either(/\bJSON/,/\b[A-Z][a-z]+([A-Z][a-z]*|\d)*/,/\b[A-Z]{2,}([A-Z][a-z]+|\d)+([A-Z][a-z]*)*/,/\b[A-Z]{2,}[a-z]+([A-Z][a-z]+|\d)*([A-Z][a-z]*)*/),className:"title.class",keywords:{_:[...tn,...sn]}},D={label:"use_strict",className:"meta",relevance:10,begin:/^\s*['"]use (strict|asm)['"]/},q={variants:[{match:[/function/,/\s+/,s,/(?=\s*\()/]},{match:[/function/,/\s*(?=\()/]}],className:{1:"keyword",3:"title.function"},label:"func.def",contains:[k],illegal:/%/},Q={relevance:0,match:/\b[A-Z][A-Z_0-9]+\b/,className:"variable.constant"};function te(o){return n.concat("(?!",o.join("|"),")")}let ie={match:n.concat(/\b/,te([...rn,"super","import"]),s,n.lookahead(/\(/)),className:"title.function",relevance:0},se={begin:n.concat(/\./,n.lookahead(n.concat(s,/(?![0-9A-Za-z$_(])/))),end:s,excludeBegin:!0,keywords:"prototype",className:"property",relevance:0},F={match:[/get|set/,/\s+/,s,/(?=\()/],className:{1:"keyword",3:"title.function"},contains:[{begin:/\(\)/},k]},W="(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|"+e.UNDERSCORE_IDENT_RE+")\\s*=>",r={match:[/const|var|let/,/\s+/,s,/\s*/,/=\s*/,/(async\s*)?/,n.lookahead(W)],keywords:"async",className:{1:"keyword",3:"title.function"},contains:[k]};return{name:"JavaScript",aliases:["js","jsx","mjs","cjs"],keywords:i,exports:{PARAMS_CONTAINS:H,CLASS_REFERENCE:Z},illegal:/#(?![$_A-z])/,contains:[e.SHEBANG({label:"shebang",binary:"node",relevance:5}),D,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,B,{match:/\$\d+/},w,Z,{className:"attr",begin:s+n.lookahead(":"),relevance:0},r,{begin:"("+e.RE_STARTERS_RE+"|\\b(case|return|throw)\\b)\\s*",keywords:"return throw case",relevance:0,contains:[B,e.REGEXP_MODE,{className:"function",begin:W,returnBegin:!0,end:"\\s*=>",contains:[{className:"params",variants:[{begin:e.UNDERSCORE_IDENT_RE,relevance:0},{className:null,begin:/\(\s*\)/,skip:!0},{begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H}]}]},{begin:/,/,relevance:0},{match:/\s+/,relevance:0},{variants:[{begin:g.begin,end:g.end},{match:E},{begin:a.begin,"on:begin":a.isTrulyOpeningTag,end:a.end}],subLanguage:"xml",contains:[{begin:a.begin,end:a.end,skip:!0,contains:["self"]}]}]},q,{beginKeywords:"while if switch catch for"},{begin:"\\b(?!function)"+e.UNDERSCORE_IDENT_RE+"\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)\\s*\\{",returnBegin:!0,label:"func.def",contains:[k,e.inherit(e.TITLE_MODE,{begin:s,className:"title.function"})]},{match:/\.\.\./,relevance:0},se,{match:"\\$"+s,relevance:0},{match:[/\bconstructor(?=\s*\()/],className:{1:"title.function"},contains:[k]},ie,Q,ne,F,{match:/\$[(.]/}]}}var be="[A-Za-z$_][0-9A-Za-z$_]*",an=["as","in","of","if","for","while","finally","var","new","function","do","return","void","else","break","catch","instanceof","with","throw","case","default","try","switch","continue","typeof","delete","let","yield","const","class","debugger","async","await","static","import","from","export","extends"],on=["true","false","null","undefined","NaN","Infinity"],cn=["Object","Function","Boolean","Symbol","Math","Date","Number","BigInt","String","RegExp","Array","Float32Array","Float64Array","Int8Array","Uint8Array","Uint8ClampedArray","Int16Array","Int32Array","Uint16Array","Uint32Array","BigInt64Array","BigUint64Array","Set","Map","WeakSet","WeakMap","ArrayBuffer","SharedArrayBuffer","Atomics","DataView","JSON","Promise","Generator","GeneratorFunction","AsyncFunction","Reflect","Proxy","Intl","WebAssembly"],ln=["Error","EvalError","InternalError","RangeError","ReferenceError","SyntaxError","TypeError","URIError"],un=["setInterval","setTimeout","clearInterval","clearTimeout","require","exports","eval","isFinite","isNaN","parseFloat","parseInt","decodeURI","decodeURIComponent","encodeURI","encodeURIComponent","escape","unescape"],dn=["arguments","this","super","console","window","document","localStorage","sessionStorage","module","global"],gn=[].concat(un,cn,ln);function Ot(e){let n=e.regex,t=(o,{after:d})=>{let h="</"+o[0].slice(1);return o.input.indexOf(h,d)!==-1},s=be,g={begin:"<>",end:"</>"},E=/<[A-Za-z0-9\\._:-]+\s*\/>/,a={begin:/<[A-Za-z0-9\\._:-]+/,end:/\/[A-Za-z0-9\\._:-]+>|\/>/,isTrulyOpeningTag:(o,d)=>{let h=o[0].length+o.index,_=o.input[h];if(_==="<"||_===","){d.ignoreMatch();return}_===">"&&(t(o,{after:h})||d.ignoreMatch());let T,v=o.input.substring(h);if(T=v.match(/^\s*=/)){d.ignoreMatch();return}if((T=v.match(/^\s+extends\s+/))&&T.index===0){d.ignoreMatch();return}}},i={$pattern:be,keyword:an,literal:on,built_in:gn,"variable.language":dn},l="[0-9](_?[0-9])*",f=`\\.(${l})`,m="0|[1-9](_?[0-9])*|0[0-7]*[89][0-9]*",w={className:"number",variants:[{begin:`(\\b(${m})((${f})|\\.)?|(${f}))[eE][+-]?(${l})\\b`},{begin:`\\b(${m})\\b((${f})\\b|\\.)?|(${f})\\b`},{begin:"\\b(0|[1-9](_?[0-9])*)n\\b"},{begin:"\\b0[xX][0-9a-fA-F](_?[0-9a-fA-F])*n?\\b"},{begin:"\\b0[bB][0-1](_?[0-1])*n?\\b"},{begin:"\\b0[oO][0-7](_?[0-7])*n?\\b"},{begin:"\\b0[0-7]+n?\\b"}],relevance:0},S={className:"subst",begin:"\\$\\{",end:"\\}",keywords:i,contains:[]},y={begin:"html`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"xml"}},C={begin:"css`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"css"}},x={begin:"gql`",end:"",starts:{end:"`",returnEnd:!1,contains:[e.BACKSLASH_ESCAPE,S],subLanguage:"graphql"}},M={className:"string",begin:"`",end:"`",contains:[e.BACKSLASH_ESCAPE,S]},B={className:"comment",variants:[e.COMMENT(/\/\*\*(?!\/)/,"\\*/",{relevance:0,contains:[{begin:"(?=@[A-Za-z]+)",relevance:0,contains:[{className:"doctag",begin:"@[A-Za-z]+"},{className:"type",begin:"\\{",end:"\\}",excludeEnd:!0,excludeBegin:!0,relevance:0},{className:"variable",begin:s+"(?=\\s*(-)|$)",endsParent:!0,relevance:0},{begin:/(?=[^\n])\s/,relevance:0}]}]}),e.C_BLOCK_COMMENT_MODE,e.C_LINE_COMMENT_MODE]},P=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,{match:/\$\d+/},w];S.contains=P.concat({begin:/\{/,end:/\}/,keywords:i,contains:["self"].concat(P)});let L=[].concat(B,S.contains),H=L.concat([{begin:/\(/,end:/\)/,keywords:i,contains:["self"].concat(L)}]),k={className:"params",begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H},ne={variants:[{match:[/class/,/\s+/,s,/\s+/,/extends/,/\s+/,n.concat(s,"(",n.concat(/\./,s),")*")],scope:{1:"keyword",3:"title.class",5:"keyword",7:"title.class.inherited"}},{match:[/class/,/\s+/,s],scope:{1:"keyword",3:"title.class"}}]},Z={relevance:0,match:n.either(/\bJSON/,/\b[A-Z][a-z]+([A-Z][a-z]*|\d)*/,/\b[A-Z]{2,}([A-Z][a-z]+|\d)+([A-Z][a-z]*)*/,/\b[A-Z]{2,}[a-z]+([A-Z][a-z]+|\d)*([A-Z][a-z]*)*/),className:"title.class",keywords:{_:[...cn,...ln]}},D={label:"use_strict",className:"meta",relevance:10,begin:/^\s*['"]use (strict|asm)['"]/},q={variants:[{match:[/function/,/\s+/,s,/(?=\s*\()/]},{match:[/function/,/\s*(?=\()/]}],className:{1:"keyword",3:"title.function"},label:"func.def",contains:[k],illegal:/%/},Q={relevance:0,match:/\b[A-Z][A-Z_0-9]+\b/,className:"variable.constant"};function te(o){return n.concat("(?!",o.join("|"),")")}let ie={match:n.concat(/\b/,te([...un,"super","import"]),s,n.lookahead(/\(/)),className:"title.function",relevance:0},se={begin:n.concat(/\./,n.lookahead(n.concat(s,/(?![0-9A-Za-z$_(])/))),end:s,excludeBegin:!0,keywords:"prototype",className:"property",relevance:0},F={match:[/get|set/,/\s+/,s,/(?=\()/],className:{1:"keyword",3:"title.function"},contains:[{begin:/\(\)/},k]},W="(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|"+e.UNDERSCORE_IDENT_RE+")\\s*=>",r={match:[/const|var|let/,/\s+/,s,/\s*/,/=\s*/,/(async\s*)?/,n.lookahead(W)],keywords:"async",className:{1:"keyword",3:"title.function"},contains:[k]};return{name:"JavaScript",aliases:["js","jsx","mjs","cjs"],keywords:i,exports:{PARAMS_CONTAINS:H,CLASS_REFERENCE:Z},illegal:/#(?![$_A-z])/,contains:[e.SHEBANG({label:"shebang",binary:"node",relevance:5}),D,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,y,C,x,M,B,{match:/\$\d+/},w,Z,{className:"attr",begin:s+n.lookahead(":"),relevance:0},r,{begin:"("+e.RE_STARTERS_RE+"|\\b(case|return|throw)\\b)\\s*",keywords:"return throw case",relevance:0,contains:[B,e.REGEXP_MODE,{className:"function",begin:W,returnBegin:!0,end:"\\s*=>",contains:[{className:"params",variants:[{begin:e.UNDERSCORE_IDENT_RE,relevance:0},{className:null,begin:/\(\s*\)/,skip:!0},{begin:/\(/,end:/\)/,excludeBegin:!0,excludeEnd:!0,keywords:i,contains:H}]}]},{begin:/,/,relevance:0},{match:/\s+/,relevance:0},{variants:[{begin:g.begin,end:g.end},{match:E},{begin:a.begin,"on:begin":a.isTrulyOpeningTag,end:a.end}],subLanguage:"xml",contains:[{begin:a.begin,end:a.end,skip:!0,contains:["self"]}]}]},q,{beginKeywords:"while if switch catch for"},{begin:"\\b(?!function)"+e.UNDERSCORE_IDENT_RE+"\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)\\s*\\{",returnBegin:!0,label:"func.def",contains:[k,e.inherit(e.TITLE_MODE,{begin:s,className:"title.function"})]},{match:/\.\.\./,relevance:0},se,{match:"\\$"+s,relevance:0},{match:[/\bconstructor(?=\s*\()/],className:{1:"title.function"},contains:[k]},ie,Q,ne,F,{match:/\$[(.]/}]}}function Re(e){let n=Ot(e),t=be,s=["any","void","number","boolean","string","object","never","symbol","bigint","unknown"],g={beginKeywords:"namespace",end:/\{/,excludeEnd:!0,contains:[n.exports.CLASS_REFERENCE]},E={beginKeywords:"interface",end:/\{/,excludeEnd:!0,keywords:{keyword:"interface extends",built_in:s},contains:[n.exports.CLASS_REFERENCE]},a={className:"meta",relevance:10,begin:/^\s*['"]use strict['"]/},i=["type","namespace","interface","public","private","protected","implements","declare","abstract","readonly","enum","override"],l={$pattern:be,keyword:an.concat(i),literal:on,built_in:gn.concat(s),"variable.language":dn},f={className:"meta",begin:"@"+t},m=(S,y,C)=>{let x=S.contains.findIndex(M=>M.label===y);if(x===-1)throw new Error("can not find mode to replace");S.contains.splice(x,1,C)};Object.assign(n.keywords,l),n.exports.PARAMS_CONTAINS.push(f),n.contains=n.contains.concat([f,g,E]),m(n,"shebang",e.SHEBANG()),m(n,"use_strict",a);let w=n.contains.find(S=>S.label==="func.def");return w.relevance=0,Object.assign(n,{name:"TypeScript",aliases:["ts","tsx","mts","cts"]}),n}function fn(e){let n=e.regex,t=n.concat(/[\p{L}_]/u,n.optional(/[\p{L}0-9_.-]*:/u),/[\p{L}0-9_.-]*/u),s=/[\p{L}0-9._:-]+/u,g={className:"symbol",begin:/&[a-z]+;|&#[0-9]+;|&#x[a-f0-9]+;/},E={begin:/\s/,contains:[{className:"keyword",begin:/#?[a-z_][a-z1-9_-]+/,illegal:/\n/}]},a=e.inherit(E,{begin:/\(/,end:/\)/}),i=e.inherit(e.APOS_STRING_MODE,{className:"string"}),l=e.inherit(e.QUOTE_STRING_MODE,{className:"string"}),f={endsWithParent:!0,illegal:/</,relevance:0,contains:[{className:"attr",begin:s,relevance:0},{begin:/=\s*/,relevance:0,contains:[{className:"string",endsParent:!0,variants:[{begin:/"/,end:/"/,contains:[g]},{begin:/'/,end:/'/,contains:[g]},{begin:/[^\s"'=<>`]+/}]}]}]};return{name:"HTML, XML",aliases:["html","xhtml","rss","atom","xjb","xsd","xsl","plist","wsf","svg"],case_insensitive:!0,unicodeRegex:!0,contains:[{className:"meta",begin:/<![a-z]/,end:/>/,relevance:10,contains:[E,l,i,a,{begin:/\[/,end:/\]/,contains:[{className:"meta",begin:/<![a-z]/,end:/>/,contains:[E,a,l,i]}]}]},e.COMMENT(/<!--/,/-->/,{relevance:10}),{begin:/<!\[CDATA\[/,end:/\]\]>/,relevance:10},g,{className:"meta",end:/\?>/,variants:[{begin:/<\?xml/,relevance:10,contains:[l]},{begin:/<\?[a-z][a-z0-9]+/}]},{className:"tag",begin:/<style(?=\s|>)/,end:/>/,keywords:{name:"style"},contains:[f],starts:{end:/<\/style>/,returnEnd:!0,subLanguage:["css","xml"]}},{className:"tag",begin:/<script(?=\s|>)/,end:/>/,keywords:{name:"script"},contains:[f],starts:{end:/<\/script>/,returnEnd:!0,subLanguage:["javascript","handlebars","xml"]}},{className:"tag",begin:/<>|<\/>/},{className:"tag",begin:n.concat(/</,n.lookahead(n.concat(t,n.either(/\/>/,/>/,/\s/)))),end:/\/?>/,contains:[{className:"name",begin:t,relevance:0,starts:f}]},{className:"tag",begin:n.concat(/<\//,n.lookahead(n.concat(t,/>/))),contains:[{className:"name",begin:t,relevance:0},{begin:/>/,relevance:0,endsParent:!0}]}]}}var Rt=e=>({IMPORTANT:{scope:"meta",begin:"!important"},BLOCK_COMMENT:e.C_BLOCK_COMMENT_MODE,HEXCOLOR:{scope:"number",begin:/#(([0-9a-fA-F]{3,4})|(([0-9a-fA-F]{2}){3,4}))\b/},FUNCTION_DISPATCH:{className:"built_in",begin:/[\w-]+(?=\()/},ATTRIBUTE_SELECTOR_MODE:{scope:"selector-attr",begin:/\[/,end:/\]/,illegal:"$",contains:[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE]},CSS_NUMBER_MODE:{scope:"number",begin:e.NUMBER_RE+"(%|em|ex|ch|rem|vw|vh|vmin|vmax|cm|mm|in|pt|pc|px|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?",relevance:0},CSS_VARIABLE:{className:"attr",begin:/--[A-Za-z_][A-Za-z0-9_-]*/}}),xt=["a","abbr","address","article","aside","audio","b","blockquote","body","button","canvas","caption","cite","code","dd","del","details","dfn","div","dl","dt","em","fieldset","figcaption","figure","footer","form","h1","h2","h3","h4","h5","h6","header","hgroup","html","i","iframe","img","input","ins","kbd","label","legend","li","main","mark","menu","nav","object","ol","p","q","quote","samp","section","span","strong","summary","sup","table","tbody","td","textarea","tfoot","th","thead","time","tr","ul","var","video"],Mt=["any-hover","any-pointer","aspect-ratio","color","color-gamut","color-index","device-aspect-ratio","device-height","device-width","display-mode","forced-colors","grid","height","hover","inverted-colors","monochrome","orientation","overflow-block","overflow-inline","pointer","prefers-color-scheme","prefers-contrast","prefers-reduced-motion","prefers-reduced-transparency","resolution","scan","scripting","update","width","min-width","max-width","min-height","max-height"],vt=["active","any-link","blank","checked","current","default","defined","dir","disabled","drop","empty","enabled","first","first-child","first-of-type","fullscreen","future","focus","focus-visible","focus-within","has","host","host-context","hover","indeterminate","in-range","invalid","is","lang","last-child","last-of-type","left","link","local-link","not","nth-child","nth-col","nth-last-child","nth-last-col","nth-last-of-type","nth-of-type","only-child","only-of-type","optional","out-of-range","past","placeholder-shown","read-only","read-write","required","right","root","scope","target","target-within","user-invalid","valid","visited","where"],kt=["after","backdrop","before","cue","cue-region","first-letter","first-line","grammar-error","marker","part","placeholder","selection","slotted","spelling-error"],It=["align-content","align-items","align-self","all","animation","animation-delay","animation-direction","animation-duration","animation-fill-mode","animation-iteration-count","animation-name","animation-play-state","animation-timing-function","backface-visibility","background","background-attachment","background-blend-mode","background-clip","background-color","background-image","background-origin","background-position","background-repeat","background-size","block-size","border","border-block","border-block-color","border-block-end","border-block-end-color","border-block-end-style","border-block-end-width","border-block-start","border-block-start-color","border-block-start-style","border-block-start-width","border-block-style","border-block-width","border-bottom","border-bottom-color","border-bottom-left-radius","border-bottom-right-radius","border-bottom-style","border-bottom-width","border-collapse","border-color","border-image","border-image-outset","border-image-repeat","border-image-slice","border-image-source","border-image-width","border-inline","border-inline-color","border-inline-end","border-inline-end-color","border-inline-end-style","border-inline-end-width","border-inline-start","border-inline-start-color","border-inline-start-style","border-inline-start-width","border-inline-style","border-inline-width","border-left","border-left-color","border-left-style","border-left-width","border-radius","border-right","border-right-color","border-right-style","border-right-width","border-spacing","border-style","border-top","border-top-color","border-top-left-radius","border-top-right-radius","border-top-style","border-top-width","border-width","bottom","box-decoration-break","box-shadow","box-sizing","break-after","break-before","break-inside","caption-side","caret-color","clear","clip","clip-path","clip-rule","color","column-count","column-fill","column-gap","column-rule","column-rule-color","column-rule-style","column-rule-width","column-span","column-width","columns","contain","content","content-visibility","counter-increment","counter-reset","cue","cue-after","cue-before","cursor","direction","display","empty-cells","filter","flex","flex-basis","flex-direction","flex-flow","flex-grow","flex-shrink","flex-wrap","float","flow","font","font-display","font-family","font-feature-settings","font-kerning","font-language-override","font-size","font-size-adjust","font-smoothing","font-stretch","font-style","font-synthesis","font-variant","font-variant-caps","font-variant-east-asian","font-variant-ligatures","font-variant-numeric","font-variant-position","font-variation-settings","font-weight","gap","glyph-orientation-vertical","grid","grid-area","grid-auto-columns","grid-auto-flow","grid-auto-rows","grid-column","grid-column-end","grid-column-start","grid-gap","grid-row","grid-row-end","grid-row-start","grid-template","grid-template-areas","grid-template-columns","grid-template-rows","hanging-punctuation","height","hyphens","icon","image-orientation","image-rendering","image-resolution","ime-mode","inline-size","isolation","justify-content","left","letter-spacing","line-break","line-height","list-style","list-style-image","list-style-position","list-style-type","margin","margin-block","margin-block-end","margin-block-start","margin-bottom","margin-inline","margin-inline-end","margin-inline-start","margin-left","margin-right","margin-top","marks","mask","mask-border","mask-border-mode","mask-border-outset","mask-border-repeat","mask-border-slice","mask-border-source","mask-border-width","mask-clip","mask-composite","mask-image","mask-mode","mask-origin","mask-position","mask-repeat","mask-size","mask-type","max-block-size","max-height","max-inline-size","max-width","min-block-size","min-height","min-inline-size","min-width","mix-blend-mode","nav-down","nav-index","nav-left","nav-right","nav-up","none","normal","object-fit","object-position","opacity","order","orphans","outline","outline-color","outline-offset","outline-style","outline-width","overflow","overflow-wrap","overflow-x","overflow-y","padding","padding-block","padding-block-end","padding-block-start","padding-bottom","padding-inline","padding-inline-end","padding-inline-start","padding-left","padding-right","padding-top","page-break-after","page-break-before","page-break-inside","pause","pause-after","pause-before","perspective","perspective-origin","pointer-events","position","quotes","resize","rest","rest-after","rest-before","right","row-gap","scroll-margin","scroll-margin-block","scroll-margin-block-end","scroll-margin-block-start","scroll-margin-bottom","scroll-margin-inline","scroll-margin-inline-end","scroll-margin-inline-start","scroll-margin-left","scroll-margin-right","scroll-margin-top","scroll-padding","scroll-padding-block","scroll-padding-block-end","scroll-padding-block-start","scroll-padding-bottom","scroll-padding-inline","scroll-padding-inline-end","scroll-padding-inline-start","scroll-padding-left","scroll-padding-right","scroll-padding-top","scroll-snap-align","scroll-snap-stop","scroll-snap-type","scrollbar-color","scrollbar-gutter","scrollbar-width","shape-image-threshold","shape-margin","shape-outside","speak","speak-as","src","tab-size","table-layout","text-align","text-align-all","text-align-last","text-combine-upright","text-decoration","text-decoration-color","text-decoration-line","text-decoration-style","text-emphasis","text-emphasis-color","text-emphasis-position","text-emphasis-style","text-indent","text-justify","text-orientation","text-overflow","text-rendering","text-shadow","text-transform","text-underline-position","top","transform","transform-box","transform-origin","transform-style","transition","transition-delay","transition-duration","transition-property","transition-timing-function","unicode-bidi","vertical-align","visibility","voice-balance","voice-duration","voice-family","voice-pitch","voice-range","voice-rate","voice-stress","voice-volume","white-space","widows","width","will-change","word-break","word-spacing","word-wrap","writing-mode","z-index"].reverse();function bn(e){let n=e.regex,t=Rt(e),s={begin:/-(webkit|moz|ms|o)-(?=[a-z])/},g="and or not only",E=/@-?\w[\w]*(-\w+)*/,a="[a-zA-Z-][a-zA-Z0-9_-]*",i=[e.APOS_STRING_MODE,e.QUOTE_STRING_MODE];return{name:"CSS",case_insensitive:!0,illegal:/[=|'\$]/,keywords:{keyframePosition:"from to"},classNameAliases:{keyframePosition:"selector-tag"},contains:[t.BLOCK_COMMENT,s,t.CSS_NUMBER_MODE,{className:"selector-id",begin:/#[A-Za-z0-9_-]+/,relevance:0},{className:"selector-class",begin:"\\."+a,relevance:0},t.ATTRIBUTE_SELECTOR_MODE,{className:"selector-pseudo",variants:[{begin:":("+vt.join("|")+")"},{begin:":(:)?("+kt.join("|")+")"}]},t.CSS_VARIABLE,{className:"attribute",begin:"\\b("+It.join("|")+")\\b"},{begin:/:/,end:/[;}{]/,contains:[t.BLOCK_COMMENT,t.HEXCOLOR,t.IMPORTANT,t.CSS_NUMBER_MODE,...i,{begin:/(url|data-uri)\(/,end:/\)/,relevance:0,keywords:{built_in:"url data-uri"},contains:[...i,{className:"string",begin:/[^)]/,endsWithParent:!0,excludeEnd:!0}]},t.FUNCTION_DISPATCH]},{begin:n.lookahead(/@/),end:"[{;]",relevance:0,illegal:/:/,contains:[{className:"keyword",begin:E},{begin:/\s/,endsWithParent:!0,excludeEnd:!0,relevance:0,keywords:{$pattern:/[a-z-]+/,keyword:g,attribute:Mt.join(" ")},contains:[{begin:/[a-z-]+(?=:)/,className:"attribute"},...i,t.CSS_NUMBER_MODE]}]},{className:"selector-tag",begin:"\\b("+xt.join("|")+")\\b"}]}}function pn(e){let n={className:"attr",begin:/"(\\.|[^\\"\r\n])*"(?=\s*:)/,relevance:1.01},t={match:/[{}[\],:]/,className:"punctuation",relevance:0},s=["true","false","null"],g={scope:"literal",beginKeywords:s.join(" ")};return{name:"JSON",keywords:{literal:s},contains:[n,t,e.QUOTE_STRING_MODE,g,e.C_NUMBER_MODE,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE],illegal:"\\S"}}function hn(e){let n=e.regex,t={},s={begin:/\$\{/,end:/\}/,contains:["self",{begin:/:-/,contains:[t]}]};Object.assign(t,{className:"variable",variants:[{begin:n.concat(/\$[\w\d#@][\w\d_]*/,"(?![\\w\\d])(?![$])")},s]});let g={className:"subst",begin:/\$\(/,end:/\)/,contains:[e.BACKSLASH_ESCAPE]},E={begin:/<<-?\s*(?=\w+)/,starts:{contains:[e.END_SAME_AS_BEGIN({begin:/(\w+)/,end:/(\w+)/,className:"string"})]}},a={className:"string",begin:/"/,end:/"/,contains:[e.BACKSLASH_ESCAPE,t,g]};g.contains.push(a);let i={match:/\\"/},l={className:"string",begin:/'/,end:/'/},f={match:/\\'/},m={begin:/\$?\(\(/,end:/\)\)/,contains:[{begin:/\d+#[0-9a-f]+/,className:"number"},e.NUMBER_MODE,t]},w=["fish","bash","zsh","sh","csh","ksh","tcsh","dash","scsh"],S=e.SHEBANG({binary:`(${w.join("|")})`,relevance:10}),y={className:"function",begin:/\w[\w\d_]*\s*\(\s*\)\s*\{/,returnBegin:!0,contains:[e.inherit(e.TITLE_MODE,{begin:/\w[\w\d_]*/})],relevance:0},C=["if","then","else","elif","fi","for","while","until","in","do","done","case","esac","function","select"],x=["true","false"],M={match:/(\/[a-z._-]+)+/},ee=["break","cd","continue","eval","exec","exit","export","getopts","hash","pwd","readonly","return","shift","test","times","trap","umask","unset"],B=["alias","bind","builtin","caller","command","declare","echo","enable","help","let","local","logout","mapfile","printf","read","readarray","source","type","typeset","ulimit","unalias"],P=["autoload","bg","bindkey","bye","cap","chdir","clone","comparguments","compcall","compctl","compdescribe","compfiles","compgroups","compquote","comptags","comptry","compvalues","dirs","disable","disown","echotc","echoti","emulate","fc","fg","float","functions","getcap","getln","history","integer","jobs","kill","limit","log","noglob","popd","print","pushd","pushln","rehash","sched","setcap","setopt","stat","suspend","ttyctl","unfunction","unhash","unlimit","unsetopt","vared","wait","whence","where","which","zcompile","zformat","zftp","zle","zmodload","zparseopts","zprof","zpty","zregexparse","zsocket","zstyle","ztcp"],L=["chcon","chgrp","chown","chmod","cp","dd","df","dir","dircolors","ln","ls","mkdir","mkfifo","mknod","mktemp","mv","realpath","rm","rmdir","shred","sync","touch","truncate","vdir","b2sum","base32","base64","cat","cksum","comm","csplit","cut","expand","fmt","fold","head","join","md5sum","nl","numfmt","od","paste","ptx","pr","sha1sum","sha224sum","sha256sum","sha384sum","sha512sum","shuf","sort","split","sum","tac","tail","tr","tsort","unexpand","uniq","wc","arch","basename","chroot","date","dirname","du","echo","env","expr","factor","groups","hostid","id","link","logname","nice","nohup","nproc","pathchk","pinky","printenv","printf","pwd","readlink","runcon","seq","sleep","stat","stdbuf","stty","tee","test","timeout","tty","uname","unlink","uptime","users","who","whoami","yes"];return{name:"Bash",aliases:["sh"],keywords:{$pattern:/\b[a-z][a-z0-9._-]+\b/,keyword:C,literal:x,built_in:[...ee,...B,"set","shopt",...P,...L]},contains:[S,e.SHEBANG(),y,m,e.HASH_COMMENT_MODE,E,M,a,i,l,f,t]}}function En(e){let n=e.regex,t={begin:/<\/?[A-Za-z_]/,end:">",subLanguage:"xml",relevance:0},s={begin:"^[-\\*]{3,}",end:"$"},g={className:"code",variants:[{begin:"(`{3,})[^`](.|\\n)*?\\1`*[ ]*"},{begin:"(~{3,})[^~](.|\\n)*?\\1~*[ ]*"},{begin:"```",end:"```+[ ]*$"},{begin:"~~~",end:"~~~+[ ]*$"},{begin:"`.+?`"},{begin:"(?=^( {4}|\\t))",contains:[{begin:"^( {4}|\\t)",end:"(\\n)$"}],relevance:0}]},E={className:"bullet",begin:"^[ 	]*([*+-]|(\\d+\\.))(?=\\s+)",end:"\\s+",excludeEnd:!0},a={begin:/^\[[^\n]+\]:/,returnBegin:!0,contains:[{className:"symbol",begin:/\[/,end:/\]/,excludeBegin:!0,excludeEnd:!0},{className:"link",begin:/:\s*/,end:/$/,excludeBegin:!0}]},i=/[A-Za-z][A-Za-z0-9+.-]*/,l={variants:[{begin:/\[.+?\]\[.*?\]/,relevance:0},{begin:/\[.+?\]\(((data|javascript|mailto):|(?:http|ftp)s?:\/\/).*?\)/,relevance:2},{begin:n.concat(/\[.+?\]\(/,i,/:\/\/.*?\)/),relevance:2},{begin:/\[.+?\]\([./?&#].*?\)/,relevance:1},{begin:/\[.*?\]\(.*?\)/,relevance:0}],returnBegin:!0,contains:[{match:/\[(?=\])/},{className:"string",relevance:0,begin:"\\[",end:"\\]",excludeBegin:!0,returnEnd:!0},{className:"link",relevance:0,begin:"\\]\\(",end:"\\)",excludeBegin:!0,excludeEnd:!0},{className:"symbol",relevance:0,begin:"\\]\\[",end:"\\]",excludeBegin:!0,excludeEnd:!0}]},f={className:"strong",contains:[],variants:[{begin:/_{2}(?!\s)/,end:/_{2}/},{begin:/\*{2}(?!\s)/,end:/\*{2}/}]},m={className:"emphasis",contains:[],variants:[{begin:/\*(?![*\s])/,end:/\*/},{begin:/_(?![_\s])/,end:/_/,relevance:0}]},w=e.inherit(f,{contains:[]}),S=e.inherit(m,{contains:[]});f.contains.push(S),m.contains.push(w);let y=[t,l];return[f,m,w,S].forEach(M=>{M.contains=M.contains.concat(y)}),y=y.concat(f,m),{name:"Markdown",aliases:["md","mkdown","mkd"],contains:[{className:"section",variants:[{begin:"^#{1,6}",end:"$",contains:y},{begin:"(?=^.+?\\n[=-]{2,}$)",contains:[{begin:"^[=-]*$"},{begin:"^",end:"\\n",contains:y}]}]},t,E,f,m,{className:"quote",begin:"^>\\s+",contains:y,end:"$"},g,s,l,a]}}U.registerLanguage("javascript",Oe);U.registerLanguage("typescript",Re);U.registerLanguage("tsx",Re);U.registerLanguage("jsx",Oe);U.registerLanguage("xml",fn);U.registerLanguage("css",bn);U.registerLanguage("json",pn);U.registerLanguage("bash",hn);U.registerLanguage("markdown",En);window.hljs=U;})();
+
+</script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>
