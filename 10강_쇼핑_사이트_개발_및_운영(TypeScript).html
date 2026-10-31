@@ -392,11 +392,11 @@ export default ProductList;</code></pre>
       <pre><code class="language-typescript">import type { ProductProp } from '../products/ProductList';
 
 export const products: ProductProp[] = [
-  { id: 1, pName: "무선 마우스", category: "마우스", price: 25000, desc: "조용한 클릭음의 2.4GHz 무선 마우스" },
-  { id: 2, pName: "기계식 키보드", category: "키보드", price: 89000, desc: "청축 스위치, RGB 백라이트" },
+  { id: 1, pName: "무선 마우스", category: "마우스", price: 25000, description: "조용한 클릭음의 2.4GHz 무선 마우스" },
+  { id: 2, pName: "기계식 키보드", category: "키보드", price: 89000, description: "청축 스위치, RGB 백라이트" },
   // ...
 ];</code></pre>
-      <p>데이터에 설명(<code>desc</code>)이 생겼으므로 타입에도 <code>desc: string;</code>을 추가합니다.</p>
+      <p>데이터에 설명(<code>description</code>)이 생겼으므로 타입에도 <code>description: string;</code>을 추가합니다.</p>
     </div>
   </section>
 
@@ -444,7 +444,7 @@ export interface Product {
   pName: string;
   category: Category;
   price: number;
-  desc: string;
+  description: string;
 }
 
 // 상품 등록 시 입력받는 값 (id는 저장할 때 생성)
@@ -469,7 +469,7 @@ const CATEGORIES = ['마우스', '키보드'] as const;  // readonly ['마우스
       <h3 class="blk">📖 ③ 등록용 타입: <code>Omit</code></h3>
       <p>사용자가 상품을 등록할 때는 번호(<code>id</code>)를 입력하지 않습니다. 번호는 저장할 때 만들어집니다.</p>
       <pre><code class="language-typescript">type NewProduct = Omit&lt;Product, 'id'&gt;;
-// { pName: string; category: Category; price: number; desc: string; }</code></pre>
+// { pName: string; category: Category; price: number; description: string; }</code></pre>
       <p><code>Product</code>를 고치면 <code>NewProduct</code>도 자동으로 따라 바뀝니다.</p>
     </div>
   </section>
@@ -520,8 +520,8 @@ export const useProducts = () =&gt; {
 
 // 상품 목록의 처음 값으로만 쓰므로 이름을 initialProducts로 바꿉니다.
 export const initialProducts: Product[] = [
-  { id: 1, pName: "무선 마우스", category: "마우스", price: 25000, desc: "조용한 클릭음의 2.4GHz 무선 마우스" },
-  { id: 2, pName: "기계식 키보드", category: "키보드", price: 89000, desc: "청축 스위치, RGB 백라이트" },
+  { id: 1, pName: "무선 마우스", category: "마우스", price: 25000, description: "조용한 클릭음의 2.4GHz 무선 마우스" },
+  { id: 2, pName: "기계식 키보드", category: "키보드", price: 89000, description: "청축 스위치, RGB 백라이트" },
   // ...
 ];</code></pre>
       <ul>
@@ -631,7 +631,7 @@ const ProductDetail = () =&gt; {
       &lt;span className="product-detail__category"&gt;{product.category}&lt;/span&gt;
       &lt;h2&gt;{product.pName}&lt;/h2&gt;
       &lt;p className="product-detail__price"&gt;{product.price.toLocaleString()}원&lt;/p&gt;
-      &lt;p className="product-detail__desc"&gt;{product.desc}&lt;/p&gt;
+      &lt;p className="product-detail__desc"&gt;{product.description}&lt;/p&gt;
     &lt;/article&gt;
   );
 }
@@ -686,14 +686,14 @@ interface ProductForm {
   pName: string;
   category: Category;
   price: string;
-  desc: string;
+  description: string;
 }
 
 const initialForm: ProductForm = {
   pName: '',
   category: CATEGORIES[0],
   price: '',
-  desc: '',
+  description: '',
 };
 
 const AddProduct = () =&gt; {
@@ -703,7 +703,7 @@ const AddProduct = () =&gt; {
   const [form, setForm] = useState&lt;ProductForm&gt;(initialForm);
   const [error, setError] = useState('');
 
-  const { pName, category, price, desc } = form;
+  const { pName, category, price, description } = form;
 
   // 입력창의 name과 form의 키를 같게 두어서 핸들러 하나로 모든 입력을 처리합니다.
   const handleInputChange = (
@@ -731,7 +731,7 @@ const AddProduct = () =&gt; {
       pName: pName.trim(),
       category,
       price: priceNumber,
-      desc: desc.trim(),
+      description: description.trim(),
     });
     alert("상품 등록을 성공했습니다.");
     console.log("등록된 상품: ", form);
@@ -784,12 +784,12 @@ const AddProduct = () =&gt; {
           /&gt;
         &lt;/div&gt;
         &lt;div&gt;
-          &lt;label htmlFor="desc"&gt;설명&lt;/label&gt;
+          &lt;label htmlFor="description"&gt;설명&lt;/label&gt;
           &lt;textarea
-            id="desc"
-            name="desc"
+            id="description"
+            name="description"
             rows={5}
-            value={desc}
+            value={description}
             onChange={handleInputChange}
             placeholder="상품 설명을 입력하세요"
           /&gt;
@@ -1281,7 +1281,7 @@ const ProductDetail = () =&gt; {
       &lt;span className="product-detail__category"&gt;{product.category}&lt;/span&gt;
       &lt;h2&gt;{product.pName}&lt;/h2&gt;
       &lt;p className="product-detail__price"&gt;{product.price.toLocaleString()}원&lt;/p&gt;
-      &lt;p className="product-detail__desc"&gt;{product.desc}&lt;/p&gt;
+      &lt;p className="product-detail__desc"&gt;{product.description}&lt;/p&gt;
       &lt;button
         type="button"
         className="product-detail__cart"
