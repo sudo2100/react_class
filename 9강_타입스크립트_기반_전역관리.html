@@ -154,7 +154,7 @@ hue-6-2: #e6c07b
 <header class="hero">
   <div class="eyebrow">React 심화 · Chapter 09 · 학습 교안</div>
   <h1>타입스크립트 기반 전역관리</h1>
-  <p>7강에서 배운 useReducer · useContext · Redux Toolkit을 TypeScript로 다시 작성하고, 현업에서 많이 쓰는 Zustand까지 비교합니다. State · Action · Context 값에 타입을 지정해, 전역 상태를 실수 없이 공유하고 변경하는 방법을 익힙니다.</p>
+  <p>7강에서 배운 useReducer · useContext · Redux Toolkit을 TypeScript로 다시 작성합니다. State · Action · Context 값에 타입을 지정해, 전역 상태를 실수 없이 공유하고 변경하는 방법을 익힙니다.</p>
   <div class="tags">
     <span>🏷️ TypeScript</span>
     <span>🏷️ useReducer</span>
@@ -165,7 +165,6 @@ hue-6-2: #e6c07b
     <span>🏷️ 커스텀 훅</span>
     <span>🏷️ Redux Toolkit</span>
     <span>🏷️ PayloadAction</span>
-    <span>🏷️ Zustand</span>
   </div>
 </header>
 <div class="wrap">
@@ -175,7 +174,6 @@ hue-6-2: #e6c07b
       <li><a href="#m1">useReducer() — TypeScript로 상태 관리</a></li>
       <li><a href="#m2">useContext() — TypeScript로 전역 데이터 공유</a></li>
       <li><a href="#m3">Redux Toolkit — TypeScript로 전역 상태 관리</a></li>
-      <li><a href="#m4">Zustand — 가볍게 전역 상태 관리</a></li>
     </ol>
   </nav>
 
@@ -1015,238 +1013,6 @@ export default bankSlice.reducer
       </details>
     </div>
   </section>
-
-  <!-- ================= MODULE 4 ================= -->
-  <section class="module" id="m4">
-    <h2><span class="num">4</span> Zustand — 가볍게 전역 상태 관리</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div>
-      <ul>
-        <li>현업에서 Context · Redux Toolkit · Zustand를 어떤 상황에 쓰는지 구분할 수 있다.</li>
-        <li><code>create&lt;타입&gt;()</code>로 타입이 지정된 Zustand store를 만들 수 있다.</li>
-        <li>selector로 필요한 값만 구독해 장바구니를 Provider 없이 공유할 수 있다.</li>
-      </ul>
-    </div>
-
-    <div class="concept">
-      <h3 class="blk">📖 Zustand란? — Context · RTK와 비교</h3>
-      <p><b>Zustand</b>는 독일어로 "상태"라는 뜻의 가벼운 전역 상태 관리 라이브러리입니다(약 1KB). <b>Provider가 필요 없고</b>, store 하나에 상태와 변경 함수를 함께 적기 때문에 코드가 짧습니다. 최근 새 프로젝트에서 RTK 대신 많이 선택됩니다.</p>
-      <table>
-        <tr><th>구분</th><th>Context + useReducer</th><th>Redux Toolkit</th><th>Zustand</th></tr>
-        <tr><td>설치</td><td>필요 없음 (React 내장)</td><td><code>@reduxjs/toolkit</code>, <code>react-redux</code></td><td><code>zustand</code></td></tr>
-        <tr><td>Provider</td><td>필요</td><td>필요 (<code>&lt;Provider store&gt;</code>)</td><td><b>필요 없음</b></td></tr>
-        <tr><td>만드는 파일</td><td>Context · reducer · Provider · 커스텀 훅</td><td>slice · store · hooks</td><td><b>store 파일 하나</b></td></tr>
-        <tr><td>변경 방법</td><td><code>dispatch({ type: "ADD", ... })</code></td><td><code>dispatch(addItem(product))</code></td><td><code>addItem(product)</code> 함수 호출</td></tr>
-        <tr><td>리렌더링</td><td>값이 바뀌면 사용하는 컴포넌트 전체</td><td>selector로 선택한 값만</td><td>selector로 선택한 값만</td></tr>
-        <tr><td>현업에서 주로</td><td>로그인 정보 · 테마 등 자주 안 바뀌는 값</td><td>대규모 · 기존 서비스</td><td>새 프로젝트의 전역 상태</td></tr>
-      </table>
-      <div class="tip"><span class="lbl">💡 설치</span> <code>npm install zustand</code> — Zustand는 TypeScript로 만들어져 있어 별도의 타입 패키지가 필요 없습니다.</div>
-    </div>
-
-    <div class="ex"><div class="lbl">💡 예제 — 장바구니 store 만들기</div>
-      <p>단원 2 · 3과 같은 장바구니입니다. 상태(<code>items</code>)와 변경 함수(<code>addItem</code> 등)를 <code>CartStore</code> 타입 하나에 정의합니다.</p>
-      <span class="fname">src/store/useCartStore.ts</span>
-      <pre><code class="language-typescript">import { create } from 'zustand'
-
-// 1. 데이터 타입 (단원 2 · 3과 같음)
-export interface Product {
-  id: number
-  name: string
-  price: number
-}
-
-export interface CartItem extends Product {
-  qty: number
-}
-
-// 2. store 타입 : 상태 + 상태를 바꾸는 함수를 한 곳에 정의
-interface CartStore {
-  items: CartItem[]
-  addItem: (product: Product) =&gt; void
-  decreaseItem: (id: number) =&gt; void
-  removeItem: (id: number) =&gt; void
-  clearCart: () =&gt; void
-}
-
-// 3. store 생성 : create&lt;타입&gt;()((set) =&gt; ({ ... }))
-//    set(함수) : 이전 state를 받아 바꿀 부분만 반환
-export const useCartStore = create&lt;CartStore&gt;()((set) =&gt; ({
-  items: [],
-
-  addItem: (product) =&gt;
-    set((state) =&gt; {
-      const found = state.items.find((item) =&gt; item.id === product.id)
-      if (found) {
-        return {
-          items: state.items.map((item) =&gt;
-            item.id === product.id ? { ...item, qty: item.qty + 1 } : item
-          ),
-        }
-      }
-      return { items: [...state.items, { ...product, qty: 1 }] }
-    }),
-
-  decreaseItem: (id) =&gt;
-    set((state) =&gt; ({
-      items: state.items
-        .map((item) =&gt; (item.id === id ? { ...item, qty: item.qty - 1 } : item))
-        .filter((item) =&gt; item.qty &gt; 0),
-    })),
-
-  removeItem: (id) =&gt;
-    set((state) =&gt; ({ items: state.items.filter((item) =&gt; item.id !== id) })),
-
-  clearCart: () =&gt; set({ items: [] }),
-}))</code></pre>
-      <div class="tip"><span class="lbl">💡 정리</span> <code>create&lt;CartStore&gt;()((set) =&gt; ...)</code>처럼 <b>괄호를 두 번</b> 쓰는 것이 TypeScript에서 Zustand를 쓰는 공식 방법입니다. <code>set</code>에 함수를 넘기면 이전 state를 받아 <b>바꿀 부분만</b> 반환하면 되고, 나머지 값은 자동으로 유지됩니다.</div>
-    </div>
-
-    <div class="ex"><div class="lbl">💡 예제 — Provider 없이 컴포넌트에서 사용하기</div>
-      <span class="fname">src/App.tsx</span>
-      <pre><code class="language-tsx">import Header from './apps/Header'
-import ProductList from './apps/ProductList'
-import Cart from './apps/Cart'
-
-// Provider가 필요 없음 : store를 import해서 바로 사용
-function App() {
-  return (
-    &lt;&gt;
-      &lt;Header /&gt;
-      &lt;ProductList /&gt;
-      &lt;Cart /&gt;
-    &lt;/&gt;
-  )
-}
-
-export default App</code></pre>
-      <span class="fname">src/apps/Header.tsx</span>
-      <pre><code class="language-tsx">import { useCartStore } from '../store/useCartStore'
-
-const Header = () =&gt; {
-  // selector로 필요한 값만 계산해서 구독 → 이 값이 바뀔 때만 다시 렌더링
-  const totalCount = useCartStore((state) =&gt;
-    state.items.reduce((sum, item) =&gt; sum + item.qty, 0)
-  )
-
-  return (
-    &lt;header className="cart-header"&gt;
-      &lt;h2&gt;SPACE SHOP&lt;/h2&gt;
-      &lt;span&gt;🛒 장바구니 ({totalCount})&lt;/span&gt;
-    &lt;/header&gt;
-  )
-}
-
-export default Header</code></pre>
-      <span class="fname">src/apps/ProductList.tsx</span>
-      <pre><code class="language-tsx">import { useCartStore } from '../store/useCartStore'
-import type { Product } from '../store/useCartStore'
-
-const products: Product[] = [
-  { id: 1, name: '무선마우스', price: 32000 },
-  { id: 2, name: '키보드', price: 40000 },
-  { id: 3, name: '모니터', price: 120000 },
-]
-
-const ProductList = () =&gt; {
-  // 함수만 꺼내 쓰므로 장바구니 내용이 바뀌어도 다시 렌더링되지 않음
-  const addItem = useCartStore((state) =&gt; state.addItem)
-
-  return (
-    &lt;ul className="product-list"&gt;
-      {products.map((product) =&gt; (
-        &lt;li key={product.id}&gt;
-          {product.name} - {product.price.toLocaleString()}원
-          &lt;button onClick={() =&gt; addItem(product)}&gt;담기&lt;/button&gt;
-        &lt;/li&gt;
-      ))}
-    &lt;/ul&gt;
-  )
-}
-
-export default ProductList</code></pre>
-      <span class="fname">src/apps/Cart.tsx</span>
-      <pre><code class="language-tsx">import { useCartStore } from '../store/useCartStore'
-
-const Cart = () =&gt; {
-  const items = useCartStore((state) =&gt; state.items) // CartItem[]
-  const addItem = useCartStore((state) =&gt; state.addItem)
-  const decreaseItem = useCartStore((state) =&gt; state.decreaseItem)
-  const removeItem = useCartStore((state) =&gt; state.removeItem)
-  const clearCart = useCartStore((state) =&gt; state.clearCart)
-
-  const totalPrice = items.reduce((sum, item) =&gt; sum + item.price * item.qty, 0)
-
-  if (items.length === 0) return &lt;p&gt;장바구니가 비어 있습니다.&lt;/p&gt;
-
-  return (
-    &lt;div className="cart"&gt;
-      &lt;h3&gt;장바구니&lt;/h3&gt;
-      &lt;ul&gt;
-        {items.map((item) =&gt; (
-          &lt;li key={item.id}&gt;
-            {item.name} × {item.qty}
-            &lt;button onClick={() =&gt; addItem(item)}&gt;+&lt;/button&gt;
-            &lt;button onClick={() =&gt; decreaseItem(item.id)}&gt;-&lt;/button&gt;
-            &lt;button onClick={() =&gt; removeItem(item.id)}&gt;삭제&lt;/button&gt;
-          &lt;/li&gt;
-        ))}
-      &lt;/ul&gt;
-      &lt;p&gt;총액: {totalPrice.toLocaleString()}원&lt;/p&gt;
-      &lt;button onClick={clearCart}&gt;비우기&lt;/button&gt;
-    &lt;/div&gt;
-  )
-}
-
-export default Cart</code></pre>
-      <div class="out"><span class="rt">브라우저 출력</span>
-        <div style="display:flex;justify-content:space-between;align-items:center;background:#333;color:#fff;padding:8px 12px;border-radius:6px"><strong>SPACE SHOP</strong><span>🛒 장바구니 (3)</span></div>
-        <ul style="margin:10px 0">
-          <li>무선마우스 - 32,000원 <button>담기</button></li>
-          <li>키보드 - 40,000원 <button>담기</button></li>
-          <li>모니터 - 120,000원 <button>담기</button></li>
-        </ul>
-        <div style="border:1px solid #ccc;padding:10px;border-radius:6px">
-          <strong>장바구니</strong>
-          <ul style="margin:6px 0">
-            <li>무선마우스 × 2 <button>+</button> <button>-</button> <button>삭제</button></li>
-            <li>키보드 × 1 <button>+</button> <button>-</button> <button>삭제</button></li>
-          </ul>
-          <p>총액: 104,000원</p>
-          <button>비우기</button>
-        </div>
-      </div>
-      <div class="tip"><span class="lbl">💡 정리</span> 화면은 단원 2 · 3과 똑같습니다. <code>useCartStore((state) =&gt; state.addItem)</code>처럼 <b>필요한 값만 골라서</b> 꺼내면, 그 값이 바뀔 때만 컴포넌트가 다시 렌더링됩니다. 그래서 ProductList는 장바구니 내용이 바뀌어도 다시 그려지지 않습니다. Context에서는 값을 쓰는 모든 컴포넌트가 다시 그려지는 것과 다른 점입니다.</div>
-    </div>
-
-    <div class="lab"><div class="lbl">✏️ 실습문제</div>
-      <h4>실습 4-1. Zustand로 카운터 만들기</h4>
-      <p>단원 3의 RTK Counter를 Zustand로 바꿔 보세요. <code>count</code>와 <code>increment</code> · <code>decrement</code> · <code>reset</code> 함수를 가진 <code>CounterStore</code> 타입을 정의하고 <code>useCounterStore</code>를 만듭니다.</p>
-      <details><summary>정답 보기</summary>
-        <pre><code class="language-typescript">import { create } from 'zustand'
-
-interface CounterStore {
-  count: number
-  increment: () =&gt; void
-  decrement: () =&gt; void
-  reset: () =&gt; void
-}
-
-export const useCounterStore = create&lt;CounterStore&gt;()((set) =&gt; ({
-  count: 0,
-  increment: () =&gt; set((state) =&gt; ({ count: state.count + 1 })),
-  decrement: () =&gt; set((state) =&gt; ({ count: state.count - 1 })),
-  reset: () =&gt; set({ count: 0 }),
-}))
-
-// 컴포넌트에서 사용
-// const count = useCounterStore((state) =&gt; state.count)
-// const increment = useCounterStore((state) =&gt; state.increment)
-// &lt;button onClick={increment}&gt;증가&lt;/button&gt;</code></pre>
-      </details>
-    </div>
-  </section>
-
-
-
 
   <footer>9강. 타입스크립트 기반 전역관리 · 학습 교안<br>모듈별 학습목표 · 개념 · 예제 · 실습문제 구성</footer>
 </div>
