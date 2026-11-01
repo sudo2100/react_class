@@ -1825,24 +1825,27 @@ const AddPost = () =&gt; {
     <div class="ex"><div class="lbl">💡 예제 — 추가(POST): 폼 렌더링(AddPost.tsx)</div>
       <span class="fname">src/placeholder/AddPost.tsx</span>
       <pre><code class="language-tsx">  return (
-    &lt;div&gt;
+    &lt;div className="add-post"&gt;
       &lt;h2&gt;게시글 작성&lt;/h2&gt;
       &lt;form onSubmit={handleSubmit}&gt;
-        &lt;input
-          type="text"
-          value={title}
-          onChange={(e) =&gt; setTitle(e.target.value)}
-          placeholder="제목을 입력하세요"
-        /&gt;
-        &lt;textarea
-          value={body}
-          onChange={(e) =&gt; setBody(e.target.value)}
-          placeholder="내용을 입력하세요"
-          rows={4}
-        /&gt;
-        {/* isLoading이 true일 때 -&gt; 버튼이 비활성화 (클릭 불가) */}
+        &lt;div&gt;
+          &lt;input 
+            type="text" 
+            value={title}
+            onChange={(e) =&gt; setTitle(e.target.value)}
+            placeholder="제목을 입력하세요"
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;textarea 
+            value={body}
+            onChange={(e) =&gt; setBody(e.target.value)}
+            placeholder="내용을 입력하세요"
+            rows={5}
+          /&gt;
+        &lt;/div&gt;
         &lt;button type="submit" disabled={isLoading}&gt;
-          {isLoading ? '등록 중...' : '등록'}
+          {isLoading ? "등록중..." : "등록"}
         &lt;/button&gt;
       &lt;/form&gt;
     &lt;/div&gt;
@@ -1850,28 +1853,49 @@ const AddPost = () =&gt; {
 }
 
 export default AddPost</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 게시글 작성 폼 스타일(App.css)</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 포스트 폼 등록 */
+.add-post form{
+  width: 30%;
+  margin: 20px auto;
+}
+.add-post form input, 
+.add-post form textarea{
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+}
+.add-post form textarea{
+  resize: vertical;
+}</code></pre>
       <div class="out"><span class="rt">브라우저 출력</span>
-        <p><b>게시글 작성</b></p>
-        <div class="demo"><input type="text" placeholder="제목을 입력하세요" style="padding:6px"> <textarea rows="2" placeholder="내용을 입력하세요"></textarea> <button disabled>등록 중...</button></div>
+        <img src="data:image/png;base64,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" alt="게시글 작성 폼 — 제목 입력칸, 내용 textarea, 등록 버튼" style="display:block;width:322px;max-width:100%;height:auto;border:1px solid #e4e7eb;border-radius:8px;margin:8px 0">
       </div>
     </div>
 
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
       <h4>실습 12-1. 삭제(DELETE) 기능 추가</h4>
-      <p>게시글 목록의 각 항목에 "삭제" 버튼을 추가하고, 클릭 시 axios로 DELETE 요청을 보낸 뒤 화면 상태에서도 해당 게시글을 제거하는 함수를 작성하세요. (jsonplaceholder는 실제로 삭제하지 않지만 요청은 성공으로 응답합니다.)</p>
+      <p>게시글 상세 페이지(<code>PostDetail.tsx</code>)에 "삭제" 버튼을 추가하고, 클릭 시 axios로 DELETE 요청을 보낸 뒤 목록 페이지로 이동하는 <code>deletePost</code> 함수를 작성하세요. (jsonplaceholder는 실제로 삭제하지 않지만 요청은 성공으로 응답합니다.)</p>
       <details><summary>정답 보기</summary>
-        <pre><code class="language-tsx">const deletePost = async (id: number) =&gt; {
-  try {
-    await axios.delete(`https://jsonplaceholder.typicode.com/posts/${id}`);
-    // 화면 상태에서도 제거 (불변성 유지)
-    setPosts(posts.filter(post =&gt; post.id !== id));
-  } catch (error) {
-    alert('삭제 중 오류가 발생했습니다.');
-  }
-};
+        <pre><code class="language-tsx">// PostDetail.tsx 안에 작성 (navigate는 이미 useNavigate()로 선언되어 있음)
 
-// 렌더링 예시
-// &lt;button onClick={() =&gt; deletePost(post.id)}&gt;삭제&lt;/button&gt;</code></pre>
+// 삭제 함수
+  const deletePost = async (id: number) =&gt; {
+    try{  
+      await axios.delete(`https://jsonplaceholder.typicode.com/posts/${id}`);
+      alert("게시글이 삭제되었습니다.");
+      navigate("/");
+    }catch(error){
+      alert("게시글 삭제 중 오류가 발생했습니다.");
+    }
+  }
+
+// 렌더링 : 뒤로 가기 버튼 옆에 삭제 버튼 추가
+&lt;button onClick={() =&gt; navigate(-1)}&gt;뒤로 가기&lt;/button&gt;
+&lt;button onClick={() =&gt; deletePost(post.id)}&gt;삭제&lt;/button&gt;</code></pre>
       </details>
     </div>
   </section>
