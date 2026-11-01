@@ -230,8 +230,7 @@ export function bankReducer(state: BankState, action: BankAction): BankState {
       };
     case "WITHDRAW":
       if (action.amount &gt; state.balance) {
-        alert("잔액이 부족합니다.");
-        return state;
+        return state;   // alert 제거, 상태만 그대로 반환
       }
       return {
         balance: state.balance - action.amount,
@@ -260,6 +259,15 @@ const Bank = () =&gt; {
     setAmount(Number(e.target.value) || 0);
   };
 
+  // 잔액 확인과 알림은 컴포넌트(이벤트 핸들러)에서 처리
+  const handleWithdraw = () =&gt; {
+    if (amount &gt; state.balance) {
+      alert("잔액이 부족합니다.");
+      return;
+    }
+    dispatch({ type: "WITHDRAW", amount });
+  };
+
   return (
     &lt;div&gt;
       &lt;h2&gt;TypeScript 은행&lt;/h2&gt;
@@ -267,7 +275,7 @@ const Bank = () =&gt; {
 
       &lt;input type="number" value={amount} step={1000} onChange={handleChange} /&gt;
       &lt;button onClick={() =&gt; dispatch({ type: "DEPOSIT", amount })}&gt;입금&lt;/button&gt;
-      &lt;button onClick={() =&gt; dispatch({ type: "WITHDRAW", amount })}&gt;출금&lt;/button&gt;
+      &lt;button onClick={handleWithdraw}&gt;출금&lt;/button&gt;
       &lt;button onClick={() =&gt; dispatch({ type: "RESET" })}&gt;초기화&lt;/button&gt;
 
       {/* dispatch({ type: "DEPOSIT" })       → amount 누락 오류
@@ -290,6 +298,7 @@ export default Bank;</code></pre>
         <ul><li>입금 30,000원</li><li>출금 5,000원</li></ul>
       </div>
       <div class="tip"><span class="lbl">💡 정리</span> Action을 Union 타입으로 정의하면 <code>dispatch({ type: "DEPOSIT" })</code>처럼 amount를 빼먹거나, <code>"TRANSFER"</code>처럼 없는 액션을 보내면 <b>실행 전에 에디터에서 빨간 줄</b>로 알려 줍니다. JavaScript의 useReducer(7강)와 동작은 같고, 실수를 미리 막아 주는 점이 다릅니다.</div>
+      <div class="tip"><span class="lbl">💡 "잔액이 부족합니다"가 2번 뜨는 이유</span> 개발 모드의 <code>&lt;StrictMode&gt;</code>는 실수를 찾기 위해 <b>리듀서를 일부러 2번 실행</b>합니다. 리듀서 안에 <code>alert</code>를 넣으면 알림도 2번 뜹니다. 리듀서는 <b>(state, action) → 새 state</b>만 계산하는 <b>순수 함수</b>여야 하므로, <code>alert</code> 같은 부수 효과는 <code>handleWithdraw</code>처럼 <b>이벤트 핸들러</b>에서 처리합니다. 리듀서의 잔액 검사는 잘못된 출금을 막는 안전장치로 남겨 둡니다.</div>
     </div>
 
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
@@ -468,6 +477,7 @@ export interface Product{
       <span class="fname">src/products/ProductList.tsx</span>
       <pre><code class="language-tsx">import type { Product } from "../context/CartContext";
 
+// products 배열에 상품 정보를 정의
 const products: Product[] = [
   { id: 1, name: "무선마우스", price: 32000 },
   { id: 2, name: "키보드", price: 40000 },
@@ -568,6 +578,8 @@ export interface Product {
   price: number;
 }
 
+// CartItem 타입 정의 (Product에 수량(qty) 추가)
+// extends 키워드를 사용하여 Product 타입을 상속받아 CartItem 타입을 정의
 export interface CartItem extends Product {
   qty: number; // Product의 속성 + 수량
 }
@@ -602,37 +614,51 @@ import type { ReactNode } from "react";
 import { CartContext } from "./CartContext";
 import type { CartAction, CartItem } from "./CartContext";
 
-// 리듀서 : 액션에 따라 새 장바구니 배열을 돌려줌
-function cartReducer(state: CartItem[], action: CartAction): CartItem[] {
-  switch (action.type) {
+// reducer 함수 정의
+// CartItem[]: 장바구니 상태의 타입, CartAction: 액션 타입
+// switch문을 사용하여 액션 타입에 따라 상태를 업데이트
+function cartReducer(state: CartItem[], action: CartAction): CartItem[]{
+  switch(action.type){
     case "ADD": {
+      // 이미 장바구니에 담긴 상품인지 확인
+      // find 메서드를 사용하여 장바구니에서 해당 상품을 찾음
       const found = state.find((item) =&gt; item.id === action.product.id);
-      if (found) {
-        return state.map((item) =&gt;
-          item.id === action.product.id ? { ...item, qty: item.qty + 1 } : item
-        );
+      if(found){
+        // 이미 장바구니에 담긴 상품이면 수량을 1 증가
+        return state.map((item) =&gt; 
+          item.id === action.product.id ? { ...item, qty: item.qty + 1 } : item)
       }
-      return [...state, { ...action.product, qty: 1 }];
+      // 장바구니에 담기지 않은 상품이면 새로 추가
+      return [...state, {...action.product, qty: 1}]
     }
     case "REMOVE":
+      // 장바구니에서 해당 상품을 제거
       return state.filter((item) =&gt; item.id !== action.id);
     default:
       return state;
   }
 }
 
-// Provider : children의 타입은 ReactNode
-const CartProvider = ({ children }: { children: ReactNode }) =&gt; {
+// CartProvider 컴포넌트 정의
+// children: ReactNode 타입의 props를 받아서 하위 컴포넌트에 전달
+const CartProvider = ({children}: {children: ReactNode}) =&gt; {
   const [cart, dispatch] = useReducer(cartReducer, []);
 
+  // totalCount: 장바구니에 담긴 상품의 총 수량
+  // reduce 메서드를 사용하여 장바구니의 각 상품의 수량을 합산
   const totalCount = cart.reduce((sum, item) =&gt; sum + item.qty, 0);
-  const totalPrice = cart.reduce((sum, item) =&gt; sum + item.price * item.qty, 0);
 
-  return (
-    &lt;CartContext.Provider value={{ cart, dispatch, totalCount, totalPrice }}&gt;
+  // totalPrice: 장바구니에 담긴 상품의 총 가격
+  // reduce 메서드를 사용하여 장바구니의 각 상품의 가격 * 수량을 합산
+  const totalPrice = cart.reduce((sum, item) =&gt; sum + item.price * item.qty, 0)
+
+  return(
+    // CartContext.Provider를 사용하여 하위 컴포넌트에 상태와 dispatch 함수를 전달
+    // value: cart, dispatch, totalCount, totalPrice를 전달
+    &lt;CartContext.Provider value={{cart, dispatch, totalCount, totalPrice}}&gt;
       {children}
     &lt;/CartContext.Provider&gt;
-  );
+  )
 }
 
 export default CartProvider;</code></pre>
@@ -670,6 +696,7 @@ function App() {
 import { useCart } from "../context/CartContext";
 
 const Header = () =&gt; {
+  // useCart 커스텀 훅을 사용하여 totalCount를 가져옴
   const {totalCount} = useCart();
 
   return(
@@ -686,14 +713,16 @@ export default Header;</code></pre>
       <pre><code class="language-tsx">import { useCart } from "../context/CartContext";
 import type { Product } from "../context/CartContext";
 
+// products 배열에 상품 정보를 정의
 const products: Product[] = [
   { id: 1, name: "무선마우스", price: 32000 },
   { id: 2, name: "키보드", price: 40000 },
   { id: 3, name: "모니터", price: 120000 },
 ];
 
-const ProductList = () =&gt; {
-  const { dispatch } = useCart();
+const ProductList= () =&gt; {
+  // useCart 커스텀 훅을 사용하여 dispatch 함수를 가져옴
+  const {dispatch} = useCart();
 
   return (
     &lt;ul className="product-list"&gt;
@@ -715,7 +744,8 @@ export default ProductList;</code></pre>
       <pre><code class="language-tsx">import { useCart } from "./context/CartContext";
 
 const Cart = () =&gt; {
-  const { cart, dispatch, totalPrice } = useCart(); // cart: CartItem[]
+  // useCart 커스텀 훅을 사용하여 cart, dispatch, totalPrice를 가져옴
+  const {cart, dispatch, totalPrice} = useCart();
 
   if (cart.length === 0) return &lt;p&gt;장바구니가 비어 있습니다.&lt;/p&gt;;
 
