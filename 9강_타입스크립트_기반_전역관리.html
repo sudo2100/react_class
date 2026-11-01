@@ -455,7 +455,7 @@ export default UserGrandChild;</code></pre>
       <div class="tip"><span class="lbl">💡 정리</span> <code>createContext&lt;User&gt;(기본값)</code>처럼 타입을 지정하면, Provider의 <code>value</code>에 <code>{ name: "오상식" }</code>처럼 <code>age</code>를 빠뜨렸을 때 바로 타입 오류가 납니다. 이 예제는 기본값을 빈 객체 대신 <code>{ name: "", age: 0 }</code>으로 주었는데, 아래 장바구니 예제처럼 기본값을 <code>null</code>로 두고 커스텀 훅에서 검사하는 방법이 실무에서 더 많이 쓰입니다.</div>
     </div>
 
-    <div class="ex"><div class="lbl">💡 예제 — 장바구니 Context (타입 정의 · 리듀서 · Provider · 커스텀 훅)</div>
+    <div class="ex"><div class="lbl">💡 예제 — 장바구니 Context (타입 정의 · 커스텀 훅) + Provider (리듀서)</div>
       <div class="flow">
 App
  └ CartProvider   → cart, dispatch, totalCount, totalPrice 제공
@@ -463,9 +463,8 @@ App
     ├ ProductList → dispatch (ADD)
     └ Cart        → cart, dispatch, totalPrice
       </div>
-      <span class="fname">src/CartContext.tsx</span>
-      <pre><code class="language-tsx">import { createContext, useContext, useReducer } from "react";
-import type { ReactNode } from "react";
+      <span class="fname">src/context/CartContext.ts</span>
+      <pre><code class="language-typescript">import { createContext, useContext } from "react";
 
 // 1. 데이터 타입
 export interface Product {
@@ -478,11 +477,10 @@ export interface CartItem extends Product {
   qty: number; // Product의 속성 + 수량
 }
 
-type CartAction =
+// 액션은 담기(ADD)와 삭제(REMOVE) 두 가지
+export type CartAction =
   | { type: "ADD"; product: Product }
-  | { type: "DECREASE"; id: number }
-  | { type: "REMOVE"; id: number }
-  | { type: "CLEAR" };
+  | { type: "REMOVE"; id: number };
 
 // 2. Context에 담을 값의 타입
 interface CartContextType {
@@ -492,6 +490,24 @@ interface CartContextType {
   totalPrice: number;
 }
 
+// 3. Context 생성 : Provider 밖에서는 값이 없으므로 null 허용
+export const CartContext = createContext&lt;CartContextType | null&gt;(null);
+
+// 4. 커스텀 훅 : null 검사를 한 곳에서 처리 → 사용하는 쪽은 CartContextType으로 받음
+export function useCart(): CartContextType {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error("useCart는 CartProvider 안에서만 사용할 수 있습니다.");
+  }
+  return context;
+}</code></pre>
+      <span class="fname">src/context/CartProvider.tsx</span>
+      <pre><code class="language-tsx">import { useReducer } from "react";
+import type { ReactNode } from "react";
+import { CartContext } from "./CartContext";
+import type { CartAction, CartItem } from "./CartContext";
+
+// 리듀서 : 액션에 따라 새 장바구니 배열을 돌려줌
 function cartReducer(state: CartItem[], action: CartAction): CartItem[] {
   switch (action.type) {
     case "ADD": {
@@ -503,24 +519,15 @@ function cartReducer(state: CartItem[], action: CartAction): CartItem[] {
       }
       return [...state, { ...action.product, qty: 1 }];
     }
-    case "DECREASE":
-      return state
-        .map((item) =&gt; (item.id === action.id ? { ...item, qty: item.qty - 1 } : item))
-        .filter((item) =&gt; item.qty &gt; 0);
     case "REMOVE":
       return state.filter((item) =&gt; item.id !== action.id);
-    case "CLEAR":
-      return [];
     default:
       return state;
   }
 }
 
-// 3. Context 생성 : Provider 밖에서는 값이 없으므로 null 허용
-const CartContext = createContext&lt;CartContextType | null&gt;(null);
-
-// 4. Provider : children의 타입은 ReactNode
-export function CartProvider({ children }: { children: ReactNode }) {
+// Provider : children의 타입은 ReactNode
+const CartProvider = ({ children }: { children: ReactNode }) =&gt; {
   const [cart, dispatch] = useReducer(cartReducer, []);
 
   const totalCount = cart.reduce((sum, item) =&gt; sum + item.qty, 0);
@@ -533,21 +540,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// 5. 커스텀 훅 : null 검사를 한 곳에서 처리 → 사용하는 쪽은 CartContextType으로 받음
-export function useCart(): CartContextType {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error("useCart는 CartProvider 안에서만 사용할 수 있습니다.");
-  }
-  return context;
-}</code></pre>
+export default CartProvider;</code></pre>
+      <div class="tip"><span class="lbl">💡 왜 파일을 두 개로 나눴나요?</span> <b>CartContext.ts</b>에는 타입 · Context · 커스텀 훅(<code>useCart</code>)처럼 <b>컴포넌트가 아닌 것</b>을, <b>CartProvider.tsx</b>에는 상태를 관리하는 <b>컴포넌트</b>만 둡니다. Vite의 빠른 새로고침(Fast Refresh)은 컴포넌트만 내보내는 파일에서 가장 잘 동작하므로, 저장할 때 화면 상태(담아 둔 장바구니)가 유지됩니다.</div>
     </div>
 
     <div class="ex"><div class="lbl">💡 예제 — Provider로 감싸고 컴포넌트에서 꺼내 쓰기</div>
       <span class="fname">src/App.tsx</span>
-      <pre><code class="language-tsx">import { CartProvider } from "./CartContext";
-import Header from "./Header";
-import ProductList from "./ProductList";
+      <pre><code class="language-tsx">import CartProvider from "./context/CartProvider";
+import Header from "./layouts/Header";
+import ProductList from "./products/ProductList";
 import Cart from "./Cart";
 
 function App() {
@@ -561,8 +562,8 @@ function App() {
 }
 
 export default App;</code></pre>
-      <span class="fname">src/Header.tsx</span>
-      <pre><code class="language-tsx">import { useCart } from "./CartContext";
+      <span class="fname">src/layouts/Header.tsx</span>
+      <pre><code class="language-tsx">import { useCart } from "../context/CartContext";
 
 const Header = () =&gt; {
   const { totalCount } = useCart(); // totalCount: number
@@ -576,9 +577,9 @@ const Header = () =&gt; {
 };
 
 export default Header;</code></pre>
-      <span class="fname">src/ProductList.tsx</span>
-      <pre><code class="language-tsx">import { useCart } from "./CartContext";
-import type { Product } from "./CartContext";
+      <span class="fname">src/products/ProductList.tsx</span>
+      <pre><code class="language-tsx">import { useCart } from "../context/CartContext";
+import type { Product } from "../context/CartContext";
 
 const products: Product[] = [
   { id: 1, name: "무선마우스", price: 32000 },
@@ -603,7 +604,7 @@ const ProductList = () =&gt; {
 
 export default ProductList;</code></pre>
       <span class="fname">src/Cart.tsx</span>
-      <pre><code class="language-tsx">import { useCart } from "./CartContext";
+      <pre><code class="language-tsx">import { useCart } from "./context/CartContext";
 
 const Cart = () =&gt; {
   const { cart, dispatch, totalPrice } = useCart(); // cart: CartItem[]
@@ -617,14 +618,11 @@ const Cart = () =&gt; {
         {cart.map((item) =&gt; (
           &lt;li key={item.id}&gt;
             {item.name} × {item.qty}
-            &lt;button onClick={() =&gt; dispatch({ type: "ADD", product: item })}&gt;+&lt;/button&gt;
-            &lt;button onClick={() =&gt; dispatch({ type: "DECREASE", id: item.id })}&gt;-&lt;/button&gt;
             &lt;button onClick={() =&gt; dispatch({ type: "REMOVE", id: item.id })}&gt;삭제&lt;/button&gt;
           &lt;/li&gt;
         ))}
       &lt;/ul&gt;
       &lt;p&gt;총액: {totalPrice.toLocaleString()}원&lt;/p&gt;
-      &lt;button onClick={() =&gt; dispatch({ type: "CLEAR" })}&gt;비우기&lt;/button&gt;
     &lt;/div&gt;
   );
 };
@@ -640,14 +638,13 @@ export default Cart;</code></pre>
         <div style="border:1px solid #ccc;padding:10px;border-radius:6px">
           <strong>장바구니</strong>
           <ul style="margin:6px 0">
-            <li>무선마우스 × 2 <button>+</button> <button>-</button> <button>삭제</button></li>
-            <li>키보드 × 1 <button>+</button> <button>-</button> <button>삭제</button></li>
+            <li>무선마우스 × 2 <button>삭제</button></li>
+            <li>키보드 × 1 <button>삭제</button></li>
           </ul>
           <p>총액: 104,000원</p>
-          <button>비우기</button>
         </div>
       </div>
-      <div class="tip"><span class="lbl">💡 정리</span> <code>CartItem extends Product</code>처럼 interface를 확장하면 상품 정보에 수량만 더한 타입을 간단히 만들 수 있습니다. dispatch의 타입은 <code>React.Dispatch&lt;CartAction&gt;</code>이므로, 컴포넌트에서 잘못된 액션을 보내면 TypeScript가 바로 알려 줍니다.</div>
+      <div class="tip"><span class="lbl">💡 정리</span> 같은 상품을 다시 담으면 줄이 늘지 않고 수량(<code>qty</code>)만 1 늘어납니다. 삭제는 <code>filter</code>로 해당 상품만 뺀 새 배열을 돌려줍니다. <code>CartItem extends Product</code>처럼 interface를 확장하면 상품 정보에 수량만 더한 타입을 간단히 만들 수 있습니다. dispatch의 타입은 <code>React.Dispatch&lt;CartAction&gt;</code>이므로, 컴포넌트에서 잘못된 액션을 보내면 TypeScript가 바로 알려 줍니다.</div>
     </div>
 
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
