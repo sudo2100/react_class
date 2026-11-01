@@ -455,6 +455,103 @@ export default UserGrandChild;</code></pre>
       <div class="tip"><span class="lbl">💡 정리</span> <code>createContext&lt;User&gt;(기본값)</code>처럼 타입을 지정하면, Provider의 <code>value</code>에 <code>{ name: "오상식" }</code>처럼 <code>age</code>를 빠뜨렸을 때 바로 타입 오류가 납니다. 이 예제는 기본값을 빈 객체 대신 <code>{ name: "", age: 0 }</code>으로 주었는데, 아래 장바구니 예제처럼 기본값을 <code>null</code>로 두고 커스텀 훅에서 검사하는 방법이 실무에서 더 많이 쓰입니다.</div>
     </div>
 
+    <div class="ex"><div class="lbl">💡 예제 — 상품 타입 만들기</div>
+      <span class="fname">src/context/CartContext.ts</span>
+      <pre><code class="language-typescript">// Product 타입 정의
+export interface Product{
+  id: number;
+  name: string;
+  price: number;
+}</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> 상품 목록(<code>ProductList</code>)과 장바구니가 함께 쓰는 타입이므로 먼저 <code>CartContext.ts</code>에 만들고 <code>export</code>합니다. 아래 Context 예제에서 이 파일에 장바구니 타입과 Context를 이어서 추가합니다.</div>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 상품 목록 화면 만들기</div>
+      <span class="fname">src/products/ProductList.tsx</span>
+      <pre><code class="language-tsx">import type { Product } from "../context/CartContext";
+
+const products: Product[] = [
+  { id: 1, name: "무선마우스", price: 32000 },
+  { id: 2, name: "키보드", price: 40000 },
+  { id: 3, name: "모니터", price: 120000 },
+]
+
+const ProductList= () =&gt; {
+
+  return(
+    &lt;div&gt;
+      &lt;ul&gt;
+        {products.map(product =&gt; (
+          &lt;li key={product.id}&gt;
+            {product.name} - {product.price.toLocaleString()}원
+            &lt;button&gt;담기&lt;/button&gt;
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default ProductList;</code></pre>
+      <ul>
+        <li><code>import type</code>으로 앞에서 만든 <code>Product</code> 타입만 가져와 상품 배열에 붙입니다. 항목을 빠뜨리거나 잘못 적으면 바로 오류가 납니다.</li>
+        <li>지금은 화면만 그리고, <b>담기</b> 버튼은 아직 아무 동작도 하지 않습니다. 장바구니 Context를 만든 뒤 연결합니다.</li>
+      </ul>
+      <div class="out"><span class="rt">브라우저 출력</span>
+        <img src="data:image/png;base64,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" alt="상품 목록 화면" style="display:block;width:310px;max-width:100%;height:auto;border:1px solid #e4e7eb;border-radius:8px;margin:8px 0 14px">
+      </div>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — App에 라우터 연결</div>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Header from './layouts/Header';
+import ProductList from './products/ProductList';
+
+function App() {
+
+  return (
+    &lt;&gt;
+      &lt;section className="app"&gt;
+        &lt;BrowserRouter&gt;
+          &lt;Header /&gt;
+          &lt;Routes&gt;
+            &lt;Route path='/' element={&lt;ProductList /&gt;} /&gt;
+          &lt;/Routes&gt;
+        &lt;/BrowserRouter&gt;
+      &lt;/section&gt;
+    &lt;/&gt;
+  )
+}
+
+export default App</code></pre>
+      <ul>
+        <li><code>BrowserRouter</code>로 감싸야 그 안의 <code>Header</code>에서 <code>Link</code>를, <code>Routes</code>에서 주소별 화면을 쓸 수 있습니다.</li>
+        <li><code>path='/'</code>일 때 <code>ProductList</code>를 보여 줍니다. <code>Header</code>는 <code>Routes</code> 밖에 있으므로 모든 주소에서 항상 보입니다.</li>
+      </ul>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 헤더 만들기</div>
+      <span class="fname">src/layouts/Header.tsx</span>
+      <pre><code class="language-tsx">import { Link } from "react-router-dom";
+
+const Header = () =&gt; {
+
+  return(
+    &lt;header className="header"&gt;
+      &lt;Link to='/'&gt;SPACE SHOP&lt;/Link&gt;
+      &lt;Link to='/'&gt;상품 목록&lt;/Link&gt;
+    &lt;/header&gt;
+  )
+}
+
+export default Header;</code></pre>
+      <ul>
+        <li><code>Link</code>는 페이지를 새로고침하지 않고 주소만 바꿔 이동합니다. <code>&lt;a href&gt;</code>를 쓰면 페이지 전체가 다시 불러와집니다.</li>
+        <li><code>Link</code>는 <code>BrowserRouter</code> 안에서만 쓸 수 있으므로, App(또는 main.tsx)을 <code>BrowserRouter</code>로 감싸야 합니다.</li>
+      </ul>
+    </div>
+
     <div class="ex"><div class="lbl">💡 예제 — 장바구니 Context (타입 정의 · 커스텀 훅) + Provider (리듀서)</div>
       <div class="flow">
 App
@@ -544,37 +641,47 @@ export default CartProvider;</code></pre>
       <div class="tip"><span class="lbl">💡 왜 파일을 두 개로 나눴나요?</span> <b>CartContext.ts</b>에는 타입 · Context · 커스텀 훅(<code>useCart</code>)처럼 <b>컴포넌트가 아닌 것</b>을, <b>CartProvider.tsx</b>에는 상태를 관리하는 <b>컴포넌트</b>만 둡니다. Vite의 빠른 새로고침(Fast Refresh)은 컴포넌트만 내보내는 파일에서 가장 잘 동작하므로, 저장할 때 화면 상태(담아 둔 장바구니)가 유지됩니다.</div>
     </div>
 
-    <div class="ex"><div class="lbl">💡 예제 — Provider로 감싸고 컴포넌트에서 꺼내 쓰기</div>
+    <div class="ex"><div class="lbl">💡 예제 — 화면 구성 (App · Header · ProductList)</div>
       <span class="fname">src/App.tsx</span>
-      <pre><code class="language-tsx">import CartProvider from "./context/CartProvider";
-import Header from "./layouts/Header";
-import ProductList from "./products/ProductList";
-import Cart from "./Cart";
+      <pre><code class="language-tsx">import './App.css'
+import Header from './layouts/Header'
+import ProductList from './products/ProductList'
+import CartProvider from './context/CartProvider'
+import Cart from './cart/Cart'
 
 function App() {
-  return (
-    &lt;CartProvider&gt;
-      &lt;Header /&gt;
-      &lt;ProductList /&gt;
-      &lt;Cart /&gt;
-    &lt;/CartProvider&gt;
-  );
-}
 
-export default App;</code></pre>
+  return (
+    &lt;&gt;
+      &lt;section className="app"&gt;
+        &lt;CartProvider&gt;
+          &lt;BrowserRouter&gt;
+            &lt;Header /&gt;
+            &lt;Routes&gt;
+              &lt;Route path='/' element={&lt;ProductList /&gt;} /&gt;
+              &lt;Route path='/cart' element={&lt;Cart /&gt;} /&gt;
+            &lt;/Routes&gt;
+          &lt;/BrowserRouter&gt;
+        &lt;/CartProvider&gt;
+      &lt;/section&gt;
+    &lt;/&gt;
+  )
+}</code></pre>
       <span class="fname">src/layouts/Header.tsx</span>
-      <pre><code class="language-tsx">import { useCart } from "../context/CartContext";
+      <pre><code class="language-tsx">import { Link } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 
 const Header = () =&gt; {
-  const { totalCount } = useCart(); // totalCount: number
+  const {totalCount} = useCart();
 
-  return (
-    &lt;header className="cart-header"&gt;
-      &lt;h2&gt;SPACE SHOP&lt;/h2&gt;
-      &lt;span&gt;🛒 장바구니 ({totalCount})&lt;/span&gt;
+  return(
+    &lt;header className="header"&gt;
+      &lt;Link to='/'&gt;SPACE SHOP&lt;/Link&gt;
+      &lt;Link to='/'&gt;상품 목록&lt;/Link&gt;
+      &lt;Link to='/cart'&gt;장바구니({totalCount})&lt;/Link&gt;
     &lt;/header&gt;
-  );
-};
+  )
+}
 
 export default Header;</code></pre>
       <span class="fname">src/products/ProductList.tsx</span>
@@ -603,6 +710,9 @@ const ProductList = () =&gt; {
 };
 
 export default ProductList;</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — 장바구니 화면에서 꺼내 쓰기 (Cart.tsx)</div>
       <span class="fname">src/Cart.tsx</span>
       <pre><code class="language-tsx">import { useCart } from "./context/CartContext";
 
@@ -863,206 +973,6 @@ export default Counter</code></pre>
         <tr><td>변경 요청</td><td><code>dispatch({ type: "ADD", product })</code></td><td><code>dispatch(addItem(product))</code></td></tr>
         <tr><td>파생 값</td><td>Provider 안에서 <code>reduce()</code></td><td>selector 함수에서 <code>reduce()</code></td></tr>
       </table>
-    </div>
-
-    <div class="ex"><div class="lbl">💡 예제 — 장바구니 slice와 store 등록</div>
-      <span class="fname">src/store/cartSlice.ts</span>
-      <pre><code class="language-typescript">import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
-import type { RootState } from './index'
-
-// 1. 데이터 타입 (단원 2와 같음)
-export interface Product {
-  id: number
-  name: string
-  price: number
-}
-
-export interface CartItem extends Product {
-  qty: number
-}
-
-interface CartState {
-  items: CartItem[]
-}
-
-const initialState: CartState = {
-  items: [],
-}
-
-const cartSlice = createSlice({
-  name: 'cart',
-  initialState,
-  reducers: {
-    // 2. 액션마다 payload 타입 지정
-    //    RTK는 내부에서 immer를 사용하므로 state를 직접 고치는 문법을 써도 불변성이 지켜짐
-    addItem: (state, action: PayloadAction&lt;Product&gt;) =&gt; {
-      const found = state.items.find((item) =&gt; item.id === action.payload.id)
-      if (found) {
-        found.qty += 1
-      } else {
-        state.items.push({ ...action.payload, qty: 1 })
-      }
-    },
-    decreaseItem: (state, action: PayloadAction&lt;number&gt;) =&gt; {
-      const found = state.items.find((item) =&gt; item.id === action.payload)
-      if (!found) return
-      found.qty -= 1
-      if (found.qty === 0) {
-        state.items = state.items.filter((item) =&gt; item.id !== action.payload)
-      }
-    },
-    removeItem: (state, action: PayloadAction&lt;number&gt;) =&gt; {
-      state.items = state.items.filter((item) =&gt; item.id !== action.payload)
-    },
-    clearCart: (state) =&gt; {
-      state.items = []
-    },
-  },
-})
-
-export const { addItem, decreaseItem, removeItem, clearCart } = cartSlice.actions
-export default cartSlice.reducer
-
-// 3. selector : state에서 계산한 값을 꺼내는 함수 (파생 값)
-export const selectCartItems = (state: RootState) =&gt; state.cart.items
-export const selectTotalCount = (state: RootState) =&gt;
-  state.cart.items.reduce((sum, item) =&gt; sum + item.qty, 0)
-export const selectTotalPrice = (state: RootState) =&gt;
-  state.cart.items.reduce((sum, item) =&gt; sum + item.price * item.qty, 0)</code></pre>
-      <span class="fname">src/store/index.ts</span>
-      <pre><code class="language-typescript">import { configureStore } from '@reduxjs/toolkit'
-import counterReducer from './counterSlice'
-import cartReducer from './cartSlice'
-
-export const store = configureStore({
-  reducer: {
-    counter: counterReducer,
-    cart: cartReducer, // 장바구니 slice 등록
-  },
-})
-
-export type RootState = ReturnType&lt;typeof store.getState&gt;
-export type AppDispatch = typeof store.dispatch</code></pre>
-    </div>
-
-    <div class="ex"><div class="lbl">💡 예제 — 컴포넌트에서 장바구니 사용하기</div>
-      <span class="fname">src/App.tsx</span>
-      <pre><code class="language-tsx">import Header from './apps/Header'
-import ProductList from './apps/ProductList'
-import Cart from './apps/Cart'
-
-// Provider는 main.tsx에서 이미 감싸고 있으므로 따로 필요 없음
-function App() {
-  return (
-    &lt;&gt;
-      &lt;Header /&gt;
-      &lt;ProductList /&gt;
-      &lt;Cart /&gt;
-    &lt;/&gt;
-  )
-}
-
-export default App</code></pre>
-      <span class="fname">src/apps/Header.tsx</span>
-      <pre><code class="language-tsx">import { useAppSelector } from '../store/hooks'
-import { selectTotalCount } from '../store/cartSlice'
-
-const Header = () =&gt; {
-  const totalCount = useAppSelector(selectTotalCount) // number
-
-  return (
-    &lt;header className="cart-header"&gt;
-      &lt;h2&gt;SPACE SHOP&lt;/h2&gt;
-      &lt;span&gt;🛒 장바구니 ({totalCount})&lt;/span&gt;
-    &lt;/header&gt;
-  )
-}
-
-export default Header</code></pre>
-      <span class="fname">src/apps/ProductList.tsx</span>
-      <pre><code class="language-tsx">import { useAppDispatch } from '../store/hooks'
-import { addItem } from '../store/cartSlice'
-import type { Product } from '../store/cartSlice'
-
-const products: Product[] = [
-  { id: 1, name: '무선마우스', price: 32000 },
-  { id: 2, name: '키보드', price: 40000 },
-  { id: 3, name: '모니터', price: 120000 },
-]
-
-const ProductList = () =&gt; {
-  const dispatch = useAppDispatch()
-
-  return (
-    &lt;ul className="product-list"&gt;
-      {products.map((product) =&gt; (
-        &lt;li key={product.id}&gt;
-          {product.name} - {product.price.toLocaleString()}원
-          &lt;button onClick={() =&gt; dispatch(addItem(product))}&gt;담기&lt;/button&gt;
-        &lt;/li&gt;
-      ))}
-    &lt;/ul&gt;
-  )
-}
-
-export default ProductList</code></pre>
-      <span class="fname">src/apps/Cart.tsx</span>
-      <pre><code class="language-tsx">import { useAppSelector, useAppDispatch } from '../store/hooks'
-import {
-  addItem,
-  decreaseItem,
-  removeItem,
-  clearCart,
-  selectCartItems,
-  selectTotalPrice,
-} from '../store/cartSlice'
-
-const Cart = () =&gt; {
-  const cart = useAppSelector(selectCartItems) // CartItem[]
-  const totalPrice = useAppSelector(selectTotalPrice)
-  const dispatch = useAppDispatch()
-
-  if (cart.length === 0) return &lt;p&gt;장바구니가 비어 있습니다.&lt;/p&gt;
-
-  return (
-    &lt;div className="cart"&gt;
-      &lt;h3&gt;장바구니&lt;/h3&gt;
-      &lt;ul&gt;
-        {cart.map((item) =&gt; (
-          &lt;li key={item.id}&gt;
-            {item.name} × {item.qty}
-            &lt;button onClick={() =&gt; dispatch(addItem(item))}&gt;+&lt;/button&gt;
-            &lt;button onClick={() =&gt; dispatch(decreaseItem(item.id))}&gt;-&lt;/button&gt;
-            &lt;button onClick={() =&gt; dispatch(removeItem(item.id))}&gt;삭제&lt;/button&gt;
-          &lt;/li&gt;
-        ))}
-      &lt;/ul&gt;
-      &lt;p&gt;총액: {totalPrice.toLocaleString()}원&lt;/p&gt;
-      &lt;button onClick={() =&gt; dispatch(clearCart())}&gt;비우기&lt;/button&gt;
-    &lt;/div&gt;
-  )
-}
-
-export default Cart</code></pre>
-      <div class="out"><span class="rt">브라우저 출력</span>
-        <div style="display:flex;justify-content:space-between;align-items:center;background:#333;color:#fff;padding:8px 12px;border-radius:6px"><strong>SPACE SHOP</strong><span>🛒 장바구니 (3)</span></div>
-        <ul style="margin:10px 0">
-          <li>무선마우스 - 32,000원 <button>담기</button></li>
-          <li>키보드 - 40,000원 <button>담기</button></li>
-          <li>모니터 - 120,000원 <button>담기</button></li>
-        </ul>
-        <div style="border:1px solid #ccc;padding:10px;border-radius:6px">
-          <strong>장바구니</strong>
-          <ul style="margin:6px 0">
-            <li>무선마우스 × 2 <button>+</button> <button>-</button> <button>삭제</button></li>
-            <li>키보드 × 1 <button>+</button> <button>-</button> <button>삭제</button></li>
-          </ul>
-          <p>총액: 104,000원</p>
-          <button>비우기</button>
-        </div>
-      </div>
-      <div class="tip"><span class="lbl">💡 정리</span> 화면 결과는 단원 2와 똑같습니다. 컴포넌트는 <code>useCart()</code> 대신 <code>useAppSelector</code> · <code>useAppDispatch</code>로 바뀌었을 뿐이고, <code>Product</code> · <code>CartItem</code> 타입은 그대로 재사용합니다. 새 slice를 store에 등록하면 <code>RootState</code>에 <code>cart</code>가 자동으로 추가되어, selector에서 <code>state.cart.items</code>가 자동완성됩니다.</div>
     </div>
 
     <div class="lab"><div class="lbl">✏️ 실습문제</div>
