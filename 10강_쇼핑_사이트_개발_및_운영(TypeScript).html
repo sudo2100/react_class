@@ -171,12 +171,11 @@ hue-6-2: #e6c07b
     <ol>
       <li><a href="#m1">강의 개요와 시작 상태 확인</a></li>
       <li><a href="#m2">상품 카드와 상품 목록 컴포넌트</a></li>
-      <li><a href="#m3">데이터 파일 분리 (.js → .ts)</a></li>
-      <li><a href="#m4">타입 파일 분리</a></li>
-      <li><a href="#m5">확장을 고려한 타입 설계</a></li>
-      <li><a href="#m6">Context로 상품 상태 공유</a></li>
-      <li><a href="#m7">장바구니</a></li>
-      <li><a href="#m8">로그인, 회원가입</a></li>
+      <li><a href="#m3">데이터 · 타입 파일 분리와 타입 설계</a></li>
+      <li><a href="#m4">Context로 상품 상태 공유</a></li>
+      <li><a href="#m5">상품 상세, 상품 등록</a></li>
+      <li><a href="#m6">장바구니</a></li>
+      <li><a href="#m7">로그인, 회원가입</a></li>
     </ol>
   </nav>
 
@@ -199,12 +198,11 @@ hue-6-2: #e6c07b
         <tr><th>단계</th><th>내용</th><th>다루는 파일</th></tr>
         <tr><td>0</td><td>시작 상태 확인</td><td><code>App.tsx</code>, <code>Header.tsx</code></td></tr>
         <tr><td>1</td><td>상품 카드와 상품 목록 컴포넌트</td><td><code>ProductCard.tsx</code>, <code>ProductList.tsx</code></td></tr>
-        <tr><td>2</td><td>데이터 파일 분리 (<code>.js</code> → <code>.ts</code>)</td><td><code>datas/products.ts</code></td></tr>
-        <tr><td>3</td><td>타입 파일 분리</td><td><code>types/product.ts</code></td></tr>
-        <tr><td>4</td><td>확장을 고려한 타입 설계</td><td><code>types/product.ts</code></td></tr>
-        <tr><td>5</td><td>Context로 상품 상태 공유 · 상품 상세 · 상품 등록</td><td><code>contexts/Product*</code>, <code>ProductList.tsx</code>, <code>ProductDetail.tsx</code>, <code>AddProduct.tsx</code>, <code>App.tsx</code>, <code>Header.tsx</code></td></tr>
-        <tr><td>6</td><td>장바구니</td><td><code>types/cart.ts</code>, <code>contexts/Cart*</code>, <code>cart/Cart.tsx</code>, <code>ProductCard.tsx</code>, <code>ProductDetail.tsx</code>, <code>Header.tsx</code>, <code>App.css</code></td></tr>
-        <tr><td>7</td><td>로그인, 회원가입</td><td><code>types/user.ts</code>, <code>datas/users.ts</code>, <code>contexts/User*</code>, <code>App.tsx</code>, <code>users/SignIn.tsx</code>, <code>users/SignUp.tsx</code>, <code>Header.tsx</code>, <code>App.css</code></td></tr>
+        <tr><td>2</td><td>데이터 · 타입 파일 분리와 타입 설계</td><td><code>datas/products.ts</code>, <code>types/product.ts</code></td></tr>
+        <tr><td>3</td><td>Context로 상품 상태 공유</td><td><code>context/Product*</code>, <code>datas/products.ts</code>, <code>App.tsx</code>, <code>ProductList.tsx</code></td></tr>
+        <tr><td>4</td><td>상품 상세, 상품 등록</td><td><code>ProductDetail.tsx</code>, <code>AddProduct.tsx</code>, <code>App.tsx</code>, <code>Header.tsx</code>, <code>App.css</code></td></tr>
+        <tr><td>5</td><td>장바구니</td><td><code>types/cart.ts</code>, <code>context/Cart*</code>, <code>products/Cart.tsx</code>, <code>ProductCard.tsx</code>, <code>ProductDetail.tsx</code>, <code>Header.tsx</code>, <code>App.css</code></td></tr>
+        <tr><td>6</td><td>로그인, 회원가입</td><td><code>types/user.ts</code>, <code>datas/users.ts</code>, <code>context/User*</code>, <code>App.tsx</code>, <code>users/SignIn.tsx</code>, <code>users/SignUp.tsx</code>, <code>Header.tsx</code>, <code>App.css</code></td></tr>
       </table>
     </div>
     <div class="concept">
@@ -297,43 +295,24 @@ main { max-width: 960px; margin: 0 auto; padding: 24px; }
     <div class="concept">
       <p>상품 하나를 그리는 <code>ProductCard</code>와, 여러 상품을 반복해서 그리는 <code>ProductList</code>로 나눕니다.</p>
     </div>
-    <div class="ex"><div class="lbl">💡 예제 — 상품 카드</div>
-      <span class="fname">src/products/ProductCard.tsx</span>
-      <pre><code class="language-tsx">import type { ProductProp } from './ProductList';
-
-interface ProductCardProps {
-  product: ProductProp;
-}
-
-const ProductCard = ({ product }: ProductCardProps) =&gt; {
-
-  return(
-    &lt;div className="card"&gt;
-      &lt;span&gt;{product.category}&lt;/span&gt;
-      &lt;h3&gt;{product.pName}&lt;/h3&gt;
-      &lt;p&gt;{product.price.toLocaleString()}원&lt;/p&gt;
-    &lt;/div&gt;
-  )
-}
-
-export default ProductCard;</code></pre>
-      <ul>
-        <li><code>ProductCardProps</code>는 이 컴포넌트가 <b>받는 값</b>의 규칙입니다.</li>
-        <li><code>toLocaleString()</code>은 <code>25000</code>을 <code>25,000</code>처럼 천 단위 쉼표를 붙여 줍니다.</li>
-      </ul>
-    </div>
     <div class="ex"><div class="lbl">💡 예제 — 상품 목록</div>
       <span class="fname">src/products/ProductList.tsx</span>
       <pre><code class="language-tsx">import ProductCard from './ProductCard';
 
-export interface ProductProp {
+export interface Product {
   id: number;
   pName: string;
   category: string;
   price: number;
 }
 
-const products: ProductProp[] = [ /* 상품 데이터 */ ];
+const products: Product[] = [
+  { id: 1, pName: "무선 마우스", category: "마우스", price: 25000, description: "조용한 클릭음의 2.4GHz 무선 마우스" },
+  { id: 2, pName: "기계식 키보드", category: "키보드", price: 89000, description: "청축 스위치, RGB 백라이트" },
+  { id: 3, pName: "27인치 모니터", category: "모니터", price: 279000, description: "QHD 해상도, 165Hz 주사율" },
+  { id: 4, pName: "USB-C 허브", category: "주변기기", price: 39000, description: "HDMI·USB 3.0·SD 카드 지원 7in1" },
+  { id: 5, pName: "웹캠 FHD", category: "주변기기", price: 45000, description: "1080p 30fps, 자동 초점" },
+];
 
 const ProductList = () =&gt; {
 
@@ -351,6 +330,31 @@ const ProductList = () =&gt; {
 
 export default ProductList;</code></pre>
     </div>
+    <div class="ex"><div class="lbl">💡 예제 — 상품 카드</div>
+      <span class="fname">src/products/ProductCard.tsx</span>
+      <pre><code class="language-tsx">import type { Product } from './ProductList';
+
+interface ProductCard {
+  product: Product;
+}
+
+const ProductCard = ({ product }: ProductCard) =&gt; {
+
+  return(
+    &lt;div className="card"&gt;
+      &lt;span&gt;{product.category}&lt;/span&gt;
+      &lt;h3&gt;{product.pName}&lt;/h3&gt;
+      &lt;p&gt;{product.price.toLocaleString()}원&lt;/p&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default ProductCard;</code></pre>
+      <ul>
+        <li><code>ProductCard</code>는 이 컴포넌트가 <b>받는 값</b>의 규칙입니다.</li>
+        <li><code>toLocaleString()</code>은 <code>25000</code>을 <code>25,000</code>처럼 천 단위 쉼표를 붙여 줍니다.</li>
+      </ul>
+    </div>
     <div class="concept">
       <h3 class="blk">📖 짚고 넘어갈 점</h3>
       <ul>
@@ -367,12 +371,16 @@ export default ProductList;</code></pre>
 
   <!-- ================= MODULE 3 ================= -->
   <section class="module" id="m3">
-    <h2><span class="num">3</span> 데이터 파일 분리 (.js → .ts)</h2>
+    <h2><span class="num">3</span> 데이터 · 타입 파일 분리와 타입 설계</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
       <li>데이터 파일을 <code>.js</code> · <code>.json</code> · <code>.ts</code> 중 무엇으로 둘지 판단할 수 있다.</li>
       <li><code>as</code> 타입 단언이 검사를 끄는 것에 가깝다는 점을 이해한다.</li>
+      <li>여러 파일이 쓰는 타입을 별도 파일로 분리해 의존 관계를 정리할 수 있다.</li>
+      <li><code>import type</code>의 의미를 설명할 수 있다.</li>
+      <li><code>Omit</code>으로 등록용 파생 타입을 만들 수 있다.</li>
     </ul></div>
 
+    <h3 class="blk">① 데이터 파일 분리 (.js → .ts)</h3>
     <div class="concept">
       <p>상품 데이터를 컴포넌트 밖 <code>src/datas/</code> 폴더로 옮깁니다. 이때 파일 형식을 무엇으로 할지 고민해 봅니다.</p>
     </div>
@@ -387,27 +395,9 @@ export default ProductList;</code></pre>
       <p>TypeScript 프로젝트에서 코드로 직접 가져다 쓴다면 <b><code>.ts</code></b> 가 유리합니다.</p>
       <div class="tip"><span class="lbl">💡 정리</span> <code>.json</code>을 가져와서 <code>as ProductProp[]</code>로 타입을 붙이면 오류는 사라지지만, 실제로 데이터가 규칙에 맞는지는 <b>검사하지 않습니다.</b> 검사를 끄는 것에 가깝습니다.</div>
     </div>
-    <div class="ex"><div class="lbl">💡 예제 — products.ts</div>
-      <span class="fname">src/datas/products.ts</span>
-      <pre><code class="language-typescript">import type { ProductProp } from '../products/ProductList';
+  
 
-export const products: ProductProp[] = [
-  { id: 1, pName: "무선 마우스", category: "마우스", price: 25000, description: "조용한 클릭음의 2.4GHz 무선 마우스" },
-  { id: 2, pName: "기계식 키보드", category: "키보드", price: 89000, description: "청축 스위치, RGB 백라이트" },
-  // ...
-];</code></pre>
-      <p>데이터에 설명(<code>description</code>)이 생겼으므로 타입에도 <code>description: string;</code>을 추가합니다.</p>
-    </div>
-  </section>
-
-  <!-- ================= MODULE 4 ================= -->
-  <section class="module" id="m4">
-    <h2><span class="num">4</span> 타입 파일 분리</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
-      <li>여러 파일이 쓰는 타입을 별도 파일로 분리해 의존 관계를 정리할 수 있다.</li>
-      <li><code>import type</code>의 의미를 설명할 수 있다.</li>
-    </ul></div>
-
+    <h3 class="blk">② 타입 파일 분리</h3>
     <div class="concept">
       <p>지금은 상품 타입이 <code>ProductList.tsx</code> 안에 있어서, 데이터 파일과 카드 컴포넌트가 <b>목록 컴포넌트에 의존</b>하게 됩니다.</p>
       <div class="flow">ProductCard ──→ ProductList (타입 때문에)
@@ -419,26 +409,18 @@ products.ts ──→ types/product.ts</div>
       <p><code>import type</code>을 쓰면 타입만 가져온다는 뜻이 분명해지고, 빌드 결과에서도 빠집니다.</p>
       <pre><code class="language-typescript">import type { Product } from '../types/product';</code></pre>
     </div>
-  </section>
+  
 
-  <!-- ================= MODULE 5 ================= -->
-  <section class="module" id="m5">
-    <h2><span class="num">5</span> 확장을 고려한 타입 설계</h2>
-    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
-      <li>역할에 맞는 타입 이름을 지을 수 있다.</li>
-      <li><code>as const</code>와 <code>typeof 배열[number]</code>로 값과 타입을 한 곳에서 관리할 수 있다.</li>
-      <li><code>Omit</code>으로 등록용 파생 타입을 만들 수 있다.</li>
-    </ul></div>
-
+    <h3 class="blk">③ 확장을 고려한 타입 설계</h3>
     <div class="concept">
       <p>앞으로 <b>상품 등록</b> 기능을 붙인다고 생각하고 타입을 다듬습니다.</p>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — product.ts</div>
       <span class="fname">src/types/product.ts</span>
-      <pre><code class="language-typescript">export const CATEGORIES = ['마우스', '키보드', '모니터', '주변기기', '음향'] as const;
+      <pre><code class="language-typescript">// 카테고리 타입 정의
+export type Category = "마우스" | "키보드" | "모니터" | "주변기기";
 
-export type Category = typeof CATEGORIES[number];
-
+// 상품 타입 정의
 export interface Product {
   id: number;
   pName: string;
@@ -447,36 +429,45 @@ export interface Product {
   description: string;
 }
 
-// 상품 등록 시 입력받는 값 (id는 저장할 때 생성)
-export type NewProduct = Omit&lt;Product, 'id'&gt;;</code></pre>
+// 상품 등록 시 입력받는 값
+// id는 자동으로 부여되므로 제외
+export type NewProduct = Omit&lt;Product, "id"&gt;;</code></pre>
     </div>
     <div class="concept">
-      <h3 class="blk">📖 ① 이름 바꾸기: <code>ProductProp</code> → <code>Product</code></h3>
-      <p><code>Prop</code>은 컴포넌트에 넘기는 값처럼 보이지만, 이 타입은 <b>상품 데이터 자체</b>입니다. 이름이 역할을 정확히 말해 주도록 바꿉니다.</p>
-    </div>
-    <div class="concept">
-      <h3 class="blk">📖 ② 카테고리 목록: <code>as const</code></h3>
-      <pre><code class="language-typescript">const CATEGORIES = ['마우스', '키보드'];           // string[]
-const CATEGORIES = ['마우스', '키보드'] as const;  // readonly ['마우스', '키보드']</code></pre>
-      <ul>
-        <li><code>as const</code>를 붙이면 값 하나하나가 그대로 타입이 됩니다.</li>
-        <li><code>typeof CATEGORIES[number]</code>는 배열 안의 값들을 모아 <code>'마우스' | '키보드' | ...</code> 타입을 만듭니다.</li>
-        <li><b>배열은 화면의 선택 목록(select)에, 타입은 검사에</b> 함께 쓸 수 있어 한 곳만 고치면 됩니다.</li>
-        <li>목록에 없는 카테고리를 적으면 바로 오류가 납니다.</li>
-      </ul>
-    </div>
-    <div class="concept">
-      <h3 class="blk">📖 ③ 등록용 타입: <code>Omit</code></h3>
+      <h3 class="blk">📖 등록용 타입: <code>Omit</code></h3>
       <p>사용자가 상품을 등록할 때는 번호(<code>id</code>)를 입력하지 않습니다. 번호는 저장할 때 만들어집니다.</p>
       <pre><code class="language-typescript">type NewProduct = Omit&lt;Product, 'id'&gt;;
 // { pName: string; category: Category; price: number; description: string; }</code></pre>
       <p><code>Product</code>를 고치면 <code>NewProduct</code>도 자동으로 따라 바뀝니다.</p>
     </div>
+    <div class="ex"><div class="lbl">💡 예제 — products.ts</div>
+      <span class="fname">src/datas/products.ts</span>
+      <pre><code class="language-typescript">import type { Product } from "../types/product";
+
+export const products: Product[] = [ 
+  { id: 1, pName: "무선 마우스", category: "마우스", price: 25000, description: "조용한 클릭음의 2.4GHz 무선 마우스" },
+  { id: 2, pName: "기계식 키보드", category: "키보드", price: 89000, description: "청축 스위치, RGB 백라이트" },
+  { id: 3, pName: "27인치 모니터", category: "모니터", price: 279000, description: "QHD 해상도, 165Hz 주사율" },
+  { id: 4, pName: "USB-C 허브", category: "주변기기", price: 39000, description: "HDMI·USB 3.0·SD 카드 지원 7in1" },
+  { id: 5, pName: "웹캠 FHD", category: "주변기기", price: 45000, description: "1080p 30fps, 자동 초점" },
+];</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — 분리한 데이터 · 타입 가져오기</div>
+      <span class="fname">src/products/ProductList.tsx</span>
+      <pre><code class="language-tsx">import { products } from "../datas/products";</code></pre>
+      <span class="fname">src/products/ProductCard.tsx</span>
+      <pre><code class="language-tsx">import type { Product } from "../types/product";</code></pre>
+      <ul>
+        <li><code>ProductList</code>에 있던 상품 배열과 <code>Product</code> 인터페이스는 지우고, 분리한 파일에서 가져옵니다.</li>
+        <li>데이터(값)는 <code>import</code>, 타입만 가져올 때는 <code>import type</code>을 씁니다.</li>
+      </ul>
+    </div>
+  
   </section>
 
-  <!-- ================= MODULE 6 ================= -->
-  <section class="module" id="m6">
-    <h2><span class="num">6</span> Context로 상품 상태 공유</h2>
+  <!-- ================= MODULE 4 ================= -->
+  <section class="module" id="m4">
+    <h2><span class="num">4</span> Context로 상품 상태 공유</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
       <li>여러 화면이 함께 쓰는 상태가 왜 필요한지 설명할 수 있다.</li>
       <li>Context · Provider · 커스텀 훅을 파일로 나눠 상품 상태를 공유할 수 있다.</li>
@@ -490,26 +481,31 @@ const CATEGORIES = ['마우스', '키보드'] as const;  // readonly ['마우스
       <p>여러 화면이 같은 데이터를 함께 쓰려면 <b>공용 저장소</b>가 필요합니다. React의 <b>Context API</b>를 사용합니다.</p>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ① Context와 꺼내 쓰는 함수 만들기</div>
-      <span class="fname">src/contexts/ProductContext.ts</span>
-      <pre><code class="language-typescript">import { createContext, useContext } from 'react';
-import type { NewProduct, Product } from '../types/product';
+      <span class="fname">src/context/ProductContext.ts</span>
+      <pre><code class="language-typescript">import type { Product, NewProduct } from "../types/product";
+import { createContext, useContext } from "react";
 
-interface ProductContextValue {
+// 상품 컨텍스트 타입 정의
+interface ProductContextType {
   products: Product[];
-  addProduct: (product: NewProduct) =&gt; void;
+  addProduct: (newProduct: NewProduct) =&gt; void;
+  removeProduct: (productId: number) =&gt; void;
+  updateProduct: (updatedProduct: Product) =&gt; void;
 }
 
-export const ProductContext = createContext&lt;ProductContextValue | null&gt;(null);
+// 상품 컨텍스트 생성
+export const ProductContext = createContext&lt;ProductContextType | null&gt;(null);
 
-export const useProducts = () =&gt; {
+// 상품 컨텍스트 커스텀 훅
+export const useProduct = () =&gt; {
   const context = useContext(ProductContext);
   if (!context) {
-    throw new Error('useProducts는 ProductProvider 안에서 사용해야 합니다.');
+    throw new Error("useProduct는 ProductProvider 내부에서만 사용 가능합니다.");
   }
   return context;
-}</code></pre>
+};</code></pre>
       <ul>
-        <li>처음 값을 <code>null</code>로 두고, <code>useProducts</code> 안에서 <code>null</code>인지 확인합니다.</li>
+        <li>처음 값을 <code>null</code>로 두고, <code>useProduct</code> 안에서 <code>null</code>인지 확인합니다.</li>
         <li>덕분에 사용하는 쪽에서는 매번 <code>null</code> 검사를 하지 않아도 됩니다.</li>
         <li><code>Provider</code> 밖에서 실수로 쓰면 <b>어디가 잘못됐는지 알려 주는 오류</b>가 납니다.</li>
       </ul>
@@ -525,46 +521,65 @@ export const initialProducts: Product[] = [
   // ...
 ];</code></pre>
       <ul>
-        <li>4단계에서 만든 <code>Product</code> 타입을 가져와 붙입니다. <code>category</code>가 <code>CATEGORIES</code>에 없는 값이면 바로 오류가 납니다.</li>
+        <li>3단원에서 만든 <code>Product</code> 타입을 가져와 붙입니다. <code>category</code>가 <code>CATEGORIES</code>에 없는 값이면 바로 오류가 납니다.</li>
         <li>이제 이 배열은 Provider의 <b>처음 값</b>으로만 쓰므로 이름을 <code>initialProducts</code>로 바꿉니다.</li>
       </ul>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ② 저장소 컴포넌트(Provider) 만들기</div>
-      <span class="fname">src/contexts/ProductProvider.tsx</span>
-      <pre><code class="language-tsx">import { useState, type ReactNode } from 'react';
-import { ProductContext } from './ProductContext';
-import { initialProducts } from '../datas/products';
-import type { NewProduct, Product } from '../types/product';
+      <span class="fname">src/context/ProductProvider.tsx</span>
+      <pre><code class="language-tsx">import React, { useState} from "react";
+import type { Product, NewProduct } from "../types/product";
+import { initialProducts } from "../datas/products";
+import { ProductContext } from "./ProductContext";
 
-const ProductProvider = ({ children }: { children: ReactNode }) =&gt; {
+const ProductProvider = ({ children }: { children: React.ReactNode }) =&gt; {
+  // 상품 상태 관리
   const [products, setProducts] = useState&lt;Product[]&gt;(initialProducts);
 
-  const addProduct = (product: NewProduct) =&gt; {
-    setProducts((prev) =&gt; {
-      const nextId = Math.max(0, ...prev.map((p) =&gt; p.id)) + 1;
-      return [...prev, { ...product, id: nextId }];
-    });
-  }
+  // 상품 추가 함수
+  const addProduct = (newProduct: NewProduct) =&gt; {
+    // 새로운 상품에 고유 ID를 부여하고 상태 업데이트
+    const product: Product = { ...newProduct, id: Date.now() };
+    setProducts([...products, product]);
+  };
 
-  return(
-    &lt;ProductContext.Provider value={{ products, addProduct }}&gt;
+  // 상품 삭제 함수
+  const removeProduct = (productId: number) =&gt; {
+    // 삭제할 상품만 빼고 새 배열로 상태 업데이트
+    setProducts(products.filter((product) =&gt; product.id !== productId));
+  };
+
+  // 상품 수정 함수
+  const updateProduct = (updatedProduct: Product) =&gt; {
+    // id가 같은 상품만 수정된 상품으로 바꾸고 상태 업데이트
+    setProducts(products.map((product) =&gt;
+      product.id === updatedProduct.id ? updatedProduct : product
+    ));
+  };
+
+  return (
+    &lt;ProductContext.Provider value={{ products, addProduct, removeProduct, updateProduct }}&gt;
       {children}
     &lt;/ProductContext.Provider&gt;
-  )
+  );
 }
 
 export default ProductProvider;</code></pre>
       <ul>
-        <li>데이터 파일의 상품은 <b>처음 값(<code>initialProducts</code>)</b> 으로만 씁니다. 이름도 그 역할에 맞게 바꿉니다.</li>
-        <li><code>addProduct</code>는 <code>NewProduct</code>(id 없음)를 받아서, 가장 큰 id + 1로 번호를 붙여 저장합니다.</li>
-        <li><code>setProducts((prev) =&gt; ...)</code>처럼 <b>이전 값을 받아 계산</b>하면 여러 번 연달아 호출해도 안전합니다.</li>
-        <li>기존 배열을 고치지 않고 <code>[...prev, 새상품]</code>으로 <b>새 배열</b>을 만들어야 React가 변화를 알아챕니다.</li>
+        <li><code>useState&lt;Product[]&gt;(initialProducts)</code> — 데이터 파일의 상품을 <b>처음 값</b>으로만 쓰고, 이후 상품 목록은 이 상태(<code>products</code>)가 관리합니다. 그래서 데이터 파일의 이름도 <code>initialProducts</code>로 바꿉니다.</li>
+        <li><code>addProduct(newProduct: NewProduct)</code> — 등록 화면에서 <b>id가 없는</b> 상품(<code>NewProduct</code>)을 받습니다.</li>
+        <li><code>{ ...newProduct, id: Date.now() }</code> — 입력받은 값을 펼쳐 복사하고 <code>id</code>를 붙여 완성된 <code>Product</code>를 만듭니다. <code>Date.now()</code>는 현재 시각을 밀리초 숫자로 돌려주므로, 연습용 고유 번호로 쓸 수 있습니다.</li>
+        <li><code>const product: Product</code>처럼 타입을 적어 두면, 항목이 빠졌을 때 TypeScript가 바로 알려 줍니다.</li>
+        <li><code>setProducts([...products, product])</code> — 기존 배열을 고치지 않고 <b>새 배열</b>을 만들어야 React가 변화를 알아채고 화면을 다시 그립니다.</li>
+        <li><code>removeProduct(productId)</code> — <code>filter</code>로 삭제할 상품만 <b>뺀</b> 새 배열을 만듭니다.</li>
+        <li><code>updateProduct(updatedProduct)</code> — <code>map</code>으로 <code>id</code>가 같은 상품만 수정된 상품으로 <b>바꾼</b> 새 배열을 만듭니다.</li>
+        <li><code>value={{ products, addProduct, removeProduct, updateProduct }}</code> — ①의 <code>ProductContextType</code>에 적은 네 가지를 모두 넘겨야 타입 오류가 나지 않습니다. Provider 안의 모든 컴포넌트가 <code>useProduct()</code>로 꺼내 쓸 수 있습니다.</li>
       </ul>
-      <div class="tip"><span class="lbl">💡 왜 파일을 두 개로 나눴나요?</span> Vite의 빠른 새로고침(Fast Refresh)은 컴포넌트만 내보내는 파일에서 가장 잘 동작합니다. 컴포넌트(<code>ProductProvider</code>)와 컴포넌트가 아닌 것(<code>ProductContext</code>, <code>useProducts</code>)을 나눠 두면 저장할 때 화면 상태가 유지됩니다.</div>
+      <div class="tip"><span class="lbl">💡 왜 파일을 두 개로 나눴나요?</span> Vite의 빠른 새로고침(Fast Refresh)은 컴포넌트만 내보내는 파일에서 가장 잘 동작합니다. 컴포넌트(<code>ProductProvider</code>)와 컴포넌트가 아닌 것(<code>ProductContext</code>, <code>useProduct</code>)을 나눠 두면 저장할 때 화면 상태가 유지됩니다.</div>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ③ 앱 전체를 감싸기</div>
       <span class="fname">src/App.tsx</span>
-      <pre><code class="language-tsx">import ProductProvider from './contexts/ProductProvider';
+      <pre><code class="language-tsx">import ProductProvider from './context/ProductProvider';
 
 function App() {
 
@@ -584,18 +599,18 @@ function App() {
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ④ 목록 화면에서 꺼내 쓰기</div>
       <span class="fname">src/products/ProductList.tsx</span>
-      <pre><code class="language-tsx">import ProductCard from './ProductCard';
-import { useProducts } from '../contexts/ProductContext';
+      <pre><code class="language-tsx">import ProductCard from "./ProductCard";
+import { useProduct } from "../context/ProductContext";
 
 const ProductList = () =&gt; {
-  const { products } = useProducts();
+  const {products} = useProduct();
 
   return(
     &lt;div className='product-list'&gt;
       {products.map((product) =&gt; (
-        &lt;ProductCard
-          key={product.id}
-          product={product}
+        &lt;ProductCard 
+          key = {product.id}
+          product={product} 
         /&gt;
       ))}
     &lt;/div&gt;
@@ -604,17 +619,79 @@ const ProductList = () =&gt; {
 
 export default ProductList;</code></pre>
     </div>
-    <div class="ex"><div class="lbl">💡 예제 — ⑤ 상세 화면에서 꺼내 쓰기 (상품 상세 보기)</div>
+  </section>
+
+  <!-- ================= MODULE 5 ================= -->
+  <section class="module" id="m5">
+    <h2><span class="num">5</span> 상품 상세, 상품 등록</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li><code>useParams</code>로 주소의 상품 번호를 꺼내 상세 화면을 만들 수 있다.</li>
+      <li>입력 폼의 값을 상태로 관리하고, 검사한 뒤 <code>addProduct</code>로 저장할 수 있다.</li>
+      <li>상세 · 등록 화면의 경로를 추가하고 헤더 메뉴로 연결할 수 있다.</li>
+    </ul></div>
+
+    <div class="ex"><div class="lbl">💡 예제 — ① 경로와 메뉴 추가</div>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import './App.css'
+import Header from './layouts/Header';
+import ProductProvider from './context/ProductProvider';
+import ProductList from './products/ProductList';
+import ProductDetail from './products/ProductDetail';
+import AddProduct from './products/AddProduct';
+
+function App() {
+
+  return (
+    &lt;ProductProvider&gt;
+      &lt;BrowserRouter&gt;
+        &lt;Header /&gt;
+        &lt;main&gt;
+          &lt;Routes&gt;
+            &lt;Route path='/' element={&lt;ProductList /&gt;} /&gt;
+            &lt;Route path='/product/new' element={&lt;AddProduct /&gt;} /&gt;
+            {/* :id 자리에 상품 번호가 들어가고, useParams()로 꺼냅니다. */}
+            &lt;Route path='/product/:id' element={&lt;ProductDetail /&gt;} /&gt;
+          &lt;/Routes&gt;
+        &lt;/main&gt;
+      &lt;/BrowserRouter&gt;
+    &lt;/ProductProvider&gt;
+  )
+}
+
+export default App;</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>/product/new</code>와 <code>/product/:id</code>는 모양이 비슷하지만, React Router(v6 이상)는 <b>고정된 경로를 먼저</b> 고르므로 <code>new</code>가 상품 번호로 잘못 읽히지 않습니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ① 경로와 메뉴 추가 (헤더)</div>
+      <span class="fname">src/layouts/Header.tsx</span>
+      <pre><code class="language-tsx">import { Link } from "react-router-dom";
+
+const Header = () =&gt; {
+
+  return(
+    &lt;div className="header"&gt;
+      &lt;h1&gt;&lt;Link to='/'&gt;SPACE SHOP&lt;/Link&gt;&lt;/h1&gt;
+      &lt;nav&gt;
+        &lt;Link to='/'&gt;상품 목록&lt;/Link&gt;
+        &lt;Link to='/product/new'&gt;상품 등록&lt;/Link&gt;
+      &lt;/nav&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default Header;</code></pre>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ② 상세 화면에서 꺼내 쓰기 (상품 상세 보기)</div>
       <span class="fname">src/products/ProductDetail.tsx</span>
       <pre><code class="language-tsx">import { Link, useParams } from 'react-router-dom';
-import { useProducts } from '../contexts/ProductContext';
+import { useProduct } from '../context/ProductContext';
 
 const ProductDetail = () =&gt; {
   const { id } = useParams&lt;{ id: string }&gt;();
-  const { products } = useProducts();
+  const { products } = useProduct();
 
   // 해당 id와 일치하는 상품 찾기
-  const product = products.find((item) =&gt; item.id === Number(id));
+  const product = products.find((p) =&gt; p.id === Number(id));
 
   if (!product) {
     return (
@@ -627,11 +704,11 @@ const ProductDetail = () =&gt; {
 
   return (
     &lt;article className="product-detail"&gt;
-      &lt;Link to="/" className="product-detail__back"&gt;← 상품 목록&lt;/Link&gt;
-      &lt;span className="product-detail__category"&gt;{product.category}&lt;/span&gt;
+      &lt;Link to="/" className="product-detail_back"&gt;← 상품 목록&lt;/Link&gt;
+      &lt;span className="product-detail_category"&gt;{product.category}&lt;/span&gt;
       &lt;h2&gt;{product.pName}&lt;/h2&gt;
-      &lt;p className="product-detail__price"&gt;{product.price.toLocaleString()}원&lt;/p&gt;
-      &lt;p className="product-detail__desc"&gt;{product.description}&lt;/p&gt;
+      &lt;p className="product-detail_price"&gt;{product.price.toLocaleString()}원&lt;/p&gt;
+      &lt;p className="product-detail_desc"&gt;{product.description}&lt;/p&gt;
     &lt;/article&gt;
   );
 }
@@ -655,147 +732,148 @@ export default ProductDetail;</code></pre>
   flex-direction: column;
   gap: 12px;
 }
-.product-detail h2 { margin: 0; }
-.product-detail__back { font-size: 14px; color: var(--text); }
-.product-detail__back:hover { color: var(--accent); }
-.product-detail__category {
+.product-detail_category {
   /* flex 안에서 기본값(stretch)이면 가로로 꽉 차므로 글자 길이만큼만 차지하게 합니다. */
   align-self: flex-start;
   padding: 2px 10px;
-  border-radius: 999px;
+  border-radius: 20px;
   font-size: 13px;
   background: var(--accent-bg);
   color: var(--accent);
 }
-.product-detail__price { font-size: 24px; font-weight: 700; color: var(--text-h); }
-.product-detail__desc {
+.product-detail_price { font-size: 24px; font-weight: 700; color: var(--text-h); }
+.product-detail_desc {
   padding-top: 16px;
   border-top: 1px solid #ddd;
   line-height: 1.7;
 }</code></pre>
     </div>
-    <div class="ex"><div class="lbl">💡 예제 — ⑥ 등록 화면에서 addProduct 쓰기 (상품 등록)</div>
+    <div class="ex"><div class="lbl">💡 예제 — ③ 등록 화면에서 addProduct 쓰기 (상품 등록)</div>
       <span class="fname">src/products/AddProduct.tsx</span>
-      <pre><code class="language-tsx">import { useState, type ChangeEvent, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useProducts } from '../contexts/ProductContext';
-import { CATEGORIES, type Category } from '../types/product';
+      <pre><code class="language-tsx">import type { Category } from "../types/product";
+import { useProduct } from "../context/ProductContext";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-// 입력창의 값은 항상 문자열이므로 가격도 문자열로 받고, 등록할 때 숫자로 바꿉니다.
+// 상품 등록 폼 데이터 타입 정의
 interface ProductForm {
   pName: string;
   category: Category;
-  price: string;
+  price: number;
   description: string;
 }
 
+// 초기 폼 데이터
 const initialForm: ProductForm = {
-  pName: '',
-  category: CATEGORIES[0],
-  price: '',
-  description: '',
+  pName: "",
+  category: "마우스",
+  price: 0,
+  description: "",
 };
 
 const AddProduct = () =&gt; {
-  const { addProduct } = useProducts();
+  const {addProduct} = useProduct();
+  const [form, setForm] = useState&lt;ProductForm&gt;(initialForm);
+  const [error, setError] = useState&lt;string | null&gt;(null);
+
+  // 폼 데이터 구조 분해 할당
+  const {pName, category, price, description} = form;
   const navigate = useNavigate();
 
-  const [form, setForm] = useState&lt;ProductForm&gt;(initialForm);
-  const [error, setError] = useState('');
-
-  const { pName, category, price, description } = form;
-
-  // 입력창의 name과 form의 키를 같게 두어서 핸들러 하나로 모든 입력을 처리합니다.
-  const handleInputChange = (
-    e: ChangeEvent&lt;HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement&gt;
-  ) =&gt; {
+  // 입력값 변경 핸들러
+  const handleChange = (
+    e: React.ChangeEvent&lt;HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement&gt;) =&gt; {
     const { name, value } = e.target;
-    setForm((prev) =&gt; ({ ...prev, [name]: value }));
-  }
-
-  const handleSubmit = (e: FormEvent&lt;HTMLFormElement&gt;) =&gt; {
-    e.preventDefault();
-
-    const priceNumber = Number(price);
-
-    if (!pName.trim()) {
-      setError('상품명을 입력하세요.');
-      return;
-    }
-    if (!price || !Number.isInteger(priceNumber) || priceNumber &lt;= 0) {
-      setError('가격은 1원 이상의 정수로 입력하세요.');
-      return;
-    }
-
-    addProduct({
-      pName: pName.trim(),
-      category,
-      price: priceNumber,
-      description: description.trim(),
+    setForm({
+      ...form,
+      [name]: value
     });
-    alert("상품 등록을 성공했습니다.");
-    console.log("등록된 상품: ", form);
-    
+  };
+
+  // 폼 제출 핸들러
+  const handleSubmit = (e: React.FormEvent&lt;HTMLFormElement&gt;) =&gt; {
+    e.preventDefault();
+    // 유효성 검사
+    if(!pName.trim()){
+      setError("상품명을 입력해주세요.");
+      return;
+    }
+    if(!price || price &lt;= 0){
+      setError("가격을 올바르게 입력해주세요.");
+      return;
+    }
+    if(!description.trim()){
+      setError("설명을 입력해주세요.");
+      return;
+    }
+
+    // 상품 추가
+    addProduct({
+      pName, 
+      category, 
+      price: Number(price), 
+      description
+    });
+    alert("상품이 등록되었습니다.");
+    // 상품 목록 페이지로 이동
     navigate('/');
   }
 
+  // 폼 초기화 핸들러
   const handleCancel = () =&gt; {
-    navigate('/');
-  }
+    setForm(initialForm);
+    setError(null);
+  };
 
-  return(
-    &lt;div className="add-product"&gt;
+  return (
+    &lt;div className="product-add"&gt; 
       &lt;h2&gt;상품 등록&lt;/h2&gt;
       &lt;form onSubmit={handleSubmit}&gt;
         &lt;div&gt;
-          &lt;label htmlFor="pName"&gt;상품명&lt;/label&gt;
+          &lt;label htmlFor="pName"&gt;상품명:&lt;/label&gt;
           &lt;input
             type="text"
             id="pName"
             name="pName"
             value={pName}
-            onChange={handleInputChange}
-            placeholder="상품명을 입력하세요"
+            onChange={handleChange}
           /&gt;
         &lt;/div&gt;
         &lt;div&gt;
-          &lt;label htmlFor="category"&gt;카테고리&lt;/label&gt;
+          &lt;label htmlFor="category"&gt;카테고리:&lt;/label&gt;
           &lt;select
             id="category"
             name="category"
             value={category}
-            onChange={handleInputChange}
+            onChange={handleChange}
           &gt;
-            {CATEGORIES.map((item) =&gt; (
-              &lt;option key={item} value={item}&gt;{item}&lt;/option&gt;
-            ))}
+            &lt;option value="마우스"&gt;마우스&lt;/option&gt;
+            &lt;option value="키보드"&gt;키보드&lt;/option&gt;
+            &lt;option value="모니터"&gt;모니터&lt;/option&gt;
+            &lt;option value="주변기기"&gt;주변기기&lt;/option&gt;
           &lt;/select&gt;
         &lt;/div&gt;
         &lt;div&gt;
-          &lt;label htmlFor="price"&gt;가격&lt;/label&gt;
+          &lt;label htmlFor="price"&gt;가격:&lt;/label&gt;
           &lt;input
             type="number"
             id="price"
             name="price"
-            min={1}
             value={price}
-            onChange={handleInputChange}
-            placeholder="가격을 입력하세요"
+            onChange={handleChange}
           /&gt;
         &lt;/div&gt;
         &lt;div&gt;
-          &lt;label htmlFor="description"&gt;설명&lt;/label&gt;
+          &lt;label htmlFor="description"&gt;설명:&lt;/label&gt;
           &lt;textarea
             id="description"
             name="description"
-            rows={5}
             value={description}
-            onChange={handleInputChange}
-            placeholder="상품 설명을 입력하세요"
+            onChange={handleChange}
           /&gt;
         &lt;/div&gt;
-        {error &amp;&amp; &lt;p className="add-product__error"&gt;{error}&lt;/p&gt;}
-        &lt;div className="add-product__buttons"&gt;
+        {error &amp;&amp; &lt;p className="product-add_error"&gt;{error}&lt;/p&gt;}
+        &lt;div className="product-add_buttons"&gt;
           &lt;button type="submit"&gt;등록&lt;/button&gt;
           &lt;button type="button" onClick={handleCancel}&gt;취소&lt;/button&gt;
         &lt;/div&gt;
@@ -804,7 +882,7 @@ const AddProduct = () =&gt; {
   )
 }
 
-export default AddProduct;</code></pre>
+export default AddProduct</code></pre>
       <ul>
         <li><b>폼 전용 타입:</b> 입력창 값은 <code>type="number"</code>라도 <b>항상 문자열</b>이므로 <code>price</code>를 <code>string</code>으로 받고, 등록할 때 숫자로 바꿉니다.</li>
         <li><code>initialForm</code>을 컴포넌트 밖에 두면 렌더링할 때마다 새로 만들지 않습니다. 카테고리 처음 값은 <code>CATEGORIES[0]</code>으로 둡니다.</li>
@@ -820,7 +898,7 @@ export default AddProduct;</code></pre>
     <div class="ex"><div class="lbl">💡 예제 — App.css (상품 등록 스타일)</div>
       <span class="fname">src/App.css</span>
       <pre><code class="language-css">/* 상품 등록 스타일 */
-.add-product {
+.product-add {
   text-align: left;
   max-width: 640px;
   margin: 0 auto;
@@ -828,23 +906,23 @@ export default AddProduct;</code></pre>
   border-radius: 8px;
   padding: 32px;
 }
-.add-product form { display: flex; flex-direction: column; gap: 16px; }
-.add-product form &gt; div { display: flex; flex-direction: column; gap: 6px; }
-.add-product label { font-size: 14px; font-weight: 600; color: var(--text-h); }
-.add-product input,
-.add-product select,
-.add-product textarea {
+.product-add form { display: flex; flex-direction: column; gap: 16px; }
+.product-add form &gt; div { display: flex; flex-direction: column; gap: 6px; }
+.product-add label { font-size: 14px; font-weight: 600; color: var(--text-h); }
+.product-add input,
+.product-add select,
+.product-add textarea {
   /* 입력 요소는 부모의 글꼴을 물려받지 않으므로 직접 지정합니다. */
   font: inherit;
   padding: 8px 12px;
   border: 1px solid #ddd;
   border-radius: 6px;
 }
-.add-product textarea { resize: vertical; }
-.add-product__error { color: #d93025; font-size: 14px; }
-/* 위의 `.add-product form &gt; div`보다 우선하도록 선택자를 더 구체적으로 씁니다. */
-.add-product form &gt; .add-product__buttons { flex-direction: row; gap: 8px; justify-content: flex-end; }
-.add-product button {
+.product-add textarea { resize: vertical; }
+.product-add_error { color: #d93025; font-size: 14px; }
+/* 위의 `.product-add form &gt; div`보다 우선하도록 선택자를 더 구체적으로 씁니다. */
+.product-add form &gt; .product-add_buttons { flex-direction: row; gap: 8px; justify-content: flex-end; }
+.product-add button {
   font: inherit;
   padding: 8px 20px;
   border: 1px solid #ddd;
@@ -853,58 +931,7 @@ export default AddProduct;</code></pre>
   color: inherit;
   cursor: pointer;
 }
-.add-product button[type="submit"] { background: #222; border-color: #222; color: #fff; }</code></pre>
-    </div>
-    <div class="ex"><div class="lbl">💡 예제 — ⑦ 경로와 메뉴 추가</div>
-      <span class="fname">src/App.tsx</span>
-      <pre><code class="language-tsx">import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import './App.css'
-import Header from './layouts/Header';
-import ProductProvider from './contexts/ProductProvider';
-import ProductList from './products/ProductList';
-import ProductDetail from './products/ProductDetail';
-import AddProduct from './products/AddProduct';
-
-function App() {
-
-  return (
-    &lt;ProductProvider&gt;
-      &lt;BrowserRouter&gt;
-        &lt;Header /&gt;
-        &lt;main&gt;
-          &lt;Routes&gt;
-            &lt;Route path='/' element={&lt;ProductList /&gt;} /&gt;
-            &lt;Route path='/products/new' element={&lt;AddProduct /&gt;} /&gt;
-            {/* :id 자리에 상품 번호가 들어가고, useParams()로 꺼냅니다. */}
-            &lt;Route path='/products/:id' element={&lt;ProductDetail /&gt;} /&gt;
-          &lt;/Routes&gt;
-        &lt;/main&gt;
-      &lt;/BrowserRouter&gt;
-    &lt;/ProductProvider&gt;
-  )
-}
-
-export default App;</code></pre>
-      <div class="tip"><span class="lbl">💡 정리</span> <code>/products/new</code>와 <code>/products/:id</code>는 모양이 비슷하지만, React Router(v6 이상)는 <b>고정된 경로를 먼저</b> 고르므로 <code>new</code>가 상품 번호로 잘못 읽히지 않습니다.</div>
-    </div>
-    <div class="ex"><div class="lbl">💡 예제 — ⑦ 경로와 메뉴 추가 (헤더)</div>
-      <span class="fname">src/layouts/Header.tsx</span>
-      <pre><code class="language-tsx">import { Link } from "react-router-dom";
-
-const Header = () =&gt; {
-
-  return(
-    &lt;div className="header"&gt;
-      &lt;h1&gt;&lt;Link to='/'&gt;SPACE SHOP&lt;/Link&gt;&lt;/h1&gt;
-      &lt;nav&gt;
-        &lt;Link to='/'&gt;상품 목록&lt;/Link&gt;
-        &lt;Link to='/products/new'&gt;상품 등록&lt;/Link&gt;
-      &lt;/nav&gt;
-    &lt;/div&gt;
-  )
-}
-
-export default Header;</code></pre>
+.product-add button[type="submit"] { background: #222; border-color: #222; color: #fff; }</code></pre>
     </div>
     <div class="concept">
       <p>이제 구조는 이렇게 됩니다.</p>
@@ -915,10 +942,10 @@ export default Header;</code></pre>
     <div class="concept">
       <h3 class="blk">📖 최종 폴더 구조</h3>
       <div class="flow">src/
-├── App.tsx                  # ProductProvider로 앱 전체 감싸기, /products/new · /products/:id 경로
+├── App.tsx                  # ProductProvider로 앱 전체 감싸기, /product/new · /product/:id 경로
 ├── main.tsx
-├── contexts/
-│   ├── ProductContext.ts    # Context, useProducts
+├── context/
+│   ├── ProductContext.ts    # Context, useProduct
 │   └── ProductProvider.tsx  # 상품 상태와 addProduct
 ├── datas/
 │   └── products.ts          # 초기 상품 데이터
@@ -934,11 +961,11 @@ export default Header;</code></pre>
     </div>
   </section>
 
-  <!-- ================= MODULE 7 ================= -->
-  <section class="module" id="m7">
-    <h2><span class="num">7</span> 장바구니</h2>
+  <!-- ================= MODULE 6 ================= -->
+  <section class="module" id="m6">
+    <h2><span class="num">6</span> 장바구니</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
-      <li>장바구니에 상품 번호와 수량만 저장하는 이유를 설명하고 <code>CartItem</code>, <code>CartLine</code> 타입을 만들 수 있다.</li>
+      <li>장바구니에 상품 번호와 수량만 저장하는 이유를 설명하고 <code>CartItem</code> 타입을 만들 수 있다.</li>
       <li>상품과 같은 구조로 <code>CartContext</code>, <code>CartProvider</code>, <code>useCart</code>를 만들어 장바구니 상태를 공유할 수 있다.</li>
       <li>담기 · 수량 변경 · 삭제 · 전체 비우기 기능과 합계 수량 · 금액 계산을 구현할 수 있다.</li>
       <li>다른 Context를 쓰는 Provider를 <b>감싸는 순서</b>를 정할 수 있다.</li>
@@ -964,156 +991,155 @@ export default Header;</code></pre>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ① 장바구니 타입</div>
       <span class="fname">src/types/cart.ts</span>
-      <pre><code class="language-typescript">import type { Product } from './product';
-
-// 장바구니에는 상품 id와 수량만 저장하고, 상품 정보는 상품 목록에서 찾아 씁니다.
+      <pre><code class="language-typescript">// 장바구니 아이템 타입 정의
 export interface CartItem {
-  productId: number;
-  quantity: number;
-}
-
-// 화면에 보여줄 때 상품 정보와 합친 형태
-export interface CartLine {
-  product: Product;
-  quantity: number;
+  productId: number;  // 상품 ID
+  qty: number;  // 수량(quantity)
 }</code></pre>
-      <div class="tip"><span class="lbl">💡 정리</span> <code>CartItem</code>은 <b>저장용</b>(상품 번호 + 수량), <code>CartLine</code>은 <b>화면 표시용</b>(상품 정보 + 수량)입니다. 장바구니에 상품 정보 전체를 복사해 두지 않고 번호만 저장하므로, 상품 가격이나 이름이 바뀌어도 장바구니에는 항상 <b>최신 정보</b>가 나옵니다.</div>
+      <div class="tip"><span class="lbl">💡 정리</span> <code>CartItem</code>에는 <b>상품 번호(<code>productId</code>)와 수량(<code>qty</code>)만</b> 저장합니다. 상품명 · 가격은 화면에 보여 줄 때 상품 목록(<code>products</code>)에서 번호로 찾아 씁니다. 상품 정보를 복사해 두지 않으므로, 상품 가격이나 이름이 바뀌어도 장바구니에는 항상 <b>최신 정보</b>가 나옵니다.</div>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ② 장바구니 Context와 꺼내 쓰는 함수</div>
-      <span class="fname">src/contexts/CartContext.ts</span>
-      <pre><code class="language-typescript">import { createContext, useContext } from 'react';
-import type { CartLine } from '../types/cart';
+      <span class="fname">src/context/CartContext.ts</span>
+      <pre><code class="language-typescript">import type { CartItem } from '../types/cart'
+import { createContext, useContext } from 'react'
 
-interface CartContextValue {
-  cartLines: CartLine[];
+// 장바구니 컨텍스트 타입 정의
+interface CartContextType {
+  cartItems: CartItem[];  // 장바구니 아이템 배열
+  addToCart: (productId: number, qty: number) =&gt; void; 
+  updateQuantity: (productId: number, qty: number) =&gt; void;
+  removeFromCart: (productId: number) =&gt; void;
   totalQuantity: number;
   totalPrice: number;
-  addToCart: (productId: number, quantity?: number) =&gt; void;
-  updateQuantity: (productId: number, quantity: number) =&gt; void;
-  removeFromCart: (productId: number) =&gt; void;
   clearCart: () =&gt; void;
 }
 
-export const CartContext = createContext&lt;CartContextValue | null&gt;(null);
+// 장바구니 컨텍스트 생성
+export const CartContext = createContext&lt;CartContextType | null&gt;(null);
 
+// 장바구니 컨텍스트 커스텀 훅
 export const useCart = () =&gt; {
   const context = useContext(CartContext);
   if (!context) {
-    throw new Error('useCart는 CartProvider 안에서 사용해야 합니다.');
+    throw new Error('useCart는 CartProvider 내부에서만 사용 가능합니다.');
   }
   return context;
-}</code></pre>
-      <div class="tip"><span class="lbl">💡 정리</span> 상품의 <code>ProductContext.ts</code>와 같은 구조입니다. <code>quantity?: number</code>처럼 <code>?</code>를 붙이면 생략할 수 있는 매개변수가 되어 <code>addToCart(1)</code>로도, <code>addToCart(1, 3)</code>으로도 호출할 수 있습니다. 화면에는 <code>CartItem</code>이 아니라 상품 정보가 합쳐진 <code>CartLine[]</code>을 넘겨서 각 화면이 상품을 다시 찾지 않아도 되게 합니다.</div>
+};</code></pre>
+      <div class="tip"><span class="lbl">💡 정리</span> 상품의 <code>ProductContext.ts</code>와 같은 구조입니다. 장바구니 상태(<code>cartItems</code>), 바꾸는 함수(<code>addToCart</code>, <code>updateQuantity</code>, <code>removeFromCart</code>, <code>clearCart</code>), 계산한 값(<code>totalQuantity</code>, <code>totalPrice</code>)을 한 타입에 모아 둡니다. <code>addToCart(상품번호, 수량)</code>처럼 담을 수량도 함께 넘깁니다.</div>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ③ 장바구니 저장소 컴포넌트(Provider)</div>
-      <span class="fname">src/contexts/CartProvider.tsx</span>
-      <pre><code class="language-tsx">import { useState, type ReactNode } from 'react';
+      <span class="fname">src/context/CartProvider.tsx</span>
+      <pre><code class="language-tsx">import React, { useState } from 'react';
+import type { CartItem } from '../types/cart';
 import { CartContext } from './CartContext';
-import { useProducts } from './ProductContext';
-import type { CartItem, CartLine } from '../types/cart';
+import { useProduct } from './ProductContext';
 
-// 상품 목록이 필요하므로 ProductProvider 안쪽에 두어야 합니다.
-const CartProvider = ({ children }: { children: ReactNode }) =&gt; {
-  const { products } = useProducts();
-  const [items, setItems] = useState&lt;CartItem[]&gt;([]);
+const CartProvider = ({ children }: { children: React.ReactNode }) =&gt; {
+  const [cartItems, setCartItems] = useState&lt;CartItem[]&gt;([]);
+  const {products} = useProduct(); // 상품 목록 가져오기 (상품명 조회용)
 
-  // 이미 담긴 상품이면 수량만 늘리고, 없으면 새로 추가합니다.
-  const addToCart = (productId: number, quantity = 1) =&gt; {
-    setItems((prev) =&gt; {
-      const exists = prev.some((item) =&gt; item.productId === productId);
-      if (exists) {
-        return prev.map((item) =&gt;
+  // 장바구니에 상품 추가
+  const addToCart = (productId: number, qty: number) =&gt; {
+    setCartItems((prevItems) =&gt; {
+      // 이미 장바구니에 있는 상품인지 확인
+      const existingItem = prevItems.find((item) =&gt; item.productId === productId);
+      if (existingItem) {
+        // 이미 장바구니에 있는 상품이면 수량 업데이트
+        return prevItems.map((item) =&gt;
           item.productId === productId
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, qty: item.qty + qty }
             : item
         );
+      } else {
+        // 새로운 상품이면 장바구니에 추가
+        return [...prevItems, { productId, qty }];
       }
-      return [...prev, { productId, quantity }];
     });
-  }
+  };
 
-  // 수량은 1개 이상만 허용합니다. 빼려면 removeFromCart를 사용합니다.
-  const updateQuantity = (productId: number, quantity: number) =&gt; {
-    if (quantity &lt; 1) return;
-    setItems((prev) =&gt;
-      prev.map((item) =&gt;
-        item.productId === productId ? { ...item, quantity } : item
+  // 장바구니에서 상품 수량 업데이트
+  const updateQuantity = (productId: number, qty: number) =&gt; {
+    setCartItems((prevItems) =&gt;
+      prevItems.map((item) =&gt;
+        item.productId === productId ? { ...item, qty } : item
       )
     );
-  }
+  };
 
+  // 장바구니에서 상품 제거
   const removeFromCart = (productId: number) =&gt; {
-    setItems((prev) =&gt; prev.filter((item) =&gt; item.productId !== productId));
-  }
+    setCartItems((prevItems) =&gt;
+      prevItems.filter((item) =&gt; item.productId !== productId)
+    );
+  };
 
-  const clearCart = () =&gt; {
-    setItems([]);
-  }
+  // 총 수량 계산
+  const totalQuantity = cartItems.reduce((sum, item) =&gt; sum + item.qty, 0);
 
-  // 저장된 id로 상품 정보를 찾아 붙입니다. 찾을 수 없는 상품은 제외합니다.
-  const cartLines: CartLine[] = items.flatMap((item) =&gt; {
+  // 총 가격 계산
+  const totalPrice = cartItems.reduce((sum, item) =&gt; {
+    // productId로 상품 정보 찾기
     const product = products.find((p) =&gt; p.id === item.productId);
-    return product ? [{ product, quantity: item.quantity }] : [];
-  });
+    // 상품이 존재하면 가격 계산(가격 * 수량), 없으면 0 
+    return sum + (product ? product.price * item.qty : 0);
+  }, 0);
 
-  const totalQuantity = cartLines.reduce((sum, line) =&gt; sum + line.quantity, 0);
-  const totalPrice = cartLines.reduce(
-    (sum, line) =&gt; sum + line.product.price * line.quantity,
-    0
-  );
+  // 장바구니 비우기
+  const clearCart = () =&gt; {
+    setCartItems([]);
+  };
 
-  return(
-    &lt;CartContext.Provider
-      value={{
-        cartLines,
-        totalQuantity,
-        totalPrice,
-        addToCart,
-        updateQuantity,
-        removeFromCart,
-        clearCart,
-      }}
-    &gt;
+  return (
+    &lt;CartContext.Provider value={{ 
+      cartItems, 
+      addToCart, 
+      updateQuantity,
+      removeFromCart, 
+      totalQuantity, 
+      totalPrice,
+      clearCart
+    }}&gt;
       {children}
     &lt;/CartContext.Provider&gt;
-  )
-}
+  );
+};
 
 export default CartProvider;</code></pre>
       <ul>
-        <li><b>담기:</b> <code>some</code>으로 이미 담긴 상품인지 확인해서, 있으면 줄을 하나 더 만들지 않고 <b>수량만</b> 늘립니다. <code>quantity = 1</code>은 <b>기본값</b>이라 <code>addToCart(상품번호)</code>만 부르면 1개가 담깁니다.</li>
-        <li><code>map</code>으로 바꿀 항목만 <code>{ ...item, quantity: ... }</code> <b>새 객체</b>로 만들고, 나머지는 그대로 둡니다.</li>
-        <li><b>수량 변경:</b> 1보다 작으면 무시해서 <b>0개짜리 상품</b>이 남지 않게 합니다. 빼기는 <code>filter</code>로 해당 상품만 제외한 <b>새 배열</b>을 만듭니다.</li>
-        <li><b>계산할 수 있는 값은 상태로 두지 않기:</b> 총 수량 · 총 금액을 <code>useState</code>로 따로 두면 담을 때마다 함께 고쳐야 하고, 하나라도 빠뜨리면 숫자가 틀어집니다. <code>items</code>에서 매번 계산하면 <b>항상 맞는 값</b>이 나옵니다.</li>
-        <li><code>flatMap</code>은 찾은 상품은 <code>[값]</code>, 못 찾은 상품은 <code>[]</code>를 돌려받아 한 겹 펼치므로 <b>변환과 걸러내기를 한 번에</b> 합니다. <code>reduce</code>의 마지막 <code>0</code>은 시작 값입니다.</li>
+        <li><b>담기:</b> <code>find</code>로 이미 담긴 상품인지 확인해서, 있으면 줄을 하나 더 만들지 않고 <b>수량만</b> 늘립니다(<code>item.qty + qty</code>). 없으면 <code>{ productId, qty }</code>를 새로 추가합니다.</li>
+        <li><code>map</code>으로 바꿀 항목만 <code>{ ...item, qty: ... }</code> <b>새 객체</b>로 만들고, 나머지는 그대로 둡니다.</li>
+        <li><code>setCartItems((prevItems) =&gt; ...)</code>처럼 <b>이전 값을 받아</b> 계산하면 여러 번 연달아 담아도 안전합니다.</li>
+        <li><b>삭제:</b> <code>filter</code>로 해당 상품만 제외한 <b>새 배열</b>을 만듭니다. <b>비우기</b>는 빈 배열로 바꿉니다.</li>
+        <li><b>계산할 수 있는 값은 상태로 두지 않기:</b> 총 수량 · 총 금액을 <code>useState</code>로 따로 두면 담을 때마다 함께 고쳐야 하고, 하나라도 빠뜨리면 숫자가 틀어집니다. <code>cartItems</code>에서 매번 계산하면 <b>항상 맞는 값</b>이 나옵니다.</li>
+        <li><b>총 가격:</b> 장바구니에는 가격이 없으므로 <code>products.find</code>로 상품을 찾아 <code>가격 × 수량</code>을 더합니다. 그래서 <code>CartProvider</code> 안에서 <code>useProduct()</code>를 씁니다. <code>reduce</code>의 마지막 <code>0</code>은 시작 값입니다.</li>
       </ul>
-      <div class="tip"><span class="lbl">💡 참고</span> <code>map</code> 후 <code>filter</code>로 걸러도 됩니다. 다만 TypeScript 5.4 이하에서는 <code>undefined</code>가 빠졌다는 것을 알아채지 못해 타입이 <code>(CartLine | undefined)[]</code>로 남습니다(5.5부터는 자동으로 좁혀짐). <code>flatMap</code>은 버전과 관계없이 <code>CartLine[]</code>이 됩니다.</div>
+      <div class="tip"><span class="lbl">💡 참고</span> 지금 <code>updateQuantity</code>에는 수량 검사가 없어서 0이나 음수로도 바꿀 수 있습니다. 장바구니 화면에서 수량이 1이면 <code>−</code> 버튼을 <code>disabled</code>로 막아 두었지만, 함수에서도 <code>if (qty &lt; 1) return;</code>으로 한 번 더 막으면 더 안전합니다.</div>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ④ Provider 감싸는 순서와 경로 추가</div>
       <span class="fname">src/App.tsx</span>
-      <pre><code class="language-tsx">import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import './App.css'
-import Header from './layouts/Header';
-import ProductProvider from './contexts/ProductProvider';
-import CartProvider from './contexts/CartProvider';
-import ProductList from './products/ProductList';
-import ProductDetail from './products/ProductDetail';
-import AddProduct from './products/AddProduct';
-import Cart from './cart/Cart';
+      <pre><code class="language-tsx">import './App.css'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import ProductList from './products/ProductList'
+import Header from './layouts/Header'
+import ProductProvider from './context/ProductProvider'
+import ProductDetail from './products/ProductDetail'
+import AddProduct from './products/AddProduct'
+import Cart from './products/Cart'
+import CartProvider from './context/CartProvider'
 
 function App() {
 
   return (
     &lt;ProductProvider&gt;
-      {/* 장바구니는 상품 목록을 참조하므로 ProductProvider 안쪽에 둡니다. */}
+      {/* 장바구니는 상품 목록을 참조하므로 ProductProvider 내부에서 사용 */}
       &lt;CartProvider&gt;
         &lt;BrowserRouter&gt;
           &lt;Header /&gt;
           &lt;main&gt;
             &lt;Routes&gt;
               &lt;Route path='/' element={&lt;ProductList /&gt;} /&gt;
-              &lt;Route path='/products/new' element={&lt;AddProduct /&gt;} /&gt;
-              &lt;Route path='/products/:id' element={&lt;ProductDetail /&gt;} /&gt;
+              &lt;Route path='/product/:id' element={&lt;ProductDetail /&gt;} /&gt;
+              &lt;Route path='/product/new' element={&lt;AddProduct /&gt;} /&gt;
               &lt;Route path='/cart' element={&lt;Cart /&gt;} /&gt;
             &lt;/Routes&gt;
           &lt;/main&gt;
@@ -1123,102 +1149,100 @@ function App() {
   )
 }
 
-export default App;</code></pre>
-      <p><code>CartProvider</code>는 안에서 <code>useProducts()</code>를 쓰므로 <code>ProductProvider</code> <b>안쪽</b>에 있어야 합니다. 순서를 거꾸로 하면 <code>useProducts는 ProductProvider 안에서 사용해야 합니다.</code> 오류가 납니다. 6단원에서 넣어 둔 오류 메시지 덕분에 원인을 바로 알 수 있습니다.</p>
+export default App</code></pre>
+      <p><code>CartProvider</code>는 안에서 <code>useProduct()</code>를 쓰므로 <code>ProductProvider</code> <b>안쪽</b>에 있어야 합니다. 순서를 거꾸로 하면 <code>useProduct는 ProductProvider 내부에서만 사용 가능합니다.</code> 오류가 납니다. 4단원에서 넣어 둔 오류 메시지 덕분에 원인을 바로 알 수 있습니다.</p>
       <div class="flow">ProductProvider          ← products
-└── CartProvider         ← useProducts()로 products를 읽음
-    └── 화면들            ← useProducts(), useCart() 둘 다 사용 가능</div>
+└── CartProvider         ← useProduct()로 products를 읽음
+    └── 화면들            ← useProduct(), useCart() 둘 다 사용 가능</div>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ⑤ 장바구니 화면</div>
-      <span class="fname">src/cart/Cart.tsx</span>
-      <pre><code class="language-tsx">import { Link } from 'react-router-dom';
-import { useCart } from '../contexts/CartContext';
+      <span class="fname">src/products/Cart.tsx</span>
+      <pre><code class="language-tsx">import { useCart } from "../context/CartContext"; // 장바구니 컨텍스트 가져오기
+import { useProduct } from "../context/ProductContext"; // 상품 컨텍스트 가져오기
+import { Link } from "react-router-dom";
 
 const Cart = () =&gt; {
-  const {
-    cartLines,
-    totalQuantity,
-    totalPrice,
-    updateQuantity,
+  const { 
+    cartItems, 
+    updateQuantity, 
     removeFromCart,
-    clearCart,
-  } = useCart();
+    totalQuantity, 
+    totalPrice,
+    clearCart 
+  } = useCart(); // 장바구니 아이템 및 통계 정보 가져오기
+  const { products } = useProduct(); // 상품 목록 가져오기 (상품명 조회용)
 
-  if (cartLines.length === 0) {
-    return (
-      &lt;section className="cart"&gt;
-        &lt;h2&gt;장바구니&lt;/h2&gt;
-        &lt;p className="cart__empty"&gt;장바구니가 비어 있습니다.&lt;/p&gt;
-        &lt;Link to="/" className="cart__link"&gt;상품 보러 가기&lt;/Link&gt;
-      &lt;/section&gt;
-    );
-  }
-
-  const handleClear = () =&gt; {
-    if (confirm('장바구니를 모두 비울까요?')) {
+  // 장바구니 비우기 버튼 클릭 시
+  const handleClearCart = () =&gt; {
+    if (window.confirm('정말로 장바구니를 비우시겠습니까?')) {
       clearCart();
     }
-  }
+  };
 
   return (
     &lt;section className="cart"&gt;
       &lt;h2&gt;장바구니&lt;/h2&gt;
-      &lt;ul className="cart__list"&gt;
-        {cartLines.map(({ product, quantity }) =&gt; (
-          &lt;li key={product.id} className="cart__item"&gt;
-            &lt;div className="cart__info"&gt;
-              &lt;span className="cart__category"&gt;{product.category}&lt;/span&gt;
-              &lt;Link to={`/products/${product.id}`}&gt;{product.pName}&lt;/Link&gt;
-              &lt;span&gt;{product.price.toLocaleString()}원&lt;/span&gt;
-            &lt;/div&gt;
-            &lt;div className="cart__quantity"&gt;
-              &lt;button
-                type="button"
-                onClick={() =&gt; updateQuantity(product.id, quantity - 1)}
-                disabled={quantity &lt;= 1}
-              &gt;
-                −
-              &lt;/button&gt;
-              &lt;span&gt;{quantity}&lt;/span&gt;
-              &lt;button
-                type="button"
-                onClick={() =&gt; updateQuantity(product.id, quantity + 1)}
-              &gt;
-                +
-              &lt;/button&gt;
-            &lt;/div&gt;
-            &lt;strong className="cart__subtotal"&gt;
-              {(product.price * quantity).toLocaleString()}원
-            &lt;/strong&gt;
-            &lt;button
-              type="button"
-              className="cart__remove"
-              onClick={() =&gt; removeFromCart(product.id)}
-            &gt;
-              삭제
-            &lt;/button&gt;
-          &lt;/li&gt;
-        ))}
-      &lt;/ul&gt;
-      &lt;div className="cart__summary"&gt;
-        &lt;span&gt;총 {totalQuantity}개&lt;/span&gt;
-        &lt;strong&gt;{totalPrice.toLocaleString()}원&lt;/strong&gt;
-      &lt;/div&gt;
-      &lt;div className="cart__buttons"&gt;
-        &lt;button type="button" onClick={handleClear}&gt;전체 비우기&lt;/button&gt;
-        &lt;Link to="/" className="cart__link"&gt;쇼핑 계속하기&lt;/Link&gt;
-      &lt;/div&gt;
+      {cartItems.length === 0 ? (
+        &lt;p className="cart_empty"&gt;장바구니가 비어 있습니다.&lt;/p&gt;
+      ) : (
+        &lt;div&gt; 
+          &lt;ul className="cart_list"&gt;
+          {cartItems.map((item) =&gt; {
+            // productId로 상품 정보 찾기
+            const product = products.find((p) =&gt; p.id === item.productId);
+            return (
+              &lt;li key={item.productId} className="cart_item"&gt;
+                &lt;div className="cart_info"&gt;
+                  &lt;span className="cart_category"&gt;{product?.category}&lt;/span&gt;
+                  &lt;Link to={`/product/${product?.id}`}&gt;{product?.pName}&lt;/Link&gt;
+                &lt;/div&gt;
+                &lt;div className="cart_quantity"&gt;
+                  &lt;button 
+                    onClick={() =&gt; updateQuantity(item.productId, item.qty - 1)} 
+                    disabled={item.qty &lt;= 1}&gt;
+                    -
+                  &lt;/button&gt;
+                  &lt;span&gt;{item.qty}&lt;/span&gt;
+                  &lt;button 
+                    onClick={() =&gt; updateQuantity(item.productId, item.qty + 1)}&gt;
+                    +
+                  &lt;/button&gt;
+                &lt;/div&gt;
+                &lt;strong className="cart_subtotal"&gt;
+                  {product ? (product.price * item.qty).toLocaleString() : 0}원
+                &lt;/strong&gt;
+                &lt;button 
+                  className="cart_remove"
+                  onClick={() =&gt; removeFromCart(item.productId)}&gt;
+                  삭제  
+                &lt;/button&gt;
+              &lt;/li&gt;
+            );
+          })}
+          &lt;/ul&gt;
+          &lt;div className="cart_summary"&gt;
+            &lt;span&gt;총 {totalQuantity}개&lt;/span&gt;
+            &lt;strong&gt;{totalPrice.toLocaleString()}원&lt;/strong&gt;
+          &lt;/div&gt;
+          &lt;div className="cart_buttons"&gt;
+            &lt;button className="cart_clear" onClick={handleClearCart}&gt;전체 비우기&lt;/button&gt; 
+            &lt;Link to="/" className="cart_link"&gt;쇼핑 계속하기&lt;/Link&gt;
+          &lt;/div&gt;
+          &lt;button className="cart_order"&gt;주문하기&lt;/button&gt;
+        &lt;/div&gt;
+      )}
     &lt;/section&gt;
-  );
+  )
 }
 
-export default Cart;</code></pre>
+export default Cart</code></pre>
       <ul>
-        <li><b>비어 있을 때를 먼저 처리하고 <code>return</code></b> 합니다. 아래 코드는 상품이 있다고 생각하고 쓸 수 있습니다.</li>
-        <li><code>map(({ product, quantity }) =&gt; ...)</code>처럼 매개변수 자리에서 바로 <b>구조 분해</b>할 수 있습니다.</li>
-        <li>− 버튼은 수량이 1이면 <code>disabled</code>로 막습니다. Provider에서도 막아 두었지만 <b>누를 수 없다는 것을 화면으로 보여 주는 것</b>이 더 친절합니다.</li>
+        <li><code>cartItems.length === 0 ? (빈 화면) : (목록)</code>처럼 <b>삼항 연산자</b>로 비어 있을 때와 아닐 때를 나눠 그립니다.</li>
+        <li><code>cartItems</code>에는 번호와 수량만 있으므로, 줄마다 <code>products.find</code>로 상품 정보를 찾아 상품명 · 카테고리 · 소계를 보여 줍니다.</li>
+        <li><code>product?.pName</code>의 <code>?.</code>(옵셔널 체이닝)는 상품을 못 찾아 <code>product</code>가 <code>undefined</code>일 때 오류 대신 <code>undefined</code>를 돌려줍니다.</li>
+        <li><code>−</code> 버튼은 수량이 1이면 <code>disabled</code>로 막습니다. <b>누를 수 없다는 것을 화면으로 보여 주는 것</b>이 사용자에게 더 친절합니다.</li>
         <li>소계(<code>가격 × 수량</code>)도 저장하지 않고 화면에서 바로 계산합니다.</li>
-        <li>전체 비우기는 되돌릴 수 없으므로 <code>confirm</code>으로 한 번 더 묻습니다.</li>
+        <li>전체 비우기는 되돌릴 수 없으므로 <code>window.confirm</code>으로 한 번 더 묻습니다. <b>주문하기</b> 버튼은 아직 동작 없이 자리만 만들어 둡니다.</li>
       </ul>
     </div>
     <div class="concept">
@@ -1227,24 +1251,31 @@ export default Cart;</code></pre>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ⑥ 상품 카드에 담기 버튼</div>
       <span class="fname">src/products/ProductCard.tsx</span>
-      <pre><code class="language-tsx">import { Link } from 'react-router-dom';
-import { useCart } from '../contexts/CartContext';
-import type { Product } from '../types/product';
+      <pre><code class="language-tsx">import { Link } from "react-router-dom";
+import type { Product } from "../types/product";
+import { useCart } from "../context/CartContext";
 
-interface ProductCardProps {
+// ProductCard 컴포넌트 타입 정의
+interface ProductCard{
   product: Product;
 }
 
-const ProductCard = ({ product }: ProductCardProps) =&gt; {
-  const { addToCart } = useCart();
+const ProductCard = ({product}: ProductCard) =&gt; {
+  const { addToCart } = useCart(); // 장바구니 추가 함수 가져오기
 
   return(
-    &lt;div className="card"&gt;
+    &lt;div className="product-card"&gt;
       &lt;span&gt;{product.category}&lt;/span&gt;
-      {/* 상품명을 누르면 상세 화면으로 이동합니다. */}
-      &lt;h3&gt;&lt;Link to={`/products/${product.id}`}&gt;{product.pName}&lt;/Link&gt;&lt;/h3&gt;
+      &lt;h3&gt;&lt;Link to={`/product/${product.id}`}&gt;{product.pName}&lt;/Link&gt;&lt;/h3&gt;
       &lt;p&gt;{product.price.toLocaleString()}원&lt;/p&gt;
-      &lt;button type="button" onClick={() =&gt; addToCart(product.id)}&gt;장바구니 담기&lt;/button&gt;
+      &lt;button 
+        onClick={() =&gt; {
+          addToCart(product.id, 1);
+          alert(`${product.pName} 상품이 장바구니에 담겼습니다.`);
+        }}
+      &gt;
+        담기
+      &lt;/button&gt;
     &lt;/div&gt;
   )
 }
@@ -1254,55 +1285,50 @@ export default ProductCard;</code></pre>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ⑥ 상품 상세에 담기 버튼</div>
       <span class="fname">src/products/ProductDetail.tsx</span>
-      <pre><code class="language-tsx">import { Link, useParams } from 'react-router-dom';
-import { useProducts } from '../contexts/ProductContext';
-import { useCart } from '../contexts/CartContext';
+      <pre><code class="language-tsx">import { Link } from "react-router-dom"
+import { useParams } from "react-router-dom"
+import { useProduct } from "../context/ProductContext"
+import { useCart } from "../context/CartContext"
 
 const ProductDetail = () =&gt; {
-  const { id } = useParams&lt;{ id: string }&gt;();
-  const { products } = useProducts();
-  const { addToCart } = useCart();
+  const {id} = useParams&lt;{id: string}&gt;()
+  const {products} = useProduct();
+  const { addToCart } = useCart(); // 장바구니 추가 함수 가져오기
 
-  // 해당 id와 일치하는 상품 찾기
-  const product = products.find((item) =&gt; item.id === Number(id));
+  // id에 해당하는 상품을 찾음
+  const product = products.find((p) =&gt; p.id === Number(id));
 
   if (!product) {
-    return (
-      &lt;section className="product-detail"&gt;
-        &lt;h2&gt;상품을 찾을 수 없습니다.&lt;/h2&gt;
-        &lt;Link to="/"&gt;상품 목록으로 돌아가기&lt;/Link&gt;
-      &lt;/section&gt;
-    );
+    return &lt;div&gt;상품을 찾을 수 없습니다.&lt;/div&gt;;
   }
 
   return (
     &lt;article className="product-detail"&gt;
-      &lt;Link to="/" className="product-detail__back"&gt;← 상품 목록&lt;/Link&gt;
-      &lt;span className="product-detail__category"&gt;{product.category}&lt;/span&gt;
+      &lt;Link to='/'&gt;← 상품 목록&lt;/Link&gt;
+      &lt;span className="product-detail_category"&gt;{product.category}&lt;/span&gt;
       &lt;h2&gt;{product.pName}&lt;/h2&gt;
-      &lt;p className="product-detail__price"&gt;{product.price.toLocaleString()}원&lt;/p&gt;
-      &lt;p className="product-detail__desc"&gt;{product.description}&lt;/p&gt;
-      &lt;button
-        type="button"
-        className="product-detail__cart"
+      &lt;p className="product-detail_price"&gt;{product.price.toLocaleString()}원&lt;/p&gt;
+      &lt;p className="product-detail_desc"&gt;{product.description}&lt;/p&gt;
+      &lt;button 
+        className="product-detail_cart"
         onClick={() =&gt; {
-          addToCart(product.id);
-          alert('장바구니에 담았습니다.');
+          addToCart(product.id, 1);
+          alert(`${product.pName} 상품이 장바구니에 담겼습니다.`);
         }}
       &gt;
-        장바구니 담기
+        장바구니
       &lt;/button&gt;
     &lt;/article&gt;
-  );
+  )
 }
 
-export default ProductDetail;</code></pre>
+export default ProductDetail</code></pre>
       <div class="tip"><span class="lbl">💡 주의</span> <code>useCart()</code>도 Hook이므로 <code>if (!product) return</code> <b>위에서</b> 불러야 합니다. Hook은 조건문이나 <code>return</code> 뒤에서 부를 수 없습니다.</div>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ⑥ 헤더에 장바구니 개수 표시</div>
       <span class="fname">src/layouts/Header.tsx</span>
       <pre><code class="language-tsx">import { Link } from "react-router-dom";
-import { useCart } from "../contexts/CartContext";
+import { useCart } from "../context/CartContext";
 
 const Header = () =&gt; {
   const { totalQuantity } = useCart();
@@ -1312,7 +1338,7 @@ const Header = () =&gt; {
       &lt;h1&gt;&lt;Link to='/'&gt;SPACE SHOP&lt;/Link&gt;&lt;/h1&gt;
       &lt;nav&gt;
         &lt;Link to='/'&gt;상품 목록&lt;/Link&gt;
-        &lt;Link to='/products/new'&gt;상품 등록&lt;/Link&gt;
+        &lt;Link to='/product/new'&gt;상품 등록&lt;/Link&gt;
         &lt;Link to='/cart'&gt;장바구니 ({totalQuantity})&lt;/Link&gt;
       &lt;/nav&gt;
     &lt;/div&gt;
@@ -1329,9 +1355,10 @@ export default Header;</code></pre>
     <div class="ex"><div class="lbl">💡 예제 — ⑦ 장바구니 스타일</div>
       <span class="fname">src/App.css</span>
       <pre><code class="language-css">/* 장바구니 담기 버튼 */
-.card button,
-.product-detail__cart {
-  font: inherit;
+.product-card button,
+.product-detail_cart {
+  font: inherit; /* 부모의 글꼴을 물려받음 */
+  margin: 8px;
   padding: 8px 20px;
   border: 1px solid #222;
   border-radius: 6px;
@@ -1339,7 +1366,7 @@ export default Header;</code></pre>
   color: #fff;
   cursor: pointer;
 }
-.product-detail__cart { align-self: flex-end; }
+.product-detail_cart { align-self: flex-end; }
 
 /* 장바구니 스타일 */
 .cart {
@@ -1351,23 +1378,20 @@ export default Header;</code></pre>
   padding: 32px;
 }
 .cart h2 { margin-top: 0; }
-.cart__empty { color: var(--text); }
-.cart__link { color: var(--accent); }
-.cart__list { list-style: none; margin: 0; padding: 0; }
-.cart__item {
-  /* 상품 정보 | 수량 | 소계 | 삭제 를 한 줄에 배치합니다. */
-  display: grid;
-  grid-template-columns: 1fr auto 120px auto;
+.cart_empty { color: var(--text); }
+.cart_list { list-style: none; margin: 0; padding: 0; }
+.cart_item {
+  display: flex;
   align-items: center;
   gap: 16px;
   padding: 16px 0;
   border-bottom: 1px solid #ddd;
 }
-.cart__info { display: flex; flex-direction: column; gap: 4px; }
-.cart__category { font-size: 13px; color: var(--accent); }
-.cart__quantity { display: flex; align-items: center; gap: 8px; }
-.cart__quantity span { min-width: 24px; text-align: center; }
-.cart__subtotal { text-align: right; color: var(--text-h); }
+.cart_info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.cart_category { font-size: 13px; color: var(--accent); }
+.cart_quantity { display: flex; align-items: center; gap: 8px; }
+.cart_quantity span { min-width: 24px; text-align: center; }
+.cart_subtotal { width: 120px; text-align: right; color: var(--text-h); }
 .cart button {
   font: inherit;
   padding: 4px 12px;
@@ -1378,16 +1402,31 @@ export default Header;</code></pre>
   cursor: pointer;
 }
 .cart button:disabled { opacity: 0.4; cursor: not-allowed; }
-.cart__remove { color: #d93025 !important; }
-.cart__summary {
+.cart_remove { color: #d93025 !important; }
+.cart_summary {
   display: flex;
   justify-content: flex-end;
   align-items: baseline;
   gap: 16px;
   padding: 20px 0;
 }
-.cart__summary strong { font-size: 24px; color: var(--text-h); }
-.cart__buttons { display: flex; justify-content: space-between; align-items: center; }</code></pre>
+.cart_summary strong { font-size: 24px; color: var(--text-h); }
+.cart_buttons { display: flex; justify-content: space-between; align-items: center; }
+.cart_link { color: var(--accent); }
+/* 전체 비우기 줄 아래에 가로 전체 너비로 배치합니다.
+   `.cart button` 기본 스타일보다 우선하도록 선택자를 더 구체적으로 씁니다. */
+.cart .cart_order {
+  display: block; 
+  width: 100%; 
+  margin-top: 20px; 
+  padding: 12px;
+  border-radius: 6px;
+  background: rgb(3, 188, 65);
+  color: #eeeeee;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cart .cart_order:hover { background: #6fee6d; }</code></pre>
       <ul>
         <li>장바구니 한 줄은 <b>상품 정보 | 수량 | 소계 | 삭제</b> 네 칸이고 줄마다 너비를 맞춰야 하므로 <code>grid</code>를 씁니다.</li>
         <li><code>1fr</code>은 <b>남는 공간을 모두</b>, <code>auto</code>는 <b>내용 크기만큼</b>, <code>120px</code>은 <b>고정 너비</b>입니다. 소계 칸을 고정하면 금액 자릿수가 달라도 위치가 맞습니다.</li>
@@ -1402,9 +1441,7 @@ export default Header;</code></pre>
       <h3 class="blk">📖 최종 폴더 구조</h3>
       <div class="flow">src/
 ├── App.tsx                  # ProductProvider &gt; CartProvider 순서로 감싸기, /cart 경로
-├── cart/
-│   └── Cart.tsx             # 장바구니 화면
-├── contexts/
+├── context/
 │   ├── CartContext.ts       # Context, useCart
 │   ├── CartProvider.tsx     # 장바구니 상태와 담기/수량/삭제/비우기
 │   ├── ProductContext.ts
@@ -1415,11 +1452,12 @@ export default Header;</code></pre>
 │   └── Header.tsx           # 장바구니 개수 표시
 ├── products/
 │   ├── AddProduct.tsx
+│   ├── Cart.tsx             # 장바구니 화면
 │   ├── ProductCard.tsx      # 담기 버튼
 │   ├── ProductDetail.tsx    # 담기 버튼
 │   └── ProductList.tsx
 └── types/
-    ├── cart.ts              # CartItem, CartLine
+    ├── cart.ts              # CartItem
     └── product.ts</div>
     </div>
     <div class="concept">
@@ -1454,9 +1492,9 @@ useEffect(() =&gt; {
     </div>
   </section>
 
-  <!-- ================= MODULE 8 ================= -->
-  <section class="module" id="m8">
-    <h2><span class="num">8</span> 로그인, 회원가입</h2>
+  <!-- ================= MODULE 7 ================= -->
+  <section class="module" id="m7">
+    <h2><span class="num">7</span> 로그인, 회원가입</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
       <li>회원 타입을 설계하고 <code>as const</code>, <code>Omit</code>으로 역할과 가입 입력값 타입을 만들 수 있다.</li>
       <li>로그인한 사용자를 <b>id만 저장</b>하고, 나머지 정보는 회원 목록에서 찾아 쓸 수 있다.</li>
@@ -1501,7 +1539,7 @@ export const initialUsers: User[] = [
       <div class="tip"><span class="lbl">💡 주의</span> 브라우저 코드에 들어간 데이터는 누구나 개발자 도구로 볼 수 있습니다. 이 파일은 <b>화면 흐름을 연습하기 위한 것</b>이며, 실제 서비스에서는 회원 정보를 서버(DB)에 두고 비밀번호는 암호화해 보관합니다.</div>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ③ 회원 Context와 꺼내 쓰는 함수</div>
-      <span class="fname">src/contexts/UserContext.ts</span>
+      <span class="fname">src/context/UserContext.ts</span>
       <pre><code class="language-typescript">import { createContext, useContext } from 'react';
 import type { NewUser, User } from '../types/user';
 
@@ -1530,7 +1568,7 @@ export const useUser = () =&gt; {
       </ul>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ④ 회원 저장소 컴포넌트(Provider)</div>
-      <span class="fname">src/contexts/UserProvider.tsx</span>
+      <span class="fname">src/context/UserProvider.tsx</span>
       <pre><code class="language-tsx">import { useState, type ReactNode } from 'react';
 import { UserContext } from './UserContext';
 import { initialUsers } from '../datas/users';
@@ -1587,13 +1625,13 @@ export default UserProvider;</code></pre>
       <pre><code class="language-tsx">import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css'
 import Header from './layouts/Header';
-import UserProvider from './contexts/UserProvider';
-import ProductProvider from './contexts/ProductProvider';
-import CartProvider from './contexts/CartProvider';
+import UserProvider from './context/UserProvider';
+import ProductProvider from './context/ProductProvider';
+import CartProvider from './context/CartProvider';
 import ProductList from './products/ProductList';
 import ProductDetail from './products/ProductDetail';
 import AddProduct from './products/AddProduct';
-import Cart from './cart/Cart';
+import Cart from './products/Cart';
 import SignIn from './users/SignIn';
 import SignUp from './users/SignUp';
 
@@ -1609,8 +1647,8 @@ function App() {
             &lt;main&gt;
               &lt;Routes&gt;
                 &lt;Route path='/' element={&lt;ProductList /&gt;} /&gt;
-                &lt;Route path='/products/new' element={&lt;AddProduct /&gt;} /&gt;
-                &lt;Route path='/products/:id' element={&lt;ProductDetail /&gt;} /&gt;
+                &lt;Route path='/product/new' element={&lt;AddProduct /&gt;} /&gt;
+                &lt;Route path='/product/:id' element={&lt;ProductDetail /&gt;} /&gt;
                 &lt;Route path='/cart' element={&lt;Cart /&gt;} /&gt;
                 &lt;Route path='/signin' element={&lt;SignIn /&gt;} /&gt;
                 &lt;Route path='/signup' element={&lt;SignUp /&gt;} /&gt;
@@ -1630,14 +1668,14 @@ export default App;</code></pre>
       </ul>
       <div class="flow">UserProvider             ← currentUser, signIn, signOut, signUp
 └── ProductProvider      ← products
-    └── CartProvider     ← useProducts()로 products를 읽음
-        └── 화면들        ← useUser(), useProducts(), useCart() 모두 사용 가능</div>
+    └── CartProvider     ← useProduct()로 products를 읽음
+        └── 화면들        ← useUser(), useProduct(), useCart() 모두 사용 가능</div>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ⑥ 로그인 화면</div>
       <span class="fname">src/users/SignIn.tsx</span>
       <pre><code class="language-tsx">import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../contexts/UserContext';
+import { useUser } from '../context/UserContext';
 import { Link } from 'react-router-dom';
 
 interface SignInForm {
@@ -1710,7 +1748,7 @@ const SignIn = () =&gt; {
             autoComplete="current-password"
           /&gt;
         &lt;/div&gt;
-        {error &amp;&amp; &lt;p className="sign-in__error"&gt;{error}&lt;/p&gt;}
+        {error &amp;&amp; &lt;p className="sign-in_error"&gt;{error}&lt;/p&gt;}
         &lt;button type="submit"&gt;로그인&lt;/button&gt;
       &lt;/form&gt;
 
@@ -1738,8 +1776,8 @@ export default SignIn;</code></pre>
     <div class="ex"><div class="lbl">💡 예제 — ⑦ 헤더에 로그인 상태 표시</div>
       <span class="fname">src/layouts/Header.tsx</span>
       <pre><code class="language-tsx">import { Link } from "react-router-dom";
-import { useCart } from "../contexts/CartContext";
-import { useUser } from "../contexts/UserContext";
+import { useCart } from "../context/CartContext";
+import { useUser } from "../context/UserContext";
 
 const Header = () =&gt; {
   const { totalQuantity } = useCart();
@@ -1750,7 +1788,7 @@ const Header = () =&gt; {
       &lt;h1&gt;&lt;Link to='/'&gt;SPACE SHOP&lt;/Link&gt;&lt;/h1&gt;
       &lt;nav&gt;
         &lt;Link to='/'&gt;상품 목록&lt;/Link&gt;
-        &lt;Link to='/products/add'&gt;상품 등록&lt;/Link&gt;
+        &lt;Link to='/product/new'&gt;상품 등록&lt;/Link&gt;
         &lt;Link to='/cart'&gt;장바구니 ({totalQuantity})&lt;/Link&gt;
         {currentUser ? (
           &lt;&gt;
@@ -1794,7 +1832,7 @@ Header 로그아웃 버튼 클릭 → signOut() → setCurrentUserId(null)
       <span class="fname">src/users/SignUp.tsx</span>
       <pre><code class="language-tsx">import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useUser } from '../contexts/UserContext';
+import { useUser } from '../context/UserContext';
 
 interface SignUpForm {
   username: string;
@@ -1936,7 +1974,7 @@ const SignUp = () =&gt; {
             autoComplete="email"
           /&gt;
         &lt;/div&gt;
-        {error &amp;&amp; &lt;p className="sign-in__error"&gt;{error}&lt;/p&gt;}
+        {error &amp;&amp; &lt;p className="sign-in_error"&gt;{error}&lt;/p&gt;}
         &lt;button type="submit"&gt;회원가입&lt;/button&gt;
       &lt;/form&gt;
 
@@ -1991,7 +2029,7 @@ export default SignUp;</code></pre>
   border: 1px solid #ddd;
   border-radius: 6px;
 }
-.sign-in__error { margin: 0; color: #d93025; font-size: 14px; }
+.sign-in_error { margin: 0; color: #d93025; font-size: 14px; }
 .sign-in button {
   font: inherit;
   padding: 10px 20px;
