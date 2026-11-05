@@ -154,7 +154,7 @@ hue-6-2: #e6c07b
 <header class="hero">
   <div class="eyebrow">React 심화 · Chapter 10 · 학습 교안</div>
   <h1>쇼핑 사이트 개발 및 운영</h1>
-  <p><b>1. 상품 목록 만들기와 확장을 고려한 설계</b> — React + TypeScript로 쇼핑몰의 상품 목록을 만들고, Context로 상품 상태를 공유해 <b>상품 상세 · 상품 등록</b> 화면을 붙입니다.<br><b>2. 장바구니 만들기</b> — 같은 Context 구조를 따라 <b>장바구니</b>를 만들고, 목록 · 상세 · 헤더 · 장바구니 화면이 같은 상태를 함께 씁니다.<br><b>3. 회원가입, 로그인</b> — 회원 타입과 연습용 회원 데이터를 만들고, 회원가입 · 로그인 화면을 붙입니다.</p>
+  <p><b>1. 상품 목록 만들기와 확장을 고려한 설계</b> — React + TypeScript로 쇼핑몰의 상품 목록을 만들고, Context로 상품 상태를 공유해 <b>상품 상세 · 상품 등록</b> 화면을 붙입니다.<br><b>2. 장바구니 만들기</b> — 같은 Context 구조를 따라 <b>장바구니</b>를 만들고, 목록 · 상세 · 헤더 · 장바구니 화면이 같은 상태를 함께 씁니다.<br><b>3. 회원가입, 로그인</b> — 회원 타입과 연습용 회원 데이터를 만들고, 회원가입 · 로그인 화면을 붙입니다.<br><b>4. 관리자 페이지</b> — 회원 권한(<code>role</code>)으로 관리자 메뉴와 대시보드를 만듭니다.</p>
   <div class="tags">
     <span>🏷️ React + TypeScript</span>
     <span>🏷️ Props 타입</span>
@@ -176,6 +176,7 @@ hue-6-2: #e6c07b
       <li><a href="#m5">상품 상세, 상품 등록</a></li>
       <li><a href="#m6">장바구니</a></li>
       <li><a href="#m7">회원가입, 로그인</a></li>
+      <li><a href="#m8">관리자 페이지</a></li>
     </ol>
   </nav>
 
@@ -203,6 +204,7 @@ hue-6-2: #e6c07b
         <tr><td>4</td><td>상품 상세, 상품 등록</td><td><code>ProductDetail.tsx</code>, <code>AddProduct.tsx</code>, <code>App.tsx</code>, <code>Header.tsx</code>, <code>App.css</code></td></tr>
         <tr><td>5</td><td>장바구니</td><td><code>types/cart.ts</code>, <code>context/Cart*</code>, <code>products/Cart.tsx</code>, <code>ProductCard.tsx</code>, <code>ProductDetail.tsx</code>, <code>Header.tsx</code>, <code>App.css</code></td></tr>
         <tr><td>6</td><td>회원가입, 로그인</td><td><code>types/user.ts</code>, <code>datas/users.ts</code>, <code>context/User*</code>, <code>App.tsx</code>, <code>users/SignIn.tsx</code>, <code>users/SignUp.tsx</code>, <code>Header.tsx</code>, <code>App.css</code></td></tr>
+        <tr><td>7</td><td>관리자 페이지</td><td><code>App.tsx</code>, <code>Header.tsx</code>, <code>admin/AdminPage.tsx</code>, <code>App.css</code></td></tr>
       </table>
     </div>
     <div class="concept">
@@ -2172,6 +2174,316 @@ Header 로그아웃 버튼 클릭 → logout() → setCurrentUser(null)
         <li>로그인 실패 메시지는 아이디와 비밀번호 중 <b>무엇이 틀렸는지 알려 주지 않는다.</b></li>
         <li>로그아웃은 <code>currentUser</code>를 <code>null</code>로 비우는 것뿐이고, 헤더는 <b>조건부 렌더링</b>으로 자동으로 바뀐다.</li>
         <li>회원가입은 입력값을 <b>위에서부터 하나씩 검사</b>하고, 아이디 중복은 저장 전에 <code>users</code>로 확인한다.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 8 ================= -->
+  <section class="module" id="m8">
+    <h2><span class="num">8</span> 관리자 페이지</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>로그인한 회원의 권한(<code>role</code>)에 따라 메뉴와 화면을 다르게 보여 줄 수 있다.</li>
+      <li>관리자 페이지(<code>/admin</code>) 경로를 추가하고, 주소로 직접 들어와도 권한을 검사할 수 있다.</li>
+      <li><code>filter</code> · <code>reduce</code> · <code>sort</code>로 상품 · 회원 통계를 계산할 수 있다.</li>
+    </ul></div>
+
+    <div class="concept">
+      <h3 class="blk">📖 무엇을 만들까?</h3>
+      <p>7단원에서 회원마다 <code>role</code>(<code>"user"</code> | <code>"admin"</code>)을 넣어 두었습니다. 이 값으로 <b>관리자만</b> 볼 수 있는 대시보드를 만듭니다. 상품과 회원 정보는 이미 Context에 있으므로 <code>useProduct()</code>, <code>useUser()</code>로 꺼내 쓰기만 하면 됩니다.</p>
+      <div class="flow">ProductProvider ── products ──┐
+                               ├──→ [AdminPage] 요약 카드 · 최근 상품 · 회원 목록
+UserProvider ── users, currentUser ┘
+                    └── currentUser.role === "admin" 일 때만 보여 줌</div>
+      <p>테스트 계정: <code>admin / a1234</code> (관리자), <code>hong / h1234</code> (일반 회원)</p>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ① 관리자 페이지 경로 추가</div>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import './App.css'
+import Header from './layouts/Header';
+import UserProvider from './context/UserProvider';
+import ProductProvider from './context/ProductProvider';
+import CartProvider from './context/CartProvider';
+import ProductList from './products/ProductList';
+import ProductDetail from './products/ProductDetail';
+import AddProduct from './products/AddProduct';
+import Cart from './products/Cart';
+import SignIn from './users/SignIn';
+import SignUp from './users/SignUp';
+import AdminPage from './admin/AdminPage';
+
+function App() {
+
+  return (
+    // UserProvider를 최상위 컴포넌트로 감싸서 로그인 상태를 전역으로 관리
+    &lt;UserProvider&gt;
+      &lt;ProductProvider&gt;
+        &lt;CartProvider&gt;
+          &lt;BrowserRouter&gt;
+            &lt;Header /&gt;
+            &lt;main&gt;
+              &lt;Routes&gt;
+                &lt;Route path='/' element={&lt;ProductList /&gt;} /&gt;
+                &lt;Route path='/product/new' element={&lt;AddProduct /&gt;} /&gt;
+                &lt;Route path='/product/:id' element={&lt;ProductDetail /&gt;} /&gt;
+                &lt;Route path='/cart' element={&lt;Cart /&gt;} /&gt;
+                &lt;Route path='/signin' element={&lt;SignIn /&gt;} /&gt;
+                &lt;Route path='/signup' element={&lt;SignUp /&gt;} /&gt;
+                {/* 관리자 페이지 */}
+                &lt;Route path='/admin' element={&lt;AdminPage /&gt;} /&gt;
+              &lt;/Routes&gt;
+            &lt;/main&gt;
+          &lt;/BrowserRouter&gt;
+        &lt;/CartProvider&gt;
+      &lt;/ProductProvider&gt;
+    &lt;/UserProvider&gt;
+  )
+}
+
+export default App;</code></pre>
+      <ul>
+        <li><code>AdminPage</code>를 import하고 <code>/admin</code> 경로를 추가합니다. 나머지는 7단원 App.tsx와 같습니다.</li>
+      </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ② 헤더에 관리자 메뉴 표시</div>
+      <span class="fname">src/layouts/Header.tsx</span>
+      <pre><code class="language-tsx">import {Link} from 'react-router-dom'
+import { useCart } from '../context/CartContext';
+import { useUser } from '../context/UserContext';
+
+const Header = () =&gt; {
+    const {totalQuantity} = useCart();
+    const { currentUser, logout } = useUser();
+
+    // 관리자인지 확인 (로그아웃 상태면 currentUser가 null이므로 ?.로 접근)
+    const isAdmin = currentUser?.role === 'admin';
+
+    // 상품 등록은 관리자만 : 관리자가 아니면 링크 이동을 막고 안내
+    const handleAddClick = (e: React.MouseEvent&lt;HTMLAnchorElement&gt;) =&gt; {
+        if (!isAdmin) {
+            e.preventDefault();
+            alert('상품 등록은 관리자만 가능합니다.');
+        }
+    };
+
+    return(
+        &lt;header className='header'&gt;
+            &lt;h1&gt;
+                &lt;Link to='/'&gt;SPACE SHOP&lt;/Link&gt;
+            &lt;/h1&gt;
+            &lt;nav&gt;
+                &lt;Link to='/'&gt;상품 목록&lt;/Link&gt;
+                &lt;Link to='/product/new' onClick={handleAddClick}&gt;상품 등록&lt;/Link&gt;
+                &lt;Link to='/cart'&gt;장바구니({totalQuantity})&lt;/Link&gt;
+                {/* 관리자에게만 관리자 메뉴 표시 */}
+                {isAdmin &amp;&amp; &lt;Link to='/admin'&gt;관리자&lt;/Link&gt;}
+                {currentUser ? (
+                    &lt;&gt;
+                        &lt;span&gt;{currentUser.name}님&lt;/span&gt;
+                        &lt;button onClick={logout}&gt;로그아웃&lt;/button&gt;
+                    &lt;/&gt;
+                ) : (
+                    &lt;Link to='/signin'&gt;로그인&lt;/Link&gt;
+                )}
+            &lt;/nav&gt;
+        &lt;/header&gt;
+    )
+}
+
+export default Header;</code></pre>
+      <ul>
+        <li><code>currentUser?.role === 'admin'</code> — 로그아웃 상태면 <code>currentUser</code>가 <code>null</code>이므로 <code>?.</code>로 안전하게 꺼냅니다.</li>
+        <li><code>{isAdmin &amp;&amp; &lt;Link …&gt;}</code> — 관리자일 때만 「관리자」 메뉴를 그립니다.</li>
+        <li>상품 등록 링크에 <code>onClick</code>을 달아, 관리자가 아니면 <code>e.preventDefault()</code>로 <b>이동을 막고</b> 안내합니다. 링크 클릭 이벤트의 타입은 <code>React.MouseEvent&lt;HTMLAnchorElement&gt;</code>입니다.</li>
+      </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ③ 관리자 대시보드</div>
+      <span class="fname">src/admin/AdminPage.tsx</span>
+      <pre><code class="language-tsx">import { Link } from "react-router-dom";
+import { useProduct } from "../context/ProductContext";
+import { useUser } from "../context/UserContext";
+
+const AdminPage = () =&gt; {
+  const { products } = useProduct();
+  const { users, currentUser } = useUser();
+
+  // 관리자만 접근 가능 (주소창에 /admin을 직접 입력해도 권한 체크)
+  if (currentUser?.role !== "admin") {
+    return (
+      &lt;div className="admin-page"&gt;
+        &lt;p&gt;관리자만 접근할 수 있습니다.&lt;/p&gt;
+        &lt;Link to="/signin"&gt;로그인&lt;/Link&gt;
+      &lt;/div&gt;
+    );
+  }
+
+  // 관리자 수 : filter()로 role이 admin인 회원만 골라 개수 세기
+  const adminCount = users.filter((user) =&gt; user.role === "admin").length;
+
+  // 상품 총 가격 : reduce()로 가격 합계 계산 (0은 시작 값)
+  const totalPrice = products.reduce((sum, product) =&gt; sum + product.price, 0);
+
+  // 평균 가격 : 상품이 없으면 0으로 나누지 않도록 0을 돌려줌
+  const avgPrice = products.length &gt; 0 ? Math.round(totalPrice / products.length) : 0;
+
+  // 최근 등록 상품 5개 : id가 클수록 나중에 등록한 상품 (b - a : 내림차순)
+  // [...products]로 복사한 뒤 정렬해야 원래 상품 목록(상태)이 바뀌지 않음
+  const recentProducts = [...products]
+    .sort((a, b) =&gt; b.id - a.id)
+    .slice(0, 5);
+
+  return (
+    &lt;div className="admin-page"&gt;
+      &lt;h2&gt;관리자 대시보드&lt;/h2&gt;
+
+      {/* 요약 카드 */}
+      &lt;div className="admin-cards"&gt;
+        &lt;div className="admin-card"&gt;
+          &lt;p&gt;전체 상품&lt;/p&gt;
+          &lt;strong&gt;{products.length}개&lt;/strong&gt;
+        &lt;/div&gt;
+        &lt;div className="admin-card"&gt;
+          &lt;p&gt;전체 회원&lt;/p&gt;
+          &lt;strong&gt;{users.length}명&lt;/strong&gt;
+        &lt;/div&gt;
+        &lt;div className="admin-card"&gt;
+          &lt;p&gt;관리자&lt;/p&gt;
+          &lt;strong&gt;{adminCount}명&lt;/strong&gt;
+        &lt;/div&gt;
+        &lt;div className="admin-card"&gt;
+          &lt;p&gt;평균 상품 가격&lt;/p&gt;
+          &lt;strong&gt;{avgPrice.toLocaleString()}원&lt;/strong&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      {/* 빠른 메뉴 */}
+      &lt;div className="admin-menu"&gt;
+        &lt;Link to="/product/new"&gt;&lt;button type="button"&gt;상품 등록&lt;/button&gt;&lt;/Link&gt;
+        &lt;Link to="/"&gt;&lt;button type="button"&gt;상품 목록&lt;/button&gt;&lt;/Link&gt;
+      &lt;/div&gt;
+
+      {/* 최근 등록 상품 */}
+      &lt;h3&gt;최근 등록 상품&lt;/h3&gt;
+      &lt;table&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th&gt;번호&lt;/th&gt;
+            &lt;th&gt;상품명&lt;/th&gt;
+            &lt;th&gt;카테고리&lt;/th&gt;
+            &lt;th&gt;가격&lt;/th&gt;
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          {recentProducts.map((product) =&gt; (
+            &lt;tr key={product.id}&gt;
+              &lt;td&gt;{product.id}&lt;/td&gt;
+              &lt;td&gt;{product.pName}&lt;/td&gt;
+              &lt;td&gt;{product.category}&lt;/td&gt;
+              &lt;td&gt;{product.price.toLocaleString()}원&lt;/td&gt;
+            &lt;/tr&gt;
+          ))}
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+
+      {/* 회원 목록 */}
+      &lt;h3&gt;회원 목록&lt;/h3&gt;
+      &lt;table&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th&gt;번호&lt;/th&gt;
+            &lt;th&gt;아이디&lt;/th&gt;
+            &lt;th&gt;이름&lt;/th&gt;
+            &lt;th&gt;이메일&lt;/th&gt;
+            &lt;th&gt;권한&lt;/th&gt;
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          {users.map((user) =&gt; (
+            &lt;tr key={user.id}&gt;
+              &lt;td&gt;{user.id}&lt;/td&gt;
+              &lt;td&gt;{user.username}&lt;/td&gt;
+              &lt;td&gt;{user.name}&lt;/td&gt;
+              &lt;td&gt;{user.email}&lt;/td&gt;
+              &lt;td&gt;{user.role === "admin" ? "관리자" : "일반회원"}&lt;/td&gt;
+            &lt;/tr&gt;
+          ))}
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default AdminPage;</code></pre>
+      <ul>
+        <li><b>권한 검사:</b> 메뉴를 숨겨도 주소창에 <code>/admin</code>을 직접 입력하면 들어올 수 있습니다. 그래서 화면 안에서도 <code>role</code>을 한 번 더 확인하고, 관리자가 아니면 안내 문구만 보여 줍니다.</li>
+        <li><b>관리자 수:</b> <code>filter()</code>로 <code>role</code>이 <code>"admin"</code>인 회원만 골라 <code>length</code>로 셉니다.</li>
+        <li><b>평균 가격:</b> <code>reduce()</code>로 가격을 모두 더한 뒤 상품 수로 나눕니다. 상품이 0개면 0으로 나누지 않도록 0을 돌려줍니다.</li>
+        <li><b>최근 등록 상품:</b> 상품 번호(<code>id</code>)는 <code>Date.now()</code>로 붙이므로 <b>클수록 나중에 등록한 상품</b>입니다. <code>sort((a, b) =&gt; b.id - a.id)</code>로 내림차순 정렬한 뒤 <code>slice(0, 5)</code>로 5개만 남깁니다.</li>
+        <li><code>[...products]</code>로 <b>복사한 뒤</b> 정렬합니다. <code>sort()</code>는 원래 배열을 바꾸므로, 그대로 쓰면 Context의 상품 목록(상태)이 바뀌어 버립니다.</li>
+        <li>회원 목록에는 비밀번호를 보여 주지 않습니다.</li>
+      </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ④ 관리자 대시보드 스타일</div>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 관리자 대시보드 */
+.admin-page {
+  /* #root의 가운데 정렬을 왼쪽 정렬로 되돌립니다. */
+  text-align: left;
+  max-width: 960px;
+  margin: 0 auto;
+}
+.admin-cards {
+  display: flex;
+  gap: 16px;
+  margin: 20px auto;
+}
+.admin-card {
+  flex: 1; /* 카드가 같은 너비를 가지도록 */
+  background-color: rgb(92, 92, 252);
+  color: #f0f0f0;
+  border-radius: 8px;
+  padding: 16px;
+}
+.admin-card:hover { background-color: rgb(6, 6, 190); }
+.admin-card p {
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+.admin-menu { text-align: right; }
+.admin-menu button {
+  margin-left: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.admin-page table {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-collapse: collapse;
+}
+/* th와 td 모두 .admin-page 안에서만 적용되도록 각각 앞에 붙입니다. */
+.admin-page th,
+.admin-page td {
+  border: 1px solid #ccc;
+  padding: 6px;
+}
+.admin-page thead { background-color: #eee; }</code></pre>
+      <ul>
+        <li><code>.admin-card { flex: 1; }</code> — 카드 4개가 남는 공간을 똑같이 나눠 같은 너비가 됩니다.</li>
+        <li><code>.admin-page th, .admin-page td</code>처럼 <b>쉼표 뒤에도</b> <code>.admin-page</code>를 붙여야 합니다. <code>.admin-page th, td</code>라고 쓰면 <code>td</code>는 앞 선택자 없이 <b>모든 표</b>에 적용됩니다.</li>
+        <li><code>border-collapse: collapse</code>는 칸마다 생기는 이중 테두리를 한 줄로 합칩니다.</li>
+      </ul>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 생각해 볼 점 — 화면에서만 막는 권한</h3>
+      <p>지금은 화면(React)에서만 권한을 검사합니다. 브라우저 코드는 누구나 볼 수 있고 고칠 수 있으므로, 실제 서비스에서는 <b>서버가</b> 요청마다 관리자인지 확인해야 합니다. 상품 등록 화면(<code>/product/new</code>)도 지금은 주소를 직접 입력하면 들어갈 수 있으니, <code>AdminPage</code>처럼 화면 안에서 권한을 한 번 더 검사해 보세요.</p>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 정리</h3>
+      <ol>
+        <li>권한(<code>role</code>)에 따라 메뉴는 <b>조건부 렌더링</b>으로 보여 주거나 숨긴다.</li>
+        <li>메뉴를 숨겨도 주소로 들어올 수 있으므로 <b>화면 안에서도</b> 권한을 검사한다.</li>
+        <li>통계는 상태로 따로 두지 않고 <code>filter</code> · <code>reduce</code>로 <b>그때그때 계산</b>한다.</li>
+        <li><code>sort()</code>는 원래 배열을 바꾸므로 <b>복사본(<code>[...배열]</code>)</b>을 정렬한다.</li>
       </ol>
     </div>
   </section>
