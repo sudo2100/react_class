@@ -292,29 +292,29 @@ CREATE DATABASE tsdb OWNER jsuser;</code></pre>
               CHECK (category IN ('마우스', '키보드', '모니터', '주변기기')),
   price       INTEGER      NOT NULL CHECK (price &gt;= 0),
   description TEXT         NOT NULL DEFAULT '',
+  image       VARCHAR(255),          -- 이미지 경로 (없으면 NULL)
   created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 
 -- 초기 데이터
-INSERT INTO products (p_name, category, price, description) VALUES
-  ('무선 마우스',        '마우스',   25000,  '조용한 클릭음의 2.4GHz 무선 마우스'),
-  ('기계식 키보드',      '키보드',   89000,  '청축 스위치, RGB 백라이트'),
-  ('27인치 모니터',      '모니터',   279000, 'QHD 해상도, 165Hz 주사율'),
-  ('USB-C 허브',         '주변기기', 39000,  'HDMI·USB 3.0·SD 카드 지원 7in1'),
-  ('웹캠 FHD',           '주변기기', 45000,  '1080p 30fps, 자동 초점');</code></pre>
+INSERT INTO products (p_name, category, price, description, image) VALUES
+  ('무선 마우스',   '마우스',   25000,  '조용한 클릭음의 2.4GHz 무선 마우스', '/images/mouse.png'),
+  ('웹캠 FHD',      '주변기기', 45000,  '1080p 30fps, 자동 초점',             '/images/webcam.png');</code></pre>
       <ul>
         <li><code>jsuser</code> 계정으로 <code>tsdb</code> DB에 접속해서 실행합니다. 그래야 테이블의 소유자가 <code>jsuser</code>가 됩니다.</li>
         <li><code>SERIAL</code>은 번호를 <b>자동으로 1씩 증가</b>시킵니다. 등록할 때 <code>id</code>를 넣지 않아도 됩니다.</li>
         <li><code>CHECK</code>는 들어갈 수 있는 값을 DB에서 한 번 더 막습니다. 카테고리는 목록에 있는 값만, 가격은 0 이상만 저장됩니다.</li>
         <li><code>DEFAULT</code>는 값을 넣지 않았을 때의 기본값입니다. <code>created_at</code>에는 저장한 시각(<code>NOW()</code>)이 자동으로 들어갑니다.</li>
         <li>PostgreSQL은 이름을 소문자로 다루므로 컬럼 이름은 <code>p_name</code>처럼 <b>소문자와 밑줄</b>로 짓습니다.</li>
+        <li><code>image</code>에는 이미지 <b>파일이 아니라 경로</b>(<code>/images/mouse.png</code>)를 저장합니다. 파일은 React 프로젝트의 <code>client/public/images/</code>에 둡니다(10강 11단원).</li>
+        <li><code>image</code>에는 <code>NOT NULL</code>이 없어서 값을 넣지 않으면 <code>NULL</code>이 됩니다. 이미지가 없는 상품에는 화면에서 기본 이미지를 보여 줍니다.</li>
       </ul>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — 5. PostgreSQL 연결 — ③ 회원 테이블 · 초기 데이터 (jsuser 계정 / tsdb DB)</div>
       <span class="fname">pgAdmin 4 — Query Tool</span>
       <pre><code class="language-sql">CREATE TABLE users (
   id          SERIAL PRIMARY KEY,
-  username    VARCHAR(16)  NOT NULL UNIQUE,
+  username    VARCHAR(12)  NOT NULL UNIQUE,
   password    VARCHAR(255) NOT NULL,
   name        VARCHAR(50)  NOT NULL,
   email       VARCHAR(100) NOT NULL UNIQUE,
@@ -325,10 +325,10 @@ INSERT INTO products (p_name, category, price, description) VALUES
 
 -- 초기 데이터 (연습용, 비밀번호 평문)
 INSERT INTO users (username, password, name, email) VALUES
-  ('admin', 'a1234',  '관리자', 'admin@spaceshop.com'),
-  ('hong',  'h1234',  '홍길동', 'hong@example.com'),
-  ('park',  'p1234',  '박상희', 'kim@example.com'),
-  ('ko',    'k1234',  '고담덕', 'lee@example.com');
+  ('admin0', 'a1234567', '관리자', 'admin@spaceshop.com'),
+  ('hong0',  'h1234567', '홍길동', 'hong@example.com'),
+  ('park0',  'p1234567', '박상희', 'park@example.com'),
+  ('ko01',   'k1234567', '고담덕', 'ko@example.com');
 
 COMMIT;
 
@@ -341,7 +341,7 @@ UPDATE users SET role = 'admin' WHERE id = 1;
 DROP TABLE users;</code></pre>
       <ul>
         <li><code>UNIQUE</code>는 같은 값이 두 번 저장되지 않게 막습니다. 아이디와 이메일은 <b>중복 가입</b>이 DB에서도 막힙니다.</li>
-        <li><code>username VARCHAR(16)</code>은 회원가입 화면의 아이디 규칙(4~16자)과 길이를 맞춘 것입니다.</li>
+        <li><code>username VARCHAR(12)</code>는 회원가입 화면의 아이디 규칙(4~12자)과 길이를 맞춘 것입니다.</li>
         <li><code>password VARCHAR(255)</code>는 나중에 비밀번호를 <b>암호화(해시)</b>해 저장하면 길이가 길어지므로 넉넉하게 잡습니다.</li>
         <li><code>role</code>은 <code>DEFAULT 'user'</code>라서 초기 데이터에 적지 않으면 모두 일반 회원이 됩니다. 그래서 <code>UPDATE</code>로 관리자 권한을 따로 줍니다.</li>
         <li>pgAdmin은 문장마다 자동으로 저장(auto commit)하므로 <code>COMMIT;</code>은 "진행 중인 트랜잭션이 없다"는 경고만 나오고 문제는 없습니다.</li>
@@ -434,11 +434,12 @@ app.get("/api/products/:id", async (req, res) =&gt; {
 
 // 상품 등록
 app.post("/api/products", async (req, res) =&gt; {
-  const { pName, category, price, description } = req.body;
-  const sql = "INSERT INTO products(p_name, category, price, description) "
-        + "VALUES ($1, $2, $3, $4)";
+  const { pName, category, price, description, image } = req.body;
+  const sql = "INSERT INTO products(p_name, category, price, description, image) "
+        + "VALUES ($1, $2, $3, $4, $5)";
   try{
-    await db.query(sql, [pName, category, price, description]);
+    // image를 보내지 않으면 undefined → null로 저장
+    await db.query(sql, [pName, category, price, description, image ?? null]);
     res.send("상품 등록 완료!!");
   }catch(err){
     console.log("상품 등록 오류!", err);
@@ -476,6 +477,7 @@ app.put("/api/products/:id", async (req, res) =&gt; {
       <ul>
         <li>PostgreSQL은 값 자리에 <code>$1</code>, <code>$2</code> …를 쓰고, 실제 값은 배열로 따로 넘깁니다. 값을 SQL 문자열에 직접 이어 붙이지 않아 <b>SQL 인젝션</b>을 막습니다.</li>
         <li>조회 결과는 <code>result.rows</code>(배열)에 들어 있습니다. 단건 조회는 첫 번째 행 <code>rows[0]</code>을 보냅니다.</li>
+        <li>조회는 <code>SELECT *</code>라서 <code>image</code>도 함께 보냅니다. 등록(<code>INSERT</code>)은 보낸 <code>image</code>를 저장하고, 보내지 않으면 <code>image ?? null</code>로 <code>NULL</code>을 저장합니다. 수정(<code>UPDATE</code>)은 <code>image</code>를 바꾸지 않아 저장된 경로가 그대로 남습니다.</li>
         <li><code>req.params.id</code>는 주소의 <code>:id</code>, <code>req.body</code>는 요청 본문입니다.</li>
       </ul>
     </div>
@@ -562,7 +564,7 @@ app.post("/api/users/login", async (req, res) =&gt; {
         <tr><th>기능</th><th>메서드 · 경로</th><th>SQL</th></tr>
         <tr><td>목록 조회</td><td><code>GET /api/products</code></td><td><code>SELECT * FROM products</code></td></tr>
         <tr><td>단건 조회</td><td><code>GET /api/products/:id</code></td><td><code>SELECT * FROM products WHERE id = $1</code></td></tr>
-        <tr><td>등록</td><td><code>POST /api/products</code></td><td><code>INSERT INTO products(...) VALUES ($1, $2, $3, $4)</code></td></tr>
+        <tr><td>등록</td><td><code>POST /api/products</code></td><td><code>INSERT INTO products(...) VALUES ($1, $2, $3, $4, $5)</code></td></tr>
         <tr><td>수정</td><td><code>PUT /api/products/:id</code></td><td><code>UPDATE products SET ... WHERE id=$5</code></td></tr>
         <tr><td>삭제</td><td><code>DELETE /api/products/:id</code></td><td><code>DELETE FROM products WHERE id = $1</code></td></tr>
         <tr><td>회원 목록</td><td><code>GET /api/users</code></td><td><code>SELECT id, username, name, email, role, created_at FROM users</code></td></tr>
@@ -665,6 +667,7 @@ export default api;</code></pre>
         <tr><th></th><th>DB · 서버 (조회 결과)</th><th>화면 (<code>Product</code> 타입)</th></tr>
         <tr><td>상품명</td><td><code>p_name</code></td><td><code>pName</code></td></tr>
         <tr><td>설명</td><td><code>description</code></td><td><code>description</code> (같게 맞춤)</td></tr>
+        <tr><td>이미지</td><td><code>image</code> (없으면 <code>null</code>)</td><td><code>image</code> (없으면 <code>undefined</code>)</td></tr>
         <tr><td>그 밖의 값</td><td><code>id</code>, <code>category</code>, <code>price</code></td><td>같음</td></tr>
       </table>
       <p>DB는 <b>소문자와 밑줄</b>로, 화면은 <b>카멜 표기</b>로 이름을 짓기 때문에 이름이 다릅니다. 서버 응답을 받는 곳에서 <b>한 번만 바꿔 주면</b> 화면 컴포넌트는 하나도 고치지 않아도 됩니다. 다음 단원의 <code>toProduct()</code>가 그 역할을 합니다.</p>
@@ -678,6 +681,7 @@ export default api;</code></pre>
       <li>서버 응답 타입을 정하고 화면 타입으로 바꾸는 함수를 만들 수 있다.</li>
       <li><code>useEffect</code>로 화면이 처음 그려질 때 상품 목록을 불러올 수 있다.</li>
       <li>상품 등록 · 삭제 · 수정을 서버에 저장하고, 끝날 때까지 <code>await</code>로 기다릴 수 있다.</li>
+      <li>상품을 등록할 때 이미지 경로도 함께 DB에 저장할 수 있다.</li>
     </ul></div>
     <div class="ex"><div class="lbl">💡 예제 — ① 상품 요청 함수</div>
       <span class="fname">src/api/products.ts</span>
@@ -691,6 +695,7 @@ interface ProductRow {
   category: Category;
   price: number;
   description: string;
+  image: string | null;  // 이미지가 없으면 DB에서 null이 옵니다.
 }
 
 // 서버 모양 → 화면 모양(Product)으로 바꿉니다.
@@ -700,6 +705,7 @@ const toProduct = (row: ProductRow): Product =&gt; ({
   category: row.category,
   price: row.price,
   description: row.description,
+  image: row.image ?? undefined,  // null → undefined (화면 타입은 image?: string)
 });
 
 // 상품 목록 조회
@@ -715,6 +721,7 @@ export const createProduct = async (product: NewProduct) =&gt; {
     category: product.category,
     price: product.price,
     description: product.description,
+    image: product.image,  // 없으면(undefined) 보내지 않음 → 서버에서 null
   });
 }
 
@@ -734,12 +741,19 @@ export const modifyProduct = async (product: Product) =&gt; {
 }</code></pre>
       <ul>
         <li><code>ProductRow</code>는 <b>서버가 보내 주는 모양</b>, <code>Product</code>는 <b>화면이 쓰는 모양</b>입니다. <code>toProduct()</code>가 둘을 이어 줍니다.</li>
+        <li><code>image</code> — DB의 빈 값은 <code>null</code>이지만 화면 타입은 10강 11단원의 <code>image?: string</code>(<code>string</code> 또는 <code>undefined</code>)입니다. <code>row.image ?? undefined</code>로 <code>null</code>을 <code>undefined</code>로 바꿉니다. 그대로 넣으면 <code>Type 'string | null' is not assignable to type 'string | undefined'</code> 오류가 납니다.</li>
         <li><code>api.get&lt;ProductRow[]&gt;()</code>처럼 제네릭으로 응답 타입을 알려 주면 <code>response.data</code>가 <code>ProductRow[]</code>가 됩니다.</li>
-        <li>등록할 때는 반대로 서버의 <code>req.body</code>에서 꺼내는 이름(<code>description</code>)에 맞춰 보냅니다.</li>
+        <li>등록할 때는 반대로 서버의 <code>req.body</code>에서 꺼내는 이름(<code>description</code>, <code>image</code>)에 맞춰 보냅니다. <code>image</code>가 <code>undefined</code>이면 JSON으로 바꿀 때 빠지므로, 서버에서는 <code>null</code>로 저장됩니다.</li>
         <li>삭제는 <code>api.delete()</code>, 수정은 <code>api.put()</code>으로 보냅니다. 어떤 상품인지는 주소의 <code>/products/${productId}</code>로 알려 줍니다. 서버의 <code>DELETE /api/products/:id</code>, <code>PUT /api/products/:id</code>와 짝이 맞습니다.</li>
         <li>상품 요청을 이 파일에 모아 두면 Provider는 <b>어떻게 요청하는지</b> 몰라도 됩니다.</li>
       </ul>
     </div>
+    <div class="tip"><span class="lbl">💡 상품 이미지</span> 상품 타입(<code>image?: string</code>), 상품 카드 · 상세의 <code>&lt;img&gt;</code>(<code>product.image ?? NO_IMAGE</code>)는 <b>10강 11단원 그대로</b> 씁니다. 이미지 파일은 서버가 아니라 React 프로젝트의 <code>client/public/images/</code>에 둡니다.<div class="flow">shop-mall/
+├─ client/
+│  ├─ public/
+│  │  └─ images/   ← 10강 11단원의 이미지 6개
+│  └─ src/
+└─ server/</div></div>
     <div class="ex"><div class="lbl">💡 예제 — ② Context 타입 바꾸기</div>
       <span class="fname">src/context/ProductContext.ts</span>
       <pre><code class="language-typescript">import type { Product, NewProduct } from "../types/product";
@@ -862,6 +876,174 @@ export default ProductProvider;</code></pre>
         <li><code>await addProduct(...)</code>로 서버 저장이 <b>끝난 뒤에</b> 알림을 띄우고 목록으로 이동합니다. 서버가 오류(500)를 돌려주면 <code>catch</code>로 와서 오류 메시지를 보여 줍니다.</li>
         <li>입력값 검사 부분과 화면(JSX)은 10강 그대로입니다.</li>
       </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑤ 상품 등록에 이미지 선택 추가</div>
+      <span class="fname">src/types/product.ts (ProductForm)</span>
+      <pre><code class="language-typescript">// 상품 등록 폼 입력값 타입
+export interface ProductForm{
+    pName: string,
+    category: Category,
+    price: number,
+    description: string,
+    image: string  // 선택한 이미지 경로 ("" = 선택 안 함)
+}</code></pre>
+      <span class="fname">src/products/AddProduct.tsx</span>
+      <pre><code class="language-tsx">import type { ProductForm } from "../types/product";
+import { useProduct } from "../context/ProductContext";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+// 초기 폼 데이터
+const initialForm: ProductForm = {
+  pName: "",
+  category: "마우스",
+  price: 0,
+  description: "",
+  image: "",  // 처음에는 선택 안 함
+};
+
+const AddProduct = () =&gt; {
+  const {addProduct} = useProduct();
+  const [form, setForm] = useState&lt;ProductForm&gt;(initialForm);
+  const [error, setError] = useState&lt;string | null&gt;(null);
+
+  // 폼 데이터 구조 분해 할당
+  const {pName, category, price, description, image} = form;
+  const navigate = useNavigate();
+
+  // 입력값 변경 핸들러
+  const handleChange = (
+    e: React.ChangeEvent&lt;HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement&gt;) =&gt; {
+    const { name, value } = e.target;
+    setForm({
+      ...form,
+      [name]: value
+    });
+  };
+
+  // 폼 제출 핸들러
+  const handleSubmit = async (e: React.FormEvent&lt;HTMLFormElement&gt;) =&gt; {
+    e.preventDefault();
+    // 유효성 검사
+    if(!pName.trim()){
+      setError("상품명을 입력해주세요.");
+      return;
+    }
+    if(!price || price &lt;= 0){
+      setError("가격을 올바르게 입력해주세요.");
+      return;
+    }
+    if(!description.trim()){
+      setError("설명을 입력해주세요.");
+      return;
+    }
+
+    // 상품 추가
+    try {
+      // 서버에 저장이 끝날 때까지 기다립니다.
+      await addProduct({
+        pName, 
+        category, 
+        price: Number(price), 
+        description,
+        image: image || undefined  // "" (선택 안 함)이면 undefined
+      });
+      alert("상품이 등록되었습니다.");
+      // 상품 목록 페이지로 이동
+      navigate('/');
+    } catch {
+      setError("상품 등록 중 오류가 발생했습니다.");
+    }
+  }
+
+  // 폼 초기화 핸들러
+  const handleCancel = () =&gt; {
+    setForm(initialForm);
+    setError(null);
+  };
+
+  return (
+    &lt;div className="product-add"&gt; 
+      &lt;h2&gt;상품 등록&lt;/h2&gt;
+      &lt;form onSubmit={handleSubmit}&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="pName"&gt;상품명:&lt;/label&gt;
+          &lt;input
+            type="text"
+            id="pName"
+            name="pName"
+            value={pName}
+            onChange={handleChange}
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="category"&gt;카테고리:&lt;/label&gt;
+          &lt;select
+            id="category"
+            name="category"
+            value={category}
+            onChange={handleChange}
+          &gt;
+            &lt;option value="마우스"&gt;마우스&lt;/option&gt;
+            &lt;option value="키보드"&gt;키보드&lt;/option&gt;
+            &lt;option value="모니터"&gt;모니터&lt;/option&gt;
+            &lt;option value="주변기기"&gt;주변기기&lt;/option&gt;
+          &lt;/select&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="price"&gt;가격:&lt;/label&gt;
+          &lt;input
+            type="number"
+            id="price"
+            name="price"
+            value={price}
+            onChange={handleChange}
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="description"&gt;설명:&lt;/label&gt;
+          &lt;textarea
+            id="description"
+            name="description"
+            value={description}
+            onChange={handleChange}
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="image"&gt;이미지:&lt;/label&gt;
+          &lt;select
+            id="image"
+            name="image"
+            value={image}
+            onChange={handleChange}
+          &gt;
+            &lt;option value=""&gt;선택 안 함&lt;/option&gt;
+            &lt;option value="/images/mouse.png"&gt;마우스&lt;/option&gt;
+            &lt;option value="/images/keyboard.png"&gt;키보드&lt;/option&gt;
+            &lt;option value="/images/monitor.png"&gt;모니터&lt;/option&gt;
+            &lt;option value="/images/usb-hub.png"&gt;USB-C 허브&lt;/option&gt;
+            &lt;option value="/images/webcam.png"&gt;웹캠&lt;/option&gt;
+          &lt;/select&gt;
+        &lt;/div&gt;
+        {error &amp;&amp; &lt;p className="product-add_error"&gt;{error}&lt;/p&gt;}
+        &lt;div className="product-add_buttons"&gt;
+          &lt;button type="submit"&gt;등록&lt;/button&gt;
+          &lt;button type="button" onClick={handleCancel}&gt;취소&lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/form&gt;
+    &lt;/div&gt;
+  )
+}
+
+export default AddProduct</code></pre>
+      <ul>
+        <li>폼 타입 <code>ProductForm</code>에 <code>image: string</code>을 더하고, 처음 값은 <code>""</code>(선택 안 함)입니다.</li>
+        <li>이미지는 <code>&lt;select&gt;</code>로 <code>public/images/</code>에 있는 파일 중 하나를 고릅니다. <code>name="image"</code>라서 카테고리처럼 <code>handleChange</code> 하나로 처리됩니다.</li>
+        <li><code>image: image || undefined</code> — <code>""</code>는 거짓 값이라 선택 안 함이면 <code>undefined</code>가 됩니다. 그러면 요청에 <code>image</code>가 빠지고 DB에는 <code>NULL</code>이 저장되어, 목록에서 기본 이미지가 나옵니다.</li>
+        <li>흐름: <code>AddProduct</code> → <code>addProduct</code>(Provider) → <code>createProduct</code>(<code>image</code> 전송) → 서버 <code>INSERT … image</code> → 목록 다시 불러오기</li>
+        <li>10강부터 남아 있던 쓰이지 않는 <code>import type {{ Category }}</code>는 지웠습니다.</li>
+      </ul>
+      <div class="tip"><span class="lbl">💡 참고</span> <code>??</code>가 아니라 <code>||</code>를 쓴 이유: <code>??</code>는 <code>null</code> · <code>undefined</code>만 바꾸므로 <code>"" ?? undefined</code>는 그대로 <code>""</code>입니다. 빈 문자열까지 바꾸려면 <code>||</code>를 씁니다.</div>
     </div>
     <div class="concept">
       <h3 class="blk">📖 생각해 볼 점 — 불러오는 동안</h3>
