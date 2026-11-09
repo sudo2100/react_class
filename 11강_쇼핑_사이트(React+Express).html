@@ -413,7 +413,7 @@ INSERT INTO users (username, password, name, email, role) VALUES
       <li>Postman으로 상품 API를 테스트할 수 있다.</li>
     </ul></div>
     <div class="ex"><div class="lbl">💡 예제 — ① 상품 목록 · 조회 · 등록</div>
-      <span class="fname">server/index.js (1단원 5-③ 기본 라우터 아래, 서버 실행 위에 추가)</span>
+      <span class="fname">server/index.js</span>
       <pre><code class="language-javascript">// 상품 목록
 app.get("/api/products", async (req, res) =&gt; {
   const sql = "SELECT * FROM products";
@@ -487,7 +487,7 @@ app.post("/api/products", async (req, res) =&gt; {
       </ul>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ② 상품 삭제 · 수정</div>
-      <span class="fname">server/index.js (① 상품 등록 아래에 추가)</span>
+      <span class="fname">server/index.js</span>
       <pre><code class="language-javascript">// 상품 삭제
 app.delete("/api/products/:id", async (req, res) =&gt; {
   const pid = req.params.id;
@@ -560,7 +560,7 @@ app.put("/api/products/:id", async (req, res) =&gt; {
       <li>로그인에 실패하면 <code>401</code> 상태 코드를 돌려줄 수 있다.</li>
     </ul></div>
     <div class="ex"><div class="lbl">💡 예제 — ① 회원 API (목록 · 가입 · 로그인)</div>
-      <span class="fname">server/index.js (상품 API 아래, 서버 실행 코드 위에 추가)</span>
+      <span class="fname">server/index.js</span>
       <pre><code class="language-javascript">// 회원 API
 // 회원 목록
 app.get("/api/users", async (req, res) =&gt; {
@@ -650,6 +650,7 @@ app.post("/api/users/login", async (req, res) =&gt; {
         <tr><td>회원 목록</td><td><code>GET /api/users</code></td><td><code>SELECT id, username, name, email, role, created_at FROM users</code></td></tr>
         <tr><td>회원 가입</td><td><code>POST /api/users</code></td><td><code>INSERT INTO users(...) VALUES ($1, $2, $3, $4)</code></td></tr>
         <tr><td>로그인</td><td><code>POST /api/users/login</code></td><td><code>SELECT id, username, … FROM users WHERE username = $1 AND password = $2</code></td></tr>
+        <tr><td>회원 정보 수정 (6단원 ⑥)</td><td><code>PUT /api/users/:id</code></td><td><code>UPDATE users SET name = $1, email = $2 WHERE id = $3 RETURNING …</code></td></tr>
       </table>
     </div>
   </section>
@@ -861,6 +862,13 @@ export const useProduct = () =&gt; {
   return context;
 };</code></pre>
       <div class="tip"><span class="lbl">💡 정리</span> 10강의 Context 타입에서 바뀐 곳은 <b>함수의 반환 타입</b>뿐입니다. <code>addProduct</code>, <code>removeProduct</code>, <code>updateProduct</code> 모두 <code>void</code> → <code>Promise&lt;void&gt;</code>. 서버 저장은 시간이 걸리므로, 부르는 쪽에서 <code>await</code>로 기다릴 수 있게 합니다.</div>
+      <ul>
+        <li><b>Promise</b>는 "지금은 결과가 없지만 <b>나중에 결과를 주겠다</b>는 약속" 객체입니다. 서버 요청처럼 시간이 걸리는 작업은 결과 대신 Promise를 먼저 돌려줍니다.</li>
+        <li>Promise는 처음에 <b>대기(pending)</b> 상태였다가, 작업이 끝나면 <b>성공(fulfilled)</b> 또는 <b>실패(rejected)</b>가 됩니다. 실패하면 <code>await</code>한 곳의 <code>catch</code>로 갑니다.</li>
+        <li><code>Promise&lt;void&gt;</code> — 꺾쇠 안은 <b>성공했을 때 받을 값의 타입</b>입니다. <code>void</code>이므로 돌려받는 값은 없고, "끝났다"는 것만 알려 줍니다. 로그인처럼 성공 여부를 받으면 <code>Promise&lt;boolean&gt;</code>입니다.</li>
+        <li><code>async</code> 함수는 항상 Promise를 돌려줍니다. 그래서 Provider의 <code>addProduct = async (…) =&gt; {…}</code>의 타입이 <code>Promise&lt;void&gt;</code>가 됩니다.</li>
+        <li>부르는 쪽은 <code>await addProduct(…)</code>로 저장이 <b>끝날 때까지 기다린 뒤</b> 다음 줄(알림, 화면 이동)을 실행합니다.</li>
+      </ul>
     </div>
     <div class="ex"><div class="lbl">💡 예제 — ③ Provider가 서버에서 상품 불러오기</div>
       <span class="fname">src/context/ProductProvider.tsx</span>
@@ -1140,6 +1148,7 @@ export default AddProduct</code></pre>
       <li>10강의 회원 Context를 그대로 두고, 함수의 반환 타입만 <code>Promise</code>로 바꿀 수 있다.</li>
       <li>서버 오류(401 등)를 <code>try / catch</code>로 받아 실패로 처리할 수 있다.</li>
       <li><code>async</code> 함수의 결과를 <code>await</code>로 기다려야 하는 이유를 설명할 수 있다.</li>
+      <li>로그인한 회원의 이름 · 이메일을 바꾸는 회원 정보 변경 화면을 만들 수 있다.</li>
     </ul></div>
     <div class="ex"><div class="lbl">💡 예제 — ① 회원 요청 함수</div>
       <span class="fname">src/api/users.ts</span>
@@ -1322,6 +1331,249 @@ export default UserProvider</code></pre>
         <li>그 사이 다른 사람이 같은 아이디로 가입하면 DB의 <code>UNIQUE</code> 때문에 서버가 오류를 돌려주고, <code>catch</code>에서 오류 메시지를 보여 줍니다.</li>
       </ul>
     </div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑥ 회원 정보 수정 API</div>
+      <span class="fname">server/index.js</span>
+      <pre><code class="language-javascript">// 회원 정보 수정 (이름 · 이메일)
+app.put("/api/users/:id", async (req, res) =&gt; {
+  const uid = req.params.id;
+  const { name, email } = req.body;
+  // RETURNING: 바꾼 뒤의 회원 정보를 바로 돌려받습니다. (password는 빼고)
+  const sql = "UPDATE users SET name = $1, email = $2 WHERE id = $3 "
+        + "RETURNING id, username, name, email, role, created_at";
+  try {
+    const result = await db.query(sql, [name, email, uid]);
+    if (result.rows.length === 0) {
+      return res.status(404).send("회원을 찾을 수 없습니다.");
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    // 23505: UNIQUE 위반 (다른 회원이 쓰는 이메일)
+    if (err.code === "23505") {
+      return res.status(409).send("이미 사용 중인 이메일입니다.");
+    }
+    console.log("회원 수정 오류!", err);
+    res.status(500).send("회원 정보 수정 중 오류가 발생했습니다.");
+  }
+});</code></pre>
+      <ul>
+        <li>주소의 <code>:id</code>로 회원을 정하고, 본문의 <code>name</code> · <code>email</code>로 바꿉니다. 아이디(<code>username</code>)와 비밀번호는 바꾸지 않습니다.</li>
+        <li><code>RETURNING …</code> — PostgreSQL에서 <code>UPDATE</code>한 행을 바로 돌려받습니다. 다시 <code>SELECT</code>하지 않아도 되고, <code>password</code>는 빼고 받습니다.</li>
+        <li>바꾼 행이 없으면(없는 회원) <code>404</code>를 돌려줍니다.</li>
+        <li>다른 회원이 쓰는 이메일이면 <code>UNIQUE</code> 때문에 오류가 납니다. PostgreSQL의 오류 코드 <code>23505</code>(중복)를 확인해 <code>409</code>(충돌)로 알려 줍니다.</li>
+      </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑦ 회원 정보 수정 요청과 Context</div>
+      <span class="fname">src/types/user.ts (아래에 추가)</span>
+      <pre><code class="language-typescript">/* 회원 정보 수정 폼 타입 정의
+   아이디(username)는 바꾸지 않고, 이름과 이메일만 수정합니다. */
+export type UserUpdateForm = Pick&lt;User, "name" | "email"&gt;</code></pre>
+      <span class="fname">src/api/users.ts (아래에 추가)</span>
+      <pre><code class="language-typescript">import type { LoginForm, NewUser, User, UserUpdateForm } from '../types/user';
+
+// ...
+
+// 회원 정보 수정: 바뀐 회원 정보(비밀번호 제외)를 돌려받습니다.
+export const modifyUser = async (id: number, form: UserUpdateForm) =&gt; {
+  const response = await api.put&lt;User&gt;(`/users/${id}`, form);
+  return response.data;
+}</code></pre>
+      <span class="fname">src/context/UserContext.ts</span>
+      <pre><code class="language-typescript">import { createContext, useContext } from "react";
+import type {User, NewUser, LoginForm, UserUpdateForm} from "../types/user"
+
+// 회원 컨텍스트 타입 정의
+// 서버에 물어봐야 하므로 signup · login은 Promise를 돌려줍니다.
+interface UserContextType{
+    users: User[];  // 회원목록
+    currentUser: User | null;  // 로그인한 회원 (로그아웃 상태면 null)
+    signup: (newUser: NewUser) =&gt; Promise&lt;void&gt;  // 회원가입
+    login: (loginForm: LoginForm) =&gt; Promise&lt;boolean&gt;  // 로그인 (성공 여부 반환)
+    logout: () =&gt; void  // 로그아웃
+    updateUser: (form: UserUpdateForm) =&gt; Promise&lt;void&gt;  // 회원 정보 수정
+}
+
+// 회원 컨텍스트 생성
+export const UserContext = createContext&lt;UserContextType | null&gt;(null);
+
+// 회원 컨텍스트 커스텀 Hook
+export const useUser = () =&gt; {
+    const context = useContext(UserContext);
+    if(!context){
+        throw new Error("useUser는 UserProvider 내부에서만 사용 가능합니다.")
+    }
+    return context
+}</code></pre>
+      <span class="fname">src/context/UserProvider.tsx (updateUser 추가)</span>
+      <pre><code class="language-tsx">import { createUser, getUsers, modifyUser, requestLogin } from "../api/users";
+
+    // ...
+
+    // 회원 정보 수정 함수: 로그인한 회원의 이름 · 이메일을 바꿉니다.
+    const updateUser = async (form: UserUpdateForm) =&gt; {
+        if (!currentUser) return;
+        const updatedUser = await modifyUser(currentUser.id, form);
+        setCurrentUser(updatedUser);   // 헤더의 이름이 바로 바뀜
+        setUsers(await getUsers());    // 회원 목록(관리자 페이지)도 다시 불러옴
+    }
+
+    return(
+        &lt;UserContext.Provider value={{
+            users, 
+            currentUser, 
+            signup, 
+            login, 
+            logout,
+            updateUser
+        }}&gt;</code></pre>
+      <ul>
+        <li><code>UserUpdateForm = Pick&lt;User, "name" | "email"&gt;</code> — <code>User</code>에서 바꿀 수 있는 두 속성만 골라 폼 타입을 만듭니다.</li>
+        <li><code>modifyUser(id, form)</code> — <code>PUT /api/users/:id</code>로 보내고, 서버가 돌려준 바뀐 회원 정보를 받습니다.</li>
+        <li><code>updateUser</code>는 서버에 저장한 뒤 <code>setCurrentUser(updatedUser)</code>로 로그인한 회원 정보를 바꿉니다. 그래서 헤더의 <b>이름이 바로 바뀝니다</b>.</li>
+        <li>회원 목록도 다시 불러와서 관리자 페이지와 이메일 중복 검사에 새 값이 쓰이게 합니다.</li>
+        <li>Context 타입에 <code>updateUser</code>를 추가했으므로, Provider의 <code>value</code>에도 꼭 넣어야 타입 오류가 나지 않습니다.</li>
+      </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑧ 회원 정보 변경 화면</div>
+      <span class="fname">src/users/MyPage.tsx</span>
+      <pre><code class="language-tsx">import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import type { User, UserUpdateForm } from "../types/user";
+import { useUser } from "../context/UserContext";
+
+// 이메일 형식 검사 (회원가입과 같은 규칙)
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// 회원 정보 수정 폼: 로그인한 회원(user)의 값을 처음 값으로 씁니다.
+const MyPageForm = ({ user }: { user: User }) =&gt; {
+  const { users, updateUser } = useUser();
+  const navigate = useNavigate();
+  const [form, setForm] = useState&lt;UserUpdateForm&gt;({
+    name: user.name,
+    email: user.email,
+  });
+  const [error, setError] = useState&lt;string | null&gt;(null);
+
+  const { name, email } = form;
+
+  // 입력값 변경 핸들러
+  const handleChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+  };
+
+  // 폼 제출 핸들러
+  const handleSubmit = async (e: React.FormEvent&lt;HTMLFormElement&gt;) =&gt; {
+    e.preventDefault();
+
+    // 유효성 검사
+    if (!name.trim()) {
+      setError("이름을 입력해주세요");
+      return;
+    }
+    if (!EMAIL_REGEX.test(email.trim())) {
+      setError("이메일 형식이 올바르지 않습니다");
+      return;
+    }
+    // 이메일 중복 확인 (나 자신은 제외)
+    if (users.some((u) =&gt; u.email === email.trim() &amp;&amp; u.id !== user.id)) {
+      setError("이미 사용 중인 이메일입니다");
+      return;
+    }
+
+    try {
+      await updateUser({ name: name.trim(), email: email.trim() });
+      alert("회원 정보가 수정되었습니다.");
+      navigate('/');
+    } catch {
+      setError("회원 정보 수정 중 오류가 발생했습니다");
+    }
+  };
+
+  return (
+    &lt;div className="sign-up"&gt;
+      &lt;h2&gt;회원 정보 변경&lt;/h2&gt;
+      &lt;form onSubmit={handleSubmit}&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="username"&gt;아이디&lt;/label&gt;
+          {/* 아이디는 바꿀 수 없으므로 readOnly */}
+          &lt;input type="text" id="username" value={user.username} readOnly /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="name"&gt;이름&lt;/label&gt;
+          &lt;input
+            type="text"
+            id="name"
+            name="name"
+            value={name}
+            onChange={handleChange}
+            autoComplete="name"
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="email"&gt;이메일&lt;/label&gt;
+          &lt;input
+            type="email"
+            id="email"
+            name="email"
+            value={email}
+            onChange={handleChange}
+            autoComplete="email"
+          /&gt;
+        &lt;/div&gt;
+        {error &amp;&amp; &lt;p className="sign-up_error"&gt;{error}&lt;/p&gt;}
+        &lt;button type="submit"&gt;저장&lt;/button&gt;
+      &lt;/form&gt;
+    &lt;/div&gt;
+  );
+};
+
+// 회원 정보 변경 화면: 로그인한 회원만 들어올 수 있습니다.
+const MyPage = () =&gt; {
+  const { currentUser } = useUser();
+
+  if (!currentUser) {
+    return (
+      &lt;div className="sign-up"&gt;
+        &lt;p&gt;로그인한 회원만 이용할 수 있습니다.&lt;/p&gt;
+        &lt;Link to="/signin"&gt;로그인&lt;/Link&gt;
+      &lt;/div&gt;
+    );
+  }
+
+  return &lt;MyPageForm user={currentUser} /&gt;;
+};
+
+export default MyPage;</code></pre>
+      <ul>
+        <li>화면을 <b>확인(MyPage)</b>과 <b>폼(MyPageForm)</b>으로 나눕니다. 7단원 상품 수정 화면도 같은 방식을 씁니다. 로그인하지 않았으면 폼 대신 로그인 안내를 보여 줍니다.</li>
+        <li>폼의 처음 값은 로그인한 회원의 이름 · 이메일입니다. 아이디는 <code>readOnly</code>로 보여 주기만 합니다.</li>
+        <li>이메일 중복 검사는 회원가입과 같지만, <b>나 자신은 제외</b>합니다(<code>u.id !== user.id</code>). 이메일을 그대로 두고 이름만 바꿀 수 있어야 하기 때문입니다.</li>
+        <li>스타일은 회원가입 화면의 <code>sign-up</code> 클래스를 그대로 씁니다.</li>
+      </ul>
+    </div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑨ 경로 추가와 헤더 링크</div>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">import MyPage from './users/MyPage';
+
+// ...
+                &lt;Route path='/signup' element={&lt;SignUp /&gt;} /&gt;
+                {/* 회원 정보 변경 */}
+                &lt;Route path='/mypage' element={&lt;MyPage /&gt;} /&gt;</code></pre>
+      <span class="fname">src/layouts/Header.tsx (로그인 상태 부분)</span>
+      <pre><code class="language-tsx">                {currentUser ? (
+                    &lt;&gt;
+                        {/* 이름을 누르면 회원 정보 변경 화면으로 이동 */}
+                        &lt;Link to='/mypage'&gt;{currentUser.name}님&lt;/Link&gt;
+                        &lt;button onClick={logout}&gt;로그아웃&lt;/button&gt;
+                    &lt;/&gt;
+                ) : (
+                    &lt;Link to='/signin'&gt;로그인&lt;/Link&gt;
+                )}</code></pre>
+      <ul>
+        <li>헤더의 <code>OOO님</code>을 <code>&lt;span&gt;</code>에서 <code>&lt;Link&gt;</code>로 바꿔, 이름을 누르면 회원 정보 변경 화면(<code>/mypage</code>)으로 갑니다.</li>
+        <li>정보를 바꾸면 <code>currentUser</code>가 바뀌므로 헤더의 이름도 자동으로 다시 그려집니다.</li>
+      </ul>
+    </div>
     <div class="concept">
       <h3 class="blk">📖 정리</h3>
       <ol>
@@ -1374,7 +1626,7 @@ import bcrypt from 'bcrypt'   // 추가</code></pre>
     </div>
 
     <div class="ex"><div class="lbl">💡 예제 — ② 회원 가입: 비밀번호를 해시로 저장</div>
-      <span class="fname">server/index.js (3단원 회원 가입 바꾸기)</span>
+      <span class="fname">server/index.js</span>
       <pre><code class="language-javascript">// 회원 가입
 app.post("/api/users", async (req, res) =&gt; {
   const { username, password, name, email} = req.body;
@@ -1400,7 +1652,7 @@ app.post("/api/users", async (req, res) =&gt; {
 </div>
 
     <div class="ex"><div class="lbl">💡 예제 — ③ 로그인: 해시와 비교</div>
-      <span class="fname">server/index.js (3단원 로그인 바꾸기)</span>
+      <span class="fname">server/index.js</span>
       <pre><code class="language-javascript">// 로그인
 app.post("/api/users/login", async (req, res) =&gt; {
   const { username, password } = req.body;
@@ -1430,49 +1682,16 @@ app.post("/api/users/login", async (req, res) =&gt; {
         <li>전에는 <code>WHERE username = $1 AND password = $2</code>로 SQL에서 비교했지만, 이제 DB에는 해시가 있으므로 <b>아이디로만</b> 찾습니다.</li>
         <li><code>bcrypt.compare(입력한 비밀번호, 저장된 해시)</code>가 <code>true</code>이면 비밀번호가 맞습니다.</li>
         <li>회원이 없을 때와 비밀번호가 틀릴 때 <b>같은 메시지 · 같은 401</b>을 돌려줍니다. 어느 쪽이 틀렸는지 알려 주지 않기 위해서입니다.</li>
-        <li><code>const {{ password: _, ...userInfo }} = user</code> — 구조 분해로 <code>password</code>만 빼고 나머지를 <code>userInfo</code>에 모읍니다. 응답에 해시도 보내지 않습니다.</li>
+        <li><code>const {{ password: _, ...userInfo }} = user</code> — 구조 분해로 <code>password</code>만 빼고 나머지를 <code>userInfo</code>에 모읍니다. 예를 들어 <code>user</code>가 <code>{ id: 1, username: "admin0", password: "해시값", role: "admin" }</code>이면 <code>userInfo</code>는 <code>{ id: 1, username: "admin0", role: "admin" }</code>이 됩니다. 응답에 비밀번호 해시가 포함되지 않게 하는 흔한 방식입니다. <code>password: _</code>는 꺼낸 비밀번호를 <code>_</code>라는 이름의 변수에 담는다는 뜻이고, 쓰지 않는 값이라 이름을 <code>_</code>로 짓습니다.</li>
       </ul>
-    </div>
-
-    <div class="ex"><div class="lbl">💡 예제 — ④ 이미 저장된 비밀번호 암호화</div>
-      <span class="fname">server/hash-passwords.js (새 파일)</span>
-      <pre><code class="language-javascript">// 이미 저장된 평문 비밀번호를 한 번에 암호화합니다. (한 번만 실행)
-import pg from 'pg'
-import bcrypt from 'bcrypt'
-
-const db = new pg.Client({
-  host: "localhost",
-  user: "jsuser",
-  password: "pwjs",
-  database: "tsdb"
-});
-
-await db.connect();
-
-const result = await db.query("SELECT id, username, password FROM users");
-for (const user of result.rows) {
-  // bcrypt 해시는 $2로 시작합니다. 이미 암호화된 비밀번호는 건너뜁니다.
-  if (user.password.startsWith("$2")) continue;
-
-  const hashedPassword = await bcrypt.hash(user.password, 10);
-  await db.query("UPDATE users SET password = $1 WHERE id = $2", [hashedPassword, user.id]);
-  console.log(`${user.username} 비밀번호 암호화 완료`);
-}
-
-await db.end();</code></pre>
-      <span class="fname">터미널 (server 폴더)</span>
-      <pre><code class="language-bash">node hash-passwords.js</code></pre>
-      <div class="out"><span class="rt">실행 결과</span>
-<pre><code class="language-bash">admin0 비밀번호 암호화 완료
-ko12 비밀번호 암호화 완료</code></pre>
+      <div class="tip"><span class="lbl">💡 주의 — 초기 회원은 로그인되지 않습니다</span> 1단원 5-⑤에서 넣은 <code>admin0</code>, <code>ko12</code>는 비밀번호가 평문이라 <code>bcrypt.compare()</code>가 항상 <code>false</code>입니다. 기존 회원을 지우고 화면(또는 Postman)에서 <b>다시 가입</b>한 뒤, 관리자로 쓸 회원만 권한을 바꿉니다.
+        <pre><code class="language-sql">DELETE FROM users;
+-- admin0으로 다시 가입한 뒤
+UPDATE users SET role = 'admin' WHERE username = 'admin0';</code></pre>
       </div>
-      <ul>
-        <li>1단원 5-⑤에서 넣은 초기 회원은 비밀번호가 평문이라, ③의 로그인으로 바꾸면 <b>로그인이 안 됩니다</b>. 이 파일을 <b>한 번</b> 실행해 평문 비밀번호를 해시로 바꿉니다.</li>
-        <li>이미 해시인 비밀번호(<code>$2</code>로 시작)는 건너뛰므로 여러 번 실행해도 괜찮습니다.</li>
-        <li>실행한 뒤 pgAdmin에서 <code>SELECT username, password FROM users;</code>로 보면 비밀번호가 <code>$2b$10$…</code>로 바뀌어 있습니다. 로그인은 원래 비밀번호(<code>a1234567</code>)로 합니다.</li>
-      </ul>
     </div>
-    <div class="ex"><div class="lbl">💡 예제 — ⑤ 서버에 이미지 업로드 API 추가</div>
+
+    <div class="ex"><div class="lbl">💡 예제 — ④ 서버에 이미지 업로드 API 추가</div>
       <span class="fname">터미널 (server 폴더)</span>
       <pre><code class="language-bash">npm install multer</code></pre>
       <span class="fname">server/index.js (위쪽 import)</span>
@@ -1482,7 +1701,7 @@ import cors from 'cors'
 import bcrypt from 'bcrypt'
 import multer from 'multer'   // 추가
 import path from 'path'       // 추가 (확장자 꺼내기)</code></pre>
-      <span class="fname">server/index.js (app.use(express.json()) 아래, 상품 API 위에 추가)</span>
+      <span class="fname">server/index.js</span>
       <pre><code class="language-javascript">// 업로드한 파일을 저장할 위치와 파일 이름
 const storage = multer.diskStorage({
   destination: "uploads/",  // server/uploads 폴더 (없으면 자동으로 만듦)
@@ -1522,7 +1741,7 @@ app.post("/api/upload", upload.single("image"), (req, res) =&gt; {
       <div class="tip"><span class="lbl">💡 .gitignore</span> 학생들이 올린 이미지가 깃허브에 올라가지 않도록 <code>server/.gitignore</code>에 <code>uploads/</code>를 한 줄 추가합니다.</div>
     </div>
 
-    <div class="ex"><div class="lbl">💡 예제 — ⑥ 업로드 요청 함수와 이미지 주소</div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑤ 업로드 요청 함수와 이미지 주소</div>
       <span class="fname">src/api/products.ts</span>
       <pre><code class="language-typescript">import api from './api';
 import type { Category, NewProduct, Product } from '../types/product';
@@ -1605,7 +1824,7 @@ export const uploadImage = async (file: File) =&gt; {
       </ul>
     </div>
 
-    <div class="ex"><div class="lbl">💡 예제 — ⑦ 상품 등록 화면에서 이미지 파일 올리기</div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑥ 상품 등록 화면에서 이미지 파일 올리기</div>
       <span class="fname">src/types/product.ts (ProductForm)</span>
       <pre><code class="language-typescript">// 상품 등록 폼 입력값 타입
 export interface ProductForm{
@@ -1819,7 +2038,7 @@ image: undefined → DB NULL → 화면에 기본 이미지(no-image.png)</div>
       </table>
     </div>
 
-    <div class="ex"><div class="lbl">💡 예제 — ⑧ 상품 수정 후 목록 다시 불러오기</div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑦ 상품 수정 후 목록 다시 불러오기</div>
       <span class="fname">src/context/ProductProvider.tsx (updateProduct)</span>
       <pre><code class="language-tsx">  // 상품 수정: 서버에서 고친 뒤, 목록을 다시 불러옵니다.
   // 새로 올린 이미지(/uploads/...)에 서버 주소를 붙이는 일은 getProducts()의 toProduct가 해 줍니다.
@@ -1833,7 +2052,7 @@ image: undefined → DB NULL → 화면에 기본 이미지(no-image.png)</div>
       </ul>
     </div>
 
-    <div class="ex"><div class="lbl">💡 예제 — ⑨ 상품 상세에 수정 · 삭제 버튼</div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑧ 상품 상세에 수정 · 삭제 버튼</div>
       <span class="fname">src/products/ProductDetail.tsx</span>
       <pre><code class="language-tsx">import { Link, useNavigate, useParams } from "react-router-dom"
 import { useProduct } from "../context/ProductContext"
@@ -1916,7 +2135,7 @@ export default ProductDetail</code></pre>
       </ul>
     </div>
 
-    <div class="ex"><div class="lbl">💡 예제 — ⑩ 상품 수정 화면</div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑨ 상품 수정 화면</div>
       <span class="fname">src/products/EditProduct.tsx</span>
       <pre><code class="language-tsx">import { useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -2114,7 +2333,7 @@ const EditProduct = () =&gt; {
 
 export default EditProduct</code></pre>
       <ul>
-        <li>상품 등록(⑦)과 같은 폼이지만, 처음 값이 빈 값이 아니라 <b>지금 상품의 값</b>입니다.</li>
+        <li>상품 등록(⑥)과 같은 폼이지만, 처음 값이 빈 값이 아니라 <b>지금 상품의 값</b>입니다.</li>
         <li><b>컴포넌트를 둘로 나눈 이유:</b> 상품 목록은 서버에서 늦게 도착하므로, 주소창에 <code>/product/3/edit</code>을 바로 입력하면 처음에는 <code>product</code>가 없습니다. <code>useState(처음 값)</code>은 처음 한 번만 쓰이므로, <code>EditProduct</code>가 상품을 찾은 <b>뒤에</b> <code>EditProductForm</code>을 그려야 처음 값이 제대로 들어갑니다.</li>
         <li>이미지: 새 파일을 고르면 미리보기를, 아니면 지금 이미지(<code>product.image</code>)를 보여 줍니다. 저장할 때 새 파일이 없으면 <code>product.image</code>를 그대로 보내 이미지가 지워지지 않습니다.</li>
         <li><code>id</code>는 바꾸지 않고 그대로 넘깁니다. 서버는 주소의 <code>:id</code>로 어떤 상품인지 찾습니다.</li>
@@ -2122,7 +2341,7 @@ export default EditProduct</code></pre>
       </ul>
     </div>
 
-    <div class="ex"><div class="lbl">💡 예제 — ⑪ 수정 화면 경로와 버튼 스타일</div>
+    <div class="ex"><div class="lbl">💡 예제 — ⑩ 수정 화면 경로와 버튼 스타일</div>
       <span class="fname">src/App.tsx</span>
       <pre><code class="language-tsx">import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css'
@@ -2269,7 +2488,7 @@ UPDATE users SET role = 'admin' WHERE username = 'admin0';</code></pre>
     </div>
 
     <div class="ex"><div class="lbl">💡 예제 — ③ 서버: DB 주소와 포트를 환경 변수로</div>
-      <span class="fname">server/index.js (1단원 5-③ 연결 설정 바꾸기)</span>
+      <span class="fname">server/index.js</span>
       <pre><code class="language-javascript">// 서버 포트: Render는 PORT 환경 변수로 포트를 정해 줍니다.
 const PORT = process.env.PORT || 8000;
 
