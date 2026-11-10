@@ -768,6 +768,7 @@ export default api;</code></pre>
       <li><code>useEffect</code>로 화면이 처음 그려질 때 상품 목록을 불러올 수 있다.</li>
       <li>상품 등록 · 삭제 · 수정을 서버에 저장하고, 끝날 때까지 <code>await</code>로 기다릴 수 있다.</li>
       <li>상품을 등록할 때 이미지 경로도 함께 DB에 저장할 수 있다.</li>
+      <li>관리자에게만 상품 수정 · 삭제 버튼을 보여 주고, 수정 화면을 만들 수 있다.</li>
     </ul></div>
     <div class="ex"><div class="lbl">💡 예제 — ① 상품 요청 함수</div>
       <span class="fname">src/api/products.ts</span>
@@ -1105,6 +1106,361 @@ export default AddProduct</code></pre>
         <li>10강부터 남아 있던 쓰이지 않는 <code>import type {{ Category }}</code>는 지웠습니다.</li>
       </ul>
       <div class="tip"><span class="lbl">💡 참고</span> <code>??</code>가 아니라 <code>||</code>를 쓴 이유: <code>??</code>는 <code>null</code> · <code>undefined</code>만 바꾸므로 <code>"" ?? undefined</code>는 그대로 <code>""</code>입니다. 빈 문자열까지 바꾸려면 <code>||</code>를 씁니다.</div>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 상품 수정 · 삭제 화면</h3>
+      <p>수정 · 삭제 API(2단원 ②)와 요청 함수(①의 <code>modifyProduct</code>, <code>deleteProduct</code>), Provider의 <code>updateProduct</code>, <code>removeProduct</code>(③)는 이미 있으므로, 이제 <b>화면</b>을 붙입니다. 상품 상세 화면에 <b>관리자에게만</b> 수정 · 삭제 버튼을 보여 줍니다.</p>
+      <table>
+        <tr><th>기능</th><th>화면</th><th>흐름</th></tr>
+        <tr><td>삭제</td><td>상품 상세의 <b>삭제</b> 버튼</td><td>확인 창 → <code>removeProduct</code> → <code>DELETE /api/products/:id</code> → 목록으로 이동</td></tr>
+        <tr><td>수정</td><td>상품 상세의 <b>수정</b> 버튼 → <code>/product/:id/edit</code></td><td>값 고치기 → <code>updateProduct</code> → <code>PUT /api/products/:id</code> → 상세로 이동</td></tr>
+      </table>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — ⑤ 상품 상세에 수정 · 삭제 버튼</div>
+      <span class="fname">src/products/ProductDetail.tsx</span>
+      <pre><code class="language-tsx">import { Link, useNavigate, useParams } from "react-router-dom"
+import { useProduct } from "../context/ProductContext"
+import { useCart } from "../context/CartContext"
+import { useUser } from "../context/UserContext"
+
+// 이미지가 없는 상품에 보여 줄 기본 이미지
+const NO_IMAGE = "/images/no-image.png";
+
+const ProductDetail = () =&gt; {
+  const {id} = useParams&lt;{id: string}&gt;()
+  const {products, removeProduct} = useProduct();
+  const { addToCart, removeFromCart } = useCart();
+  const { currentUser } = useUser();
+  const navigate = useNavigate();
+
+  // 관리자에게만 수정 · 삭제 버튼을 보여 줍니다.
+  const isAdmin = currentUser?.role === 'admin';
+
+  // id에 해당하는 상품을 찾음
+  const product = products.find((p) =&gt; p.id === Number(id));
+
+  if (!product) {
+    return &lt;div&gt;상품을 찾을 수 없습니다.&lt;/div&gt;;
+  }
+
+  // 상품 삭제 핸들러
+  const handleDelete = async () =&gt; {
+    // 되돌릴 수 없으므로 한 번 더 묻습니다.
+    if (!window.confirm(`${product.pName} 상품을 삭제할까요?`)) return;
+    try {
+      await removeProduct(product.id);
+      removeFromCart(product.id);  // 장바구니에 담겨 있던 상품도 뺍니다.
+      alert("상품이 삭제되었습니다.");
+      navigate('/');
+    } catch {
+      alert("상품 삭제 중 오류가 발생했습니다.");
+    }
+  };
+
+  return (
+    &lt;article className="product-detail"&gt;
+      &lt;Link to='/'&gt;← 상품 목록&lt;/Link&gt;
+      &lt;img
+        className="product-detail_img"
+        src={product.image ?? NO_IMAGE}
+        alt={product.pName}
+      /&gt;
+      &lt;span className="product-detail_category"&gt;{product.category}&lt;/span&gt;
+      &lt;h2&gt;{product.pName}&lt;/h2&gt;
+      &lt;p className="product-detail_price"&gt;{product.price.toLocaleString()}원&lt;/p&gt;
+      &lt;p className="product-detail_desc"&gt;{product.description}&lt;/p&gt;
+      &lt;button 
+        className="product-detail_cart"
+        onClick={() =&gt; {
+          addToCart(product.id, 1);
+          alert(`${product.pName} 상품이 장바구니에 담겼습니다.`);
+        }}
+      &gt;
+        장바구니
+      &lt;/button&gt;
+      {/* 관리자 메뉴: 수정 화면으로 이동 · 삭제 */}
+      {isAdmin &amp;&amp; (
+        &lt;div className="product-detail_admin"&gt;
+          &lt;Link to={`/product/${product.id}/edit`} className="product-detail_edit"&gt;수정&lt;/Link&gt;
+          &lt;button type="button" className="product-detail_delete" onClick={handleDelete}&gt;삭제&lt;/button&gt;
+        &lt;/div&gt;
+      )}
+    &lt;/article&gt;
+  )
+}
+
+export default ProductDetail</code></pre>
+      <ul>
+        <li><code>isAdmin</code>이 <code>true</code>일 때만 <code>&amp;&amp;</code>로 버튼을 그립니다. 일반 회원과 로그아웃 상태에서는 보이지 않습니다.</li>
+        <li><b>삭제</b>는 되돌릴 수 없으므로 <code>window.confirm()</code>으로 한 번 더 묻고, 취소하면 <code>return</code>으로 끝냅니다.</li>
+        <li>서버에서 지운 뒤 <code>removeFromCart(product.id)</code>로 <b>장바구니에 담겨 있던 같은 상품도</b> 뺍니다.</li>
+        <li>삭제하면 이 상세 화면의 상품이 없어지므로 <code>navigate('/')</code>로 목록으로 이동합니다.</li>
+        <li><b>수정</b>은 화면 이동이므로 <code>&lt;Link&gt;</code>로 <code>/product/3/edit</code> 같은 주소로 갑니다.</li>
+      </ul>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — ⑥ 상품 수정 화면</div>
+      <span class="fname">src/products/EditProduct.tsx</span>
+      <pre><code class="language-tsx">import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import type { Product, ProductForm } from "../types/product";
+import { useProduct } from "../context/ProductContext";
+import { useUser } from "../context/UserContext";
+
+// 수정 폼: 찾은 상품(product)을 받아 처음 값으로 씁니다.
+const EditProductForm = ({ product }: { product: Product }) =&gt; {
+  const { updateProduct } = useProduct();
+  const navigate = useNavigate();
+
+  // 처음 값 = 지금 상품의 값
+  const initialForm: ProductForm = {
+    pName: product.pName,
+    category: product.category,
+    price: product.price,
+    description: product.description,
+    image: product.image ?? "",  // 이미지가 없으면 "" (선택 안 함)
+  };
+  const [form, setForm] = useState&lt;ProductForm&gt;(initialForm);
+  const [error, setError] = useState&lt;string | null&gt;(null);
+
+  const {pName, category, price, description, image} = form;
+
+  // 입력값 변경 핸들러
+  const handleChange = (
+    e: React.ChangeEvent&lt;HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement&gt;) =&gt; {
+    const { name, value } = e.target;
+    setForm({
+      ...form,
+      [name]: value
+    });
+  };
+
+  // 폼 제출 핸들러
+  const handleSubmit = async (e: React.FormEvent&lt;HTMLFormElement&gt;) =&gt; {
+    e.preventDefault();
+    // 유효성 검사
+    if(!pName.trim()){
+      setError("상품명을 입력해주세요.");
+      return;
+    }
+    if(!price || price &lt;= 0){
+      setError("가격을 올바르게 입력해주세요.");
+      return;
+    }
+    if(!description.trim()){
+      setError("설명을 입력해주세요.");
+      return;
+    }
+
+    try {
+      // id는 그대로 두고 나머지 값을 바꿉니다.
+      await updateProduct({
+        id: product.id,
+        pName,
+        category,
+        price: Number(price),
+        description,
+        image: image || undefined  // "" (선택 안 함)이면 undefined
+      });
+      alert("상품이 수정되었습니다.");
+      // 수정한 상품의 상세 화면으로 이동
+      navigate(`/product/${product.id}`);
+    } catch {
+      setError("상품 수정 중 오류가 발생했습니다.");
+    }
+  }
+
+  // 되돌리기 핸들러: 처음 값(지금 상품의 값)으로 돌아갑니다.
+  const handleReset = () =&gt; {
+    setForm(initialForm);
+    setError(null);
+  };
+
+  return (
+    &lt;div className="product-add"&gt;
+      &lt;h2&gt;상품 수정&lt;/h2&gt;
+      &lt;form onSubmit={handleSubmit}&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="pName"&gt;상품명:&lt;/label&gt;
+          &lt;input
+            type="text"
+            id="pName"
+            name="pName"
+            value={pName}
+            onChange={handleChange}
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="category"&gt;카테고리:&lt;/label&gt;
+          &lt;select
+            id="category"
+            name="category"
+            value={category}
+            onChange={handleChange}
+          &gt;
+            &lt;option value="마우스"&gt;마우스&lt;/option&gt;
+            &lt;option value="키보드"&gt;키보드&lt;/option&gt;
+            &lt;option value="모니터"&gt;모니터&lt;/option&gt;
+            &lt;option value="주변기기"&gt;주변기기&lt;/option&gt;
+          &lt;/select&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="price"&gt;가격:&lt;/label&gt;
+          &lt;input
+            type="number"
+            id="price"
+            name="price"
+            value={price}
+            onChange={handleChange}
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="description"&gt;설명:&lt;/label&gt;
+          &lt;textarea
+            id="description"
+            name="description"
+            value={description}
+            onChange={handleChange}
+          /&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label htmlFor="image"&gt;이미지:&lt;/label&gt;
+          &lt;select
+            id="image"
+            name="image"
+            value={image}
+            onChange={handleChange}
+          &gt;
+            &lt;option value=""&gt;선택 안 함&lt;/option&gt;
+            &lt;option value="/images/mouse.png"&gt;마우스&lt;/option&gt;
+            &lt;option value="/images/keyboard.png"&gt;키보드&lt;/option&gt;
+            &lt;option value="/images/monitor.png"&gt;모니터&lt;/option&gt;
+            &lt;option value="/images/usb-hub.png"&gt;USB-C 허브&lt;/option&gt;
+            &lt;option value="/images/webcam.png"&gt;웹캠&lt;/option&gt;
+          &lt;/select&gt;
+        &lt;/div&gt;
+        {error &amp;&amp; &lt;p className="product-add_error"&gt;{error}&lt;/p&gt;}
+        &lt;div className="product-add_buttons"&gt;
+          &lt;button type="submit"&gt;저장&lt;/button&gt;
+          &lt;button type="button" onClick={handleReset}&gt;되돌리기&lt;/button&gt;
+          &lt;button type="button" onClick={() =&gt; navigate(`/product/${product.id}`)}&gt;취소&lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/form&gt;
+    &lt;/div&gt;
+  )
+}
+
+// 수정 화면: 주소의 id로 상품을 찾아 수정 폼에 넘깁니다.
+const EditProduct = () =&gt; {
+  const { id } = useParams&lt;{ id: string }&gt;();
+  const { products } = useProduct();
+  const { currentUser } = useUser();
+
+  // 관리자만 수정 가능 (주소창에 직접 입력해도 막기)
+  if (currentUser?.role !== 'admin') {
+    return (
+      &lt;div className="product-add"&gt;
+        &lt;p&gt;관리자만 상품을 수정할 수 있습니다.&lt;/p&gt;
+        &lt;Link to="/signin"&gt;로그인&lt;/Link&gt;
+      &lt;/div&gt;
+    );
+  }
+
+  const product = products.find((p) =&gt; p.id === Number(id));
+
+  // 상품 목록을 아직 불러오는 중이거나 없는 상품이면
+  if (!product) {
+    return &lt;div&gt;상품을 찾을 수 없습니다.&lt;/div&gt;;
+  }
+
+  return &lt;EditProductForm product={product} /&gt;;
+}
+
+export default EditProduct</code></pre>
+      <ul>
+        <li>④ 상품 등록과 같은 폼이지만, 처음 값이 빈 값이 아니라 <b>지금 상품의 값</b>입니다. 이미지가 없는 상품은 <code>""</code>(선택 안 함)로 시작합니다.</li>
+        <li><b>컴포넌트를 둘로 나눈 이유:</b> 상품 목록은 서버에서 늦게 도착하므로, 주소창에 <code>/product/3/edit</code>을 바로 입력하면 처음에는 <code>product</code>가 없습니다. <code>useState(처음 값)</code>은 처음 한 번만 쓰이므로, <code>EditProduct</code>가 상품을 찾은 <b>뒤에</b> <code>EditProductForm</code>을 그려야 처음 값이 제대로 들어갑니다.</li>
+        <li><code>id</code>는 바꾸지 않고 그대로 넘깁니다. 서버는 주소의 <code>:id</code>로 어떤 상품인지 찾습니다.</li>
+        <li>관리자 확인은 상세 화면의 버튼뿐 아니라 <b>수정 화면에서도</b> 합니다. 주소창에 직접 입력해 들어올 수 있기 때문입니다.</li>
+      </ul>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — ⑦ 수정 화면 경로와 버튼 스타일</div>
+      <span class="fname">src/App.tsx</span>
+      <pre><code class="language-tsx">import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import './App.css'
+import Header from './layouts/Header';
+import UserProvider from './context/UserProvider';
+import ProductProvider from './context/ProductProvider';
+import CartProvider from './context/CartProvider';
+import ProductList from './products/ProductList';
+import ProductDetail from './products/ProductDetail';
+import AddProduct from './products/AddProduct';
+import EditProduct from './products/EditProduct';
+import Cart from './products/Cart';
+import SignIn from './users/SignIn';
+import SignUp from './users/SignUp';
+import AdminPage from './admin/AdminPage';
+
+function App() {
+
+  return (
+    // UserProvider를 최상위 컴포넌트로 감싸서 로그인 상태를 전역으로 관리
+    &lt;UserProvider&gt;
+      &lt;ProductProvider&gt;
+        &lt;CartProvider&gt;
+          &lt;BrowserRouter&gt;
+            &lt;Header /&gt;
+            &lt;main&gt;
+              &lt;Routes&gt;
+                &lt;Route path='/' element={&lt;ProductList /&gt;} /&gt;
+                &lt;Route path='/product/new' element={&lt;AddProduct /&gt;} /&gt;
+                &lt;Route path='/product/:id' element={&lt;ProductDetail /&gt;} /&gt;
+                {/* 상품 수정 (관리자) */}
+                &lt;Route path='/product/:id/edit' element={&lt;EditProduct /&gt;} /&gt;
+                &lt;Route path='/cart' element={&lt;Cart /&gt;} /&gt;
+                &lt;Route path='/signin' element={&lt;SignIn /&gt;} /&gt;
+                &lt;Route path='/signup' element={&lt;SignUp /&gt;} /&gt;
+                {/* 관리자 페이지 */}
+                &lt;Route path='/admin' element={&lt;AdminPage /&gt;} /&gt;
+              &lt;/Routes&gt;
+            &lt;/main&gt;
+          &lt;/BrowserRouter&gt;
+        &lt;/CartProvider&gt;
+      &lt;/ProductProvider&gt;
+    &lt;/UserProvider&gt;
+  )
+}
+
+export default App;</code></pre>
+      <span class="fname">src/App.css</span>
+      <pre><code class="language-css">/* 상품 상세 관리자 버튼 (수정 · 삭제) */
+.product-detail_admin {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #ddd;
+}
+.product-detail_edit,
+.product-detail_delete {
+  font: inherit;
+  font-size: 14px;
+  padding: 6px 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.product-detail_delete { color: #d93025; border-color: #d93025; }</code></pre>
+      <ul>
+        <li><code>/product/:id/edit</code> — <code>:id</code> 뒤에 <code>/edit</code>이 붙은 주소입니다. <code>/product/:id</code>와 겹치지 않으므로 순서와 상관없이 맞는 경로로 갑니다.</li>
+        <li>수정 화면은 <code>className="product-add"</code>를 그대로 써서 상품 등록 화면과 같은 모양이 됩니다.</li>
+        <li>삭제 버튼은 빨간 글자 · 테두리로 <b>위험한 동작</b>이라는 것을 보여 줍니다.</li>
+      </ul>
+      <div class="tip"><span class="lbl">💡 주의</span> 화면에서 버튼을 숨겨도 Postman으로 <code>DELETE</code> · <code>PUT</code>을 보내면 누구나 지우고 고칠 수 있습니다. 실제 서비스에서는 서버도 로그인한 사용자가 관리자인지 확인해야 합니다(토큰 · 세션 인증).</div>
     </div>
     <div class="concept">
       <h3 class="blk">📖 생각해 볼 점 — 불러오는 동안</h3>
