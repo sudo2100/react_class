@@ -175,7 +175,8 @@ hue-6-2: #e6c07b
       <li><a href="#m5">상품 API 연결</a></li>
       <li><a href="#m6">회원 API 연결</a></li>
       <li><a href="#m7">MyPage(회원정보변경)</a></li>
-      <li><a href="#m8">배포(Deploy)</a></li>
+      <li><a href="#m8">로그인 인증 (세션)</a></li>
+      <li><a href="#m9">배포(Deploy)</a></li>
     </ol>
   </nav>
 
@@ -2203,7 +2204,357 @@ export default MyPage;</code></pre>
 
   <!-- ================= MODULE 8 ================= -->
   <section class="module" id="m8">
-    <h2><span class="num">8</span> 배포(Deploy)</h2>
+    <h2><span class="num">8</span> 로그인 인증 (세션)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>HTTP가 요청마다 "누구인지" 기억하지 못한다는 것을 이해하고, 세션과 JWT 토큰 인증의 차이를 설명할 수 있다.</li>
+      <li><code>express-session</code>으로 로그인 정보를 서버 세션에 저장할 수 있다.</li>
+      <li>미들웨어로 로그인 · 관리자 권한이 필요한 API를 서버에서 막을 수 있다.</li>
+      <li>React에서 쿠키를 함께 보내고(<code>withCredentials</code>), 새로고침해도 로그인을 유지할 수 있다.</li>
+    </ul></div>
+
+    <div class="concept">
+      <h3 class="blk">📖 지금까지 만든 로그인 방식의 문제</h3>
+      <p>6단원까지는 로그인에 성공하면 서버가 돌려준 회원 정보를 React의 <code>currentUser</code>(메모리)에만 저장했습니다. 그래서 세 가지 문제가 있습니다.</p>
+      <table>
+        <tr><th>문제</th><th>이유</th></tr>
+        <tr><td>새로고침하면 로그아웃</td><td><code>currentUser</code>는 메모리 상태라 새로고침하면 처음 값(<code>null</code>)으로 돌아감</td></tr>
+        <tr><td>서버 API가 무방비</td><td>서버는 요청을 보낸 사람이 누구인지 모름 → Postman으로 누구나 상품을 등록 · 수정 · 삭제 가능</td></tr>
+        <tr><td>관리자 확인이 화면에만 있음</td><td>버튼을 숨겨도 주소창이나 Postman으로 우회 가능</td></tr>
+      </table>
+      <p>HTTP는 요청 하나하나가 따로따로입니다(<b>무상태, stateless</b>). 서버가 "이 요청은 로그인한 user1이 보냈다"는 것을 알려면, 로그인 뒤 요청마다 <b>나를 증명하는 값</b>을 함께 보내야 합니다. 이것을 <b>인증(Authentication)</b>이라고 합니다.</p>
+    </div>
+
+    <div class="concept">
+      <h3 class="blk">📖 세션 인증 vs JWT 토큰 인증</h3>
+      <table>
+        <tr><th></th><th>세션(Session)</th><th>JWT 토큰(JSON Web Token)</th></tr>
+        <tr><td>로그인 정보 저장 위치</td><td><b>서버</b> (세션 저장소)</td><td><b>토큰 안</b>에 담아 브라우저가 보관</td></tr>
+        <tr><td>브라우저가 보내는 것</td><td>세션 ID가 든 <b>쿠키</b> (자동 전송)</td><td><code>Authorization: Bearer 토큰</code> 헤더 (직접 붙임)</td></tr>
+        <tr><td>서버가 확인하는 방법</td><td>세션 ID로 저장소에서 회원 정보 찾기</td><td>비밀키로 <b>서명 · 만료 시간</b> 확인</td></tr>
+        <tr><td>로그아웃</td><td>서버에서 세션 삭제 → 바로 무효</td><td>브라우저에서 토큰 삭제 (토큰 자체는 만료 전까지 유효)</td></tr>
+        <tr><td>서버가 여러 대일 때</td><td>세션 저장소를 공유해야 함 (DB · Redis)</td><td>비밀키만 같으면 어느 서버든 확인 가능</td></tr>
+        <tr><td>Express 라이브러리</td><td><code>express-session</code></td><td><code>jsonwebtoken</code></td></tr>
+      </table>
+      <p>이 단원에서는 <b>세션</b>으로 새로고침 로그인 유지와 관리자 API 보호를 만듭니다. 같은 기능을 <b>JWT 토큰</b>으로 만드는 방법은 <b>11-2강</b>에서 다룹니다. 실제 프로젝트에서는 <b>둘 중 하나</b>만 씁니다.</p>
+    </div>
+    <div class="concept">
+      <h3 class="blk">📖 미들웨어(middleware)</h3>
+      <p>Express에서 요청이 라우터 함수에 닿기 <b>전에</b> 먼저 실행되는 함수입니다. <code>(req, res, next)</code>를 받아서, 통과시키려면 <code>next()</code>를 부르고 막으려면 바로 응답(<code>res.status(401)…</code>)을 보냅니다. <code>app.use(express.json())</code>, <code>app.use(cors())</code>도 미들웨어입니다. 이번 강의에서는 <b>로그인 확인 · 관리자 확인</b> 미들웨어를 직접 만듭니다.</p>
+      <div class="flow">요청 → cors → express.json → requireLogin → requireAdmin → 라우터 함수 → 응답
+                                   │(로그인 안 함)    │(관리자 아님)
+                                   ▼ 401              ▼ 403</div>
+    </div>
+
+    <div class="concept">
+      <h3 class="blk">📖 세션 인증 흐름</h3>
+      <div class="flow">[로그인]
+브라우저 ── POST /api/users/login (아이디 · 비밀번호) ──▶ 서버
+          서버: 비밀번호 확인 → req.session.user = 회원 정보 (서버 메모리에 저장)
+        ◀── Set-Cookie: connect.sid=세션ID ──
+[다음 요청부터]
+브라우저 ── 요청 + Cookie: connect.sid=세션ID (자동으로 붙음) ──▶ 서버
+          서버: 세션ID로 req.session.user를 찾음 → 누구인지 앎</div>
+      <p><b>쿠키(cookie)</b>는 서버가 브라우저에 맡겨 두는 작은 값입니다. 한 번 받으면 브라우저가 같은 서버로 요청할 때마다 <b>자동으로</b> 함께 보냅니다. 세션 방식은 쿠키에 회원 정보가 아니라 <b>세션 ID(번호표)</b>만 넣고, 실제 회원 정보는 서버가 가지고 있습니다.</p>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — ① express-session 설치와 설정</div>
+      <span class="fname">터미널 (server 폴더)</span>
+      <pre><code class="language-bash">npm install express-session</code></pre>
+      <span class="fname">server/index.js (위쪽 import)</span>
+      <pre><code class="language-javascript">import express from 'express'
+import pg from 'pg'
+import cors from 'cors'
+import bcrypt from 'bcrypt'
+import session from 'express-session'   // 추가</code></pre>
+      <span class="fname">server/index.js (app 아래, 라우터 위)</span>
+      <pre><code class="language-javascript">// 쿠키를 주고받으려면 허용할 주소(origin)를 정확히 적고 credentials를 켭니다.
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
+
+// 세션 설정: 로그인 정보를 서버 메모리에 저장하고, 브라우저에는 세션 ID 쿠키만 보냅니다.
+app.use(session({
+  secret: "space-shop-secret",   // 세션 ID 쿠키를 서명하는 비밀 키
+  resave: false,                 // 바뀐 것이 없으면 다시 저장하지 않음
+  saveUninitialized: false,      // 로그인하기 전에는 세션을 만들지 않음
+  cookie: {
+    httpOnly: true,              // 자바스크립트로 쿠키를 읽을 수 없게 (XSS 방어)
+    maxAge: 1000 * 60 * 60       // 1시간 뒤 만료
+  }
+}));
+
+// 본문 요청 파싱
+app.use(express.json());</code></pre>
+      <ul>
+        <li><code>cors()</code>는 모든 주소를 허용하지만, <b>쿠키를 주고받을 때</b>는 <code>origin</code>에 React 주소를 정확히 적고 <code>credentials: true</code>를 켜야 합니다.</li>
+        <li><code>secret</code> — 세션 ID 쿠키에 서명해 위조를 막는 비밀 키입니다. 배포할 때는 환경변수로 넣습니다.</li>
+        <li><code>httpOnly: true</code> — 자바스크립트(<code>document.cookie</code>)로 쿠키를 읽을 수 없어, 악성 스크립트가 세션 ID를 훔쳐 가기 어렵습니다.</li>
+        <li>세션은 기본적으로 <b>서버 메모리</b>에 저장됩니다. 서버를 다시 시작하면(nodemon 포함) 모든 세션이 사라져 다시 로그인해야 합니다.</li>
+      </ul>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — ② 로그인 확인 · 관리자 확인 미들웨어</div>
+      <span class="fname">server/index.js (express.json() 아래)</span>
+      <pre><code class="language-javascript">// 로그인했는지 확인하는 미들웨어
+const requireLogin = (req, res, next) =&gt; {
+  if (!req.session.user) {
+    return res.status(401).send("로그인이 필요합니다.");
+  }
+  next();   // 다음 단계(라우터)로 넘어감
+};
+
+// 관리자인지 확인하는 미들웨어
+const requireAdmin = (req, res, next) =&gt; {
+  if (req.session.user?.role !== "admin") {
+    return res.status(403).send("관리자만 사용할 수 있습니다.");
+  }
+  next();
+};</code></pre>
+      <ul>
+        <li><code>req.session</code> — express-session이 요청마다 쿠키의 세션 ID로 찾아서 넣어 주는 객체입니다. 로그인할 때 <code>req.session.user</code>에 회원 정보를 넣어 둡니다.</li>
+        <li><code>401</code>(Unauthorized) — 로그인하지 않음, <code>403</code>(Forbidden) — 로그인했지만 권한 없음.</li>
+        <li><code>next()</code>를 부르면 다음 미들웨어나 라우터 함수로 넘어가고, 부르지 않고 응답을 보내면 거기서 끝납니다.</li>
+      </ul>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — ③ 로그인 · 로그인 확인 · 로그아웃 API</div>
+      <span class="fname">server/index.js (회원 API의 로그인 바꾸기)</span>
+      <pre><code class="language-javascript">// 로그인: 비밀번호가 맞으면 세션에 회원 정보를 저장합니다.
+app.post("/api/users/login", async (req, res) =&gt; {
+  const { username, password } = req.body;
+  const sql = "SELECT * FROM users WHERE username = $1";
+  try {
+    const result = await db.query(sql, [username]);
+    const user = result.rows[0];
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(401).send("아이디 또는 비밀번호가 올바르지 않습니다.");
+    }
+    const { password: _, ...userInfo } = user;
+    req.session.user = userInfo;   // 세션에 로그인 정보 저장
+    res.json({ message: "로그인 성공", user: userInfo });
+  } catch (err) {
+    console.log("회원 로그인 오류!", err);
+    res.status(500).send("로그인 중 오류가 발생했습니다.");
+  }
+});
+
+// 로그인 확인: 새로고침해도 세션에 남아 있는 회원 정보를 돌려줍니다.
+app.get("/api/users/me", requireLogin, (req, res) =&gt; {
+  res.json(req.session.user);
+});
+
+// 로그아웃: 서버의 세션을 지우고 쿠키도 지웁니다.
+app.post("/api/users/logout", (req, res) =&gt; {
+  req.session.destroy(() =&gt; {
+    res.clearCookie("connect.sid");
+    res.send("로그아웃 완료");
+  });
+});</code></pre>
+      <ul>
+        <li>로그인에 성공하면 <code>req.session.user = userInfo</code>로 세션에 저장합니다. 이때 express-session이 응답에 <code>Set-Cookie: connect.sid=…</code>를 붙입니다.</li>
+        <li><code>GET /api/users/me</code> — React가 새로고침 직후 "나 로그인되어 있나?"를 물어보는 API입니다. 세션이 있으면 회원 정보를, 없으면 <code>requireLogin</code>이 401을 돌려줍니다.</li>
+        <li><code>req.session.destroy()</code>로 서버의 세션을 지우고, <code>res.clearCookie("connect.sid")</code>로 브라우저 쿠키도 지웁니다.</li>
+      </ul>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — ④ API 보호 — 관리자 · 본인만</div>
+      <span class="fname">server/index.js (상품 API)</span>
+      <pre><code class="language-javascript">// 상품 등록 · 수정 · 삭제는 관리자만: 경로와 함수 사이에 미들웨어를 끼워 넣습니다.
+app.post("/api/products", requireAdmin, async (req, res) =&gt; {
+  // ... (안은 그대로)
+});
+
+app.put("/api/products/:id", requireAdmin, async (req, res) =&gt; {
+  // ... (안은 그대로)
+});
+
+app.delete("/api/products/:id", requireAdmin, async (req, res) =&gt; {
+  // ... (안은 그대로)
+});</code></pre>
+      <span class="fname">server/index.js (회원 정보 수정)</span>
+      <pre><code class="language-javascript">// 회원 정보 수정 (이름 · 이메일)
+app.put("/api/users/:id", requireLogin, async (req, res) =&gt; {
+  // 세션의 회원 번호와 주소의 번호가 다르면 막음 (본인만 수정)
+  if (req.session.user.id !== Number(req.params.id)) {
+    return res.status(403).send("본인 정보만 수정할 수 있습니다.");
+  }
+  const uid = req.params.id;
+  const { name, email } = req.body;
+  // RETURNING: 바꾼 뒤의 회원 정보를 바로 돌려받습니다. (password는 빼고)
+  const sql = "UPDATE users SET name = $1, email = $2 WHERE id = $3 "
+        + "RETURNING id, username, name, email, role, created_at";
+  try {
+    const result = await db.query(sql, [name, email, uid]);
+    if (result.rows.length === 0) {
+      return res.status(404).send("회원을 찾을 수 없습니다.");
+    }
+    req.session.user = result.rows[0];   // 세션의 회원 정보도 새 값으로
+    res.json(result.rows[0]);
+  } catch (err) {
+    // 23505: UNIQUE 위반 (다른 회원이 쓰는 이메일)
+    if (err.code === "23505") {
+      return res.status(409).send("이미 사용 중인 이메일입니다.");
+    }
+    console.log("회원 수정 오류!", err);
+    res.status(500).send("회원 정보 수정 중 오류가 발생했습니다.");
+  }
+});</code></pre>
+      <ul>
+        <li><code>app.post(경로, 미들웨어, 함수)</code>처럼 경로와 함수 사이에 미들웨어를 넣으면 그 API에만 적용됩니다. 상품 목록 · 상세 조회(<code>GET</code>)는 누구나 볼 수 있게 그대로 둡니다.</li>
+        <li>회원 정보 수정은 <b>본인만</b>: 세션의 회원 번호와 주소의 <code>:id</code>가 같은지 확인합니다. 주소의 값은 문자열이라 <code>Number()</code>로 바꿔 비교합니다.</li>
+        <li>수정에 성공하면 <code>req.session.user</code>도 새 값으로 바꿔, 새로고침해도 바뀐 이름이 나오게 합니다.</li>
+      </ul>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 테스트 (Postman)</div>
+      <ul>
+        <li>로그인하지 않고 <code>POST /api/products</code> → <code>403 관리자만 사용할 수 있습니다.</code></li>
+        <li><code>POST /api/users/login</code>(관리자) → 응답의 <b>Cookies</b> 탭에 <code>connect.sid</code>가 생깁니다. Postman은 받은 쿠키를 다음 요청에 자동으로 붙여 줍니다.</li>
+        <li>다시 <code>POST /api/products</code> → <code>200 상품 등록 완료!!</code></li>
+        <li><code>POST /api/users/logout</code> 후 <code>GET /api/users/me</code> → <code>401 로그인이 필요합니다.</code></li>
+      </ul>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — ⑤ React: 요청마다 쿠키 보내기</div>
+      <span class="fname">src/api/api.ts</span>
+      <pre><code class="language-typescript">import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://localhost:8000/api',
+  // 요청할 때마다 세션 쿠키(connect.sid)를 함께 보냅니다.
+  withCredentials: true,
+});
+
+export default api;</code></pre>
+      <ul>
+        <li>브라우저는 <b>다른 주소</b>(5173 → 8000)로 요청할 때 기본적으로 쿠키를 보내지 않습니다. <code>withCredentials: true</code>를 켜야 세션 쿠키가 함께 갑니다.</li>
+        <li>서버의 <code>cors({{ origin, credentials: true }})</code>와 짝이 맞아야 합니다. 한쪽만 켜면 브라우저가 응답을 막습니다.</li>
+      </ul>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — ⑥ 로그인 확인 · 로그아웃 요청 함수</div>
+      <span class="fname">src/api/users.ts (아래에 추가)</span>
+      <pre><code class="language-typescript">// 로그인 확인: 서버 세션에 남아 있는 회원 정보를 받습니다. (로그아웃 상태면 401 오류)
+export const getMe = async () =&gt; {
+  const response = await api.get&lt;User&gt;('/users/me');
+  return response.data;
+}
+
+// 로그아웃: 서버의 세션을 지웁니다.
+export const requestLogout = async () =&gt; {
+  await api.post('/users/logout');
+}</code></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — ⑦ Context와 Provider: 새로고침해도 로그인 유지</div>
+      <span class="fname">src/context/UserContext.ts</span>
+      <pre><code class="language-typescript">// 회원 컨텍스트 타입 정의
+// 서버에 물어봐야 하므로 signup · login은 Promise를 돌려줍니다.
+interface UserContextType{
+    users: User[];  // 회원목록
+    currentUser: User | null;  // 로그인한 회원 (로그아웃 상태면 null)
+    isAuthLoading: boolean;  // 로그인 상태 확인 중 여부
+    signup: (newUser: NewUser) =&gt; Promise&lt;void&gt;  // 회원가입
+    login: (loginForm: LoginForm) =&gt; Promise&lt;boolean&gt;  // 로그인 (성공 여부 반환)
+    logout: () =&gt; Promise&lt;void&gt;  // 로그아웃 (서버에 요청)
+    updateUser: (form: UserUpdateForm) =&gt; Promise&lt;void&gt;  // 회원 정보 수정
+}</code></pre>
+      <span class="fname">src/context/UserProvider.tsx</span>
+      <pre><code class="language-tsx">import { createUser, getMe, getUsers, modifyUser, requestLogin, requestLogout } from "../api/users";
+
+// ...
+
+    const [currentUser, setCurrentUser] = useState&lt;User | null&gt;(null);
+    // 처음에는 로그인 상태를 확인하는 중(true)
+    const [isAuthLoading, setIsAuthLoading] = useState&lt;boolean&gt;(true);
+
+    // 새로고침해도 로그인 유지: 서버 세션에 로그인 정보가 있는지 물어봅니다.
+    useEffect(() =&gt; {
+        getMe()
+            .then(setCurrentUser)               // 세션이 있으면 로그인 상태
+            .catch(() =&gt; setCurrentUser(null))  // 401이면 로그아웃 상태
+            .finally(() =&gt; setIsAuthLoading(false));
+    }, []);
+
+
+    // ...
+
+    // 로그아웃 함수: 서버의 세션을 지운 뒤 화면에서도 로그아웃
+    const logout = async () =&gt; {
+        await requestLogout();
+        setCurrentUser(null);
+    }
+
+    return(
+        &lt;UserContext.Provider value={{
+            users, 
+            currentUser, 
+            isAuthLoading,
+            signup, 
+            login, 
+            logout,
+            updateUser
+        }}&gt;</code></pre>
+      <ul>
+        <li>Provider가 처음 그려질 때 <code>getMe()</code>로 서버에 물어봅니다. 세션 쿠키가 살아 있으면 회원 정보를 받아 <code>currentUser</code>에 넣으므로 <b>새로고침해도 로그인이 유지</b>됩니다.</li>
+        <li><code>isAuthLoading</code> — 서버의 대답을 기다리는 동안은 로그인 여부를 아직 모르므로 <code>true</code>입니다. 상품의 <code>isLoading</code>과 같은 방식입니다.</li>
+        <li><code>logout</code>은 서버에 요청하므로 <code>Promise&lt;void&gt;</code>를 돌려줍니다. 로그인(<code>login</code>)은 6단원 그대로입니다.</li>
+      </ul>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — ⑧ 헤더: 로그아웃 기다리기</div>
+      <span class="fname">src/layouts/Header.tsx</span>
+      <pre><code class="language-tsx">    // 로그아웃 시 장바구니 비우고 상품 목록으로 이동
+    const handleLogout = async () =&gt; {
+        await logout();   // 서버에 로그아웃 요청이 끝날 때까지 기다림
+        clearCart();
+        navigate('/');
+    }</code></pre>
+      <ul>
+        <li><code>logout()</code>이 서버 요청이 되었으므로 <code>await</code>로 끝날 때까지 기다린 뒤 장바구니를 비우고 이동합니다.</li>
+      </ul>
+    </div>
+
+    <div class="ex"><div class="lbl">💡 예제 — ⑨ 로그인 확인 중에는 기다리기 (MyPage · 관리자 페이지)</div>
+      <span class="fname">src/users/MyPage.tsx</span>
+      <pre><code class="language-tsx">const MyPage = () =&gt; {
+  const { currentUser, isAuthLoading } = useUser();
+
+  // 로그인 상태를 확인하는 동안에는 기다림 (새로고침 직후)
+  if (isAuthLoading) {
+    return &lt;div&gt;불러오는 중...&lt;/div&gt;;
+  }
+
+  if (!currentUser) {</code></pre>
+      <span class="fname">src/admin/AdminPage.tsx</span>
+      <pre><code class="language-tsx">const AdminPage = () =&gt; {
+  const { products } = useProduct();
+  const { users, currentUser, isAuthLoading } = useUser();
+
+  // 로그인 상태를 확인하는 동안에는 기다림 (새로고침 직후)
+  if (isAuthLoading) {
+    return &lt;div&gt;불러오는 중...&lt;/div&gt;;
+  }</code></pre>
+      <ul>
+        <li>새로고침 직후에는 <code>currentUser</code>가 아직 <code>null</code>이라 "로그인한 회원만 …"이 잠깐 보였다가 사라집니다. <code>isAuthLoading</code>이 <code>true</code>인 동안에는 "불러오는 중..."을 보여 줍니다.</li>
+      </ul>
+    </div>
+
+    <div class="concept">
+      <h3 class="blk">📖 정리</h3>
+      <ol>
+        <li>세션 방식은 회원 정보를 <b>서버</b>에 두고, 브라우저에는 세션 ID 쿠키만 줍니다.</li>
+        <li>서버는 <code>cors({ origin, credentials: true })</code>, React는 <code>withCredentials: true</code>로 쿠키를 주고받습니다.</li>
+        <li><code>requireLogin</code> · <code>requireAdmin</code> 미들웨어로 서버 API를 직접 막습니다(401 · 403).</li>
+        <li>새로고침하면 <code>GET /api/users/me</code>로 로그인 상태를 다시 가져옵니다.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 9 ================= -->
+  <section class="module" id="m9">
+    <h2><span class="num">9</span> 배포(Deploy)</h2>
     <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
       <li>Render.com에 PostgreSQL · Express 서버 · React 사이트를 차례로 배포할 수 있다.</li>
       <li>환경 변수로 내 컴퓨터와 배포 환경의 설정(DB 주소, 서버 주소, 포트)을 나눌 수 있다.</li>
@@ -2269,10 +2620,13 @@ UPDATE users SET role = 'admin' WHERE username = 'admin0';</code></pre>
       </ul>
     </div>
 
-    <div class="ex"><div class="lbl">💡 예제 — ③ 서버: DB 주소와 포트를 환경 변수로</div>
-      <span class="fname">server/index.js</span>
+    <div class="ex"><div class="lbl">💡 예제 — ③ 서버: 환경변수로 배포 설정</div>
+      <span class="fname">server/index.js (const app = express(); 아래)</span>
       <pre><code class="language-javascript">// 서버 포트: Render는 PORT 환경 변수로 포트를 정해 줍니다.
 const PORT = process.env.PORT || 8000;
+
+// 배포(Render)인지 확인: Render 환경변수에 NODE_ENV=production을 넣습니다.
+const isProduction = process.env.NODE_ENV === "production";
 
 // postgreSQL 연결 설정
 // 배포(Render)에서는 환경 변수 DATABASE_URL로, 내 컴퓨터에서는 기존 설정으로 연결합니다.
@@ -2283,12 +2637,57 @@ const db = process.env.DATABASE_URL
       user: "jsuser",
       password: "pwjs",
       database: "tsdb"
-    });</code></pre>
+    });
+
+// Render는 앞단 프록시(https)를 거쳐 요청이 들어오므로, 프록시를 믿어야 secure 쿠키가 동작합니다.
+if (isProduction) {
+  app.set("trust proxy", 1);
+}
+
+// CORS: 배포에서는 CLIENT_URL(React 사이트 주소)만 허용
+app.use(cors({
+  origin: process.env.CLIENT_URL || "http://localhost:5173",
+  credentials: true
+}));
+
+// 세션: 비밀 키와 쿠키 설정을 배포 환경에 맞춤
+app.use(session({
+  secret: process.env.SESSION_SECRET || "space-shop-secret",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60,
+    // React(shop-client)와 서버(shop-server)가 다른 사이트라
+    // 배포에서는 sameSite: "none" + secure(https 전용)가 있어야 쿠키가 오갑니다.
+    sameSite: isProduction ? "none" : "lax",
+    secure: isProduction
+  }
+}));</code></pre>
       <ul>
-        <li><code>process.env.이름</code>으로 환경 변수를 읽습니다. Render에는 ④에서 <code>DATABASE_URL</code>을 넣고, 내 컴퓨터에는 넣지 않으므로 기존 <code>localhost</code> 설정으로 연결됩니다.</li>
+        <li><code>process.env.이름</code>으로 환경변수를 읽습니다. Render에는 ④에서 값을 넣고, 내 컴퓨터에는 넣지 않으므로 기존 <code>localhost</code> 설정으로 동작합니다.</li>
         <li><code>connectionString</code> — <code>postgresql://계정:비밀번호@호스트/DB</code> 모양의 주소 하나로 접속 정보를 한 번에 넘깁니다.</li>
-        <li><code>PORT</code> — Render는 서버가 쓸 포트를 <code>PORT</code> 환경 변수로 알려 줍니다. 없으면(내 컴퓨터) <code>8000</code>을 씁니다. 나머지 코드는 고치지 않습니다.</li>
+        <li><b>세션 쿠키(8단원)</b> — React(<code>shop-client.onrender.com</code>)와 서버(<code>shop-server.onrender.com</code>)는 <b>다른 사이트</b>로 취급됩니다. 이때 쿠키가 오가려면 <code>sameSite: "none"</code>과 <code>secure: true</code>(https 전용)가 필요하고, Render는 프록시를 거쳐 https로 들어오므로 <code>app.set("trust proxy", 1)</code>도 넣습니다. 내 컴퓨터(http)에서는 기존 설정(<code>lax</code>)을 그대로 씁니다.</li>
+        <li>8단원 ①의 <code>cors(…)</code> · <code>session(…)</code> 설정을 이 코드로 바꿉니다. 나머지 코드는 고치지 않습니다.</li>
         <li>고친 뒤 <code>git add .</code> → <code>git commit</code> → <code>git push</code>로 깃허브에 올립니다.</li>
+      </ul>
+    </div>
+
+    <div class="concept">
+      <h3 class="blk">📖 환경변수 체크리스트</h3>
+      <table>
+        <tr><th>서비스</th><th>이름</th><th>값</th><th>코드에서</th></tr>
+        <tr><td rowspan="4">Web Service<br>(<code>server</code>)</td><td><code>DATABASE_URL</code></td><td>①의 <b>Internal</b> Database URL</td><td>DB 연결</td></tr>
+        <tr><td><code>NODE_ENV</code></td><td><code>production</code></td><td>배포 설정 켜기 (쿠키 · trust proxy)</td></tr>
+        <tr><td><code>SESSION_SECRET</code></td><td>길고 무작위인 문자열 (예: 32자 이상)</td><td>세션 쿠키 서명</td></tr>
+        <tr><td><code>CLIENT_URL</code></td><td>⑥의 React 주소 (<code>https://shop-client.onrender.com</code>, 끝에 <code>/</code> 없이)</td><td>CORS 허용 주소</td></tr>
+        <tr><td>Static Site<br>(<code>client</code>)</td><td><code>VITE_API_URL</code></td><td>④의 서버 주소 (<code>https://shop-server.onrender.com</code>, 끝에 <code>/</code> 없이)</td><td>axios 서버 주소</td></tr>
+      </table>
+      <ul>
+        <li><code>PORT</code>는 Render가 자동으로 넣어 주므로 직접 넣지 않습니다.</li>
+        <li><code>CLIENT_URL</code>은 ⑥에서 React 사이트를 만든 <b>뒤에</b> 주소를 알 수 있습니다. 서버를 먼저 만들고, ⑥이 끝나면 서버의 <b>Environment</b>에 추가합니다. 저장하면 서버가 자동으로 다시 배포됩니다. (그 전까지는 React에서 서버로 보내는 요청이 CORS에 막힙니다.)</li>
+        <li>주소 끝에 <code>/</code>가 붙으면 CORS 주소가 맞지 않아 요청이 막힙니다.</li>
+        <li><code>SESSION_SECRET</code> · <code>DATABASE_URL</code>은 비밀번호와 같으므로 코드나 깃허브, 화면 캡처에 노출하지 않습니다.</li>
       </ul>
     </div>
 
@@ -2303,10 +2702,11 @@ const db = process.env.DATABASE_URL
         <tr><td>Build Command</td><td><code>npm install</code></td><td>패키지 설치</td></tr>
         <tr><td>Start Command</td><td><code>node index.js</code></td><td>배포에서는 nodemon 대신 node로 실행</td></tr>
         <tr><td>Instance Type</td><td><code>Free</code></td><td></td></tr>
-        <tr><td>Environment Variables</td><td><code>DATABASE_URL</code> = ①의 <b>Internal Database URL</b></td><td>③의 <code>process.env.DATABASE_URL</code></td></tr>
+        <tr><td>Environment Variables</td><td><code>DATABASE_URL</code>, <code>NODE_ENV</code>, <code>SESSION_SECRET</code>, <code>CLIENT_URL</code></td><td>📖 환경변수 체크리스트 참고 (<code>CLIENT_URL</code>은 ⑥ 뒤에 추가)</td></tr>
       </table>
       <ul>
         <li><b>Deploy Web Service</b>를 누르면 Render가 저장소를 받아 설치 · 실행합니다. <b>Logs</b>에 <code>postgreSQL 연결 성공</code>이 나오면 성공입니다.</li>
+        <li>Logs에 <code>MemoryStore is not designed for a production environment</code> 경고가 나옵니다. 세션을 서버 메모리에 두기 때문이며 수업용으로는 괜찮습니다. 서버가 다시 시작되면 로그인이 풀립니다.</li>
         <li>브라우저에서 <code>https://shop-server.onrender.com/api/products</code>를 열어 상품 JSON이 나오는지 확인합니다.</li>
       </ul>
     </div>
@@ -2321,12 +2721,15 @@ export const SERVER_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000
 // 요청할 때는 '/products'처럼 뒷부분만 적습니다.
 const api = axios.create({
   baseURL: `${SERVER_URL}/api`,
+  // 요청할 때마다 세션 쿠키를 함께 보냅니다. (8단원)
+  withCredentials: true,
 });
 
 export default api;</code></pre>
       <ul>
         <li>Vite에서는 <code>VITE_</code>로 시작하는 환경 변수만 <code>import.meta.env.이름</code>으로 읽을 수 있습니다.</li>
         <li>값이 없으면(내 컴퓨터) <code>??</code>로 <code>http://localhost:8000</code>을 씁니다. 서버 주소는 <b>한 곳(api.ts)</b>에만 둡니다.</li>
+        <li>8단원 ⑤의 <code>withCredentials: true</code>도 그대로 둡니다. 없으면 배포에서 로그인이 유지되지 않습니다.</li>
         <li>환경 변수 값은 <b>빌드할 때</b> 코드에 들어갑니다. Render에서 값을 바꾸면 다시 배포(빌드)해야 반영됩니다.</li>
       </ul>
     </div>
@@ -2343,7 +2746,7 @@ export default api;</code></pre>
         <tr><td>Redirects/Rewrites</td><td><code>/*</code> → <code>/index.html</code>, <code>Rewrite</code></td></tr>
       </table>
       <ul>
-        <li>배포가 끝나면 <code>https://shop-client.onrender.com</code>에서 상품 목록이 나오는지 확인합니다.</li>
+        <li>배포가 끝나면 이 주소를 서버(④)의 <code>CLIENT_URL</code>에 넣습니다. 서버가 다시 배포된 뒤 <code>https://shop-client.onrender.com</code>에서 상품 목록이 나오는지 확인합니다.</li>
         <li><code>admin0</code>으로 회원 가입 → pgAdmin에서 ②의 <code>UPDATE</code> 실행 → 다시 로그인하면 관리자 메뉴가 보입니다.</li>
       </ul>
     </div>
